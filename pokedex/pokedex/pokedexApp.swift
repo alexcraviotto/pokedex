@@ -1,10 +1,3 @@
-//
-//  pokedexApp.swift
-//  pokedex
-//
-//  Created by Antonio Ordóñez on 5/11/24.
-//
-
 import SwiftUI
 
 @main

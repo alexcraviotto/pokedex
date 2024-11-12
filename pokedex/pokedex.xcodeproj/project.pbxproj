@@ -6,6 +6,14 @@
 	objectVersion = 70;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		357735FC2CE3BE6D0001A726 /* ApiCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357735FB2CE3BE6D0001A726 /* ApiCalls.swift */; };
+		357735FE2CE3BE860001A726 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357735FD2CE3BE860001A726 /* File.swift */; };
+		35B050AF2CE3C4F9002D7D20 /* PokemonAPI in Frameworks */ = {isa = PBXBuildFile; productRef = 35B050AE2CE3C4F9002D7D20 /* PokemonAPI */; };
+		35B050B22CE3CEF0002D7D20 /* fetchPokemonGif.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B050B12CE3CEF0002D7D20 /* fetchPokemonGif.swift */; };
+		35B050B52CE3D792002D7D20 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 35B050B42CE3D792002D7D20 /* SDWebImageSwiftUI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A9FBC7642CDA858200C4A0DF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +32,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		357735FB2CE3BE6D0001A726 /* ApiCalls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiCalls.swift; sourceTree = "<group>"; };
+		357735FD2CE3BE860001A726 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
+		35B050B12CE3CEF0002D7D20 /* fetchPokemonGif.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = fetchPokemonGif.swift; sourceTree = "<group>"; };
 		A9FBC7532CDA858100C4A0DF /* pokedex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pokedex.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9FBC7632CDA858200C4A0DF /* pokedexTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = pokedexTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9FBC76D2CDA858200C4A0DF /* pokedexUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = pokedexUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -40,6 +51,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35B050B52CE3D792002D7D20 /* SDWebImageSwiftUI in Frameworks */,
+				35B050AF2CE3C4F9002D7D20 /* PokemonAPI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,9 +73,36 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		357735F92CE3BE180001A726 /* Backend */ = {
+			isa = PBXGroup;
+			children = (
+				357735FB2CE3BE6D0001A726 /* ApiCalls.swift */,
+			);
+			path = Backend;
+			sourceTree = "<group>";
+		};
+		357735FA2CE3BE280001A726 /* Front */ = {
+			isa = PBXGroup;
+			children = (
+				357735FD2CE3BE860001A726 /* File.swift */,
+			);
+			path = Front;
+			sourceTree = "<group>";
+		};
+		35B050B02CE3CE9C002D7D20 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				35B050B12CE3CEF0002D7D20 /* fetchPokemonGif.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		A9FBC74A2CDA858100C4A0DF = {
 			isa = PBXGroup;
 			children = (
+				35B050B02CE3CE9C002D7D20 /* Utils */,
+				357735FA2CE3BE280001A726 /* Front */,
+				357735F92CE3BE180001A726 /* Backend */,
 				A9FBC7552CDA858100C4A0DF /* pokedex */,
 				A9FBC7662CDA858200C4A0DF /* pokedexTests */,
 				A9FBC7702CDA858200C4A0DF /* pokedexUITests */,
@@ -100,6 +140,8 @@
 			);
 			name = pokedex;
 			packageProductDependencies = (
+				35B050AE2CE3C4F9002D7D20 /* PokemonAPI */,
+				35B050B42CE3D792002D7D20 /* SDWebImageSwiftUI */,
 			);
 			productName = pokedex;
 			productReference = A9FBC7532CDA858100C4A0DF /* pokedex.app */;
@@ -184,6 +226,10 @@
 			);
 			mainGroup = A9FBC74A2CDA858100C4A0DF;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				357735F82CE3BCDC0001A726 /* XCRemoteSwiftPackageReference "PokemonAPI" */,
+				35B050B32CE3D792002D7D20 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+			);
 			productRefGroup = A9FBC7542CDA858100C4A0DF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -224,6 +270,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35B050B22CE3CEF0002D7D20 /* fetchPokemonGif.swift in Sources */,
+				357735FE2CE3BE860001A726 /* File.swift in Sources */,
+				357735FC2CE3BE6D0001A726 /* ApiCalls.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -540,6 +589,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		357735F82CE3BCDC0001A726 /* XCRemoteSwiftPackageReference "PokemonAPI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kinkofer/PokemonAPI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.1.1;
+			};
+		};
+		35B050B32CE3D792002D7D20 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		35B050AE2CE3C4F9002D7D20 /* PokemonAPI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 357735F82CE3BCDC0001A726 /* XCRemoteSwiftPackageReference "PokemonAPI" */;
+			productName = PokemonAPI;
+		};
+		35B050B42CE3D792002D7D20 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 35B050B32CE3D792002D7D20 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A9FBC74B2CDA858100C4A0DF /* Project object */;
 }
