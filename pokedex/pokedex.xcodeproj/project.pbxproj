@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXContainerItemProxy section */
@@ -30,21 +30,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A9FBC7552CDA858100C4A0DF /* pokedex */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = pokedex;
-			sourceTree = "<group>";
-		};
-		A9FBC7662CDA858200C4A0DF /* pokedexTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = pokedexTests;
-			sourceTree = "<group>";
-		};
-		A9FBC7702CDA858200C4A0DF /* pokedexUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = pokedexUITests;
-			sourceTree = "<group>";
-		};
+		A9FBC7552CDA858100C4A0DF /* pokedex */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = pokedex; sourceTree = "<group>"; };
+		A9FBC7662CDA858200C4A0DF /* pokedexTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = pokedexTests; sourceTree = "<group>"; };
+		A9FBC7702CDA858200C4A0DF /* pokedexUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = pokedexUITests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,6 +175,7 @@
 				};
 			};
 			buildConfigurationList = A9FBC74E2CDA858100C4A0DF /* Build configuration list for PBXProject "pokedex" */;
+			compatibilityVersion = "Xcode 15.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -195,7 +184,6 @@
 			);
 			mainGroup = A9FBC74A2CDA858100C4A0DF;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			productRefGroup = A9FBC7542CDA858100C4A0DF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
