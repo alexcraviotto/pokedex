@@ -16,7 +16,9 @@ struct ContentView: View {
                     .scaledToFill()
                 
             }
-            Text("Hola")
+            Image("logoPokemon").resizable().scaledToFit().padding(.top, -300.0
+            )
+            Text("Pulsa para continuar").padding(.top, 620.0).foregroundColor(.white)
             
         }
     }
