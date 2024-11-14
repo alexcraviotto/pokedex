@@ -97,7 +97,7 @@ struct ParteAbajo: View {
                                 .resizable()
                                 .frame(width: 50, height: 50)
                         }
-                        Text(tipo)
+                        Text(espanolizador(tipo: tipo))
                             .font(.custom("Press Start 2P Regular", size: 16))
                     }
                     Spacer()
@@ -110,7 +110,7 @@ struct ParteAbajo: View {
                                 .resizable()
                                 .frame(width: 50, height: 50)
                         }
-                        Text(tipoS)
+                        Text(espanolizador(tipo: tipoS))
                             .font(.custom("Press Start 2P Regular", size: 16))
                     }
                     Spacer()
@@ -158,5 +158,46 @@ func colorPicker(tipo: String) -> Color{
         return Color(CGColor(red: 116/255, green: 81/255, blue: 153/255, alpha: 1))
     default:
         return Color(CGColor(red: 217/255, green: 180/255, blue: 211/255, alpha: 1))
+    }
+}
+
+func espanolizador(tipo:String) -> String {
+    switch tipo{
+    case "bug":
+        return "bicho"
+    case "dark":
+        return "siniestro"
+    case "dragon":
+        return "dragon"
+    case "electric":
+        return "electrico"
+    case "fairy":
+        return "hada"
+    case "fighting":
+        return "lucha"
+    case "fire":
+        return "fuego"
+    case "flying":
+        return "volador"
+    case "ghost":
+        return "fantasma"
+    case "grass":
+        return "planta"
+    case "ground":
+        return "tierra"
+    case "ice":
+        return "hielo"
+    case "poison":
+        return "veneno"
+    case "psychic":
+        return "psiquico"
+    case "rock":
+        return "roca"
+    case "steel":
+        return "metal"
+    case "water":
+        return "agua"
+    default:
+        return "normal"
     }
 }
