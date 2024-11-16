@@ -46,15 +46,6 @@ struct listadoTarjetas: View {
     }
 }
 
-struct Pokemon: Identifiable {
-    let id = UUID()
-    var nombre: String
-    var tipo: String
-    var tipoS: String
-    var numero: String
-    var imagen: String
-}
-
 
 #Preview {
     listadoTarjetas()
