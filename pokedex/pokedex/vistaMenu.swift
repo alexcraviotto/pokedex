@@ -8,10 +8,33 @@
 import SwiftUI
 
 struct vistaMenu: View {
+    @State var seleccion: Int = 0
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        TabView(selection: $seleccion) {
+            listadoTarjetas()
+                .tabItem {
+                    Image("inicio")
+                    Text("Inicio")
+                }
+                .tag(0)
+            
+            VistaBusqueda()
+                .tabItem {
+                    Image("busqueda")
+                    Text("Búsqueda")
+                }
+                .tag(1)
+            
+            VistaAjustes()
+                .tabItem {
+                    Image("ajustes")
+                    Text("Ajustes")
+                }
+                .tag(2)
+        }
     }
 }
+
 
 #Preview {
     vistaMenu()

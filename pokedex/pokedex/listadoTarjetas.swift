@@ -8,10 +8,53 @@
 import SwiftUI
 
 struct listadoTarjetas: View {
+    let pokemons = [
+        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
+        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
+        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
+        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
+        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
+        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
+        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png")
+    ]
+    
+    let columnas = [
+          GridItem(.flexible()),
+          GridItem(.flexible())
+      ]
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            HStack{
+                Image("Pokedex").scaledToFit().frame(height: 50)
+                Spacer()
+            }.padding()
+            ScrollView {
+                LazyVGrid(columns: columnas, spacing: 20) {
+                    ForEach(pokemons) { pokemon in
+                        PokemonTarjeta(
+                            nombre: pokemon.nombre,
+                            tipo: pokemon.tipo,
+                            tipoS: pokemon.tipoS,
+                            numero: pokemon.numero,
+                            imagen: pokemon.imagen
+                        ).scaleEffect(0.55).frame(width: (200), height: (300))
+                    }
+                }
+            }
+        }
     }
 }
+
+struct Pokemon: Identifiable {
+    let id = UUID()
+    var nombre: String
+    var tipo: String
+    var tipoS: String
+    var numero: String
+    var imagen: String
+}
+
 
 #Preview {
     listadoTarjetas()
