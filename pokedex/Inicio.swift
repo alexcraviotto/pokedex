@@ -19,14 +19,14 @@ struct Inicio: View {
                         Image("pokemon")
                             .resizable()
                             .frame(width: 400, height: 170)
-                            .padding(.top, 110)
+                            .padding(.top, 150)
                         Spacer()
                         Text("Pulsa para continuar")
                             .foregroundStyle(Color.white)
                             .padding(.bottom, 180)
                     }
                 }
-            }
+            }.frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationBarHidden(true)
         }
     }

@@ -68,7 +68,7 @@ struct IniciarSesion: View {
                 }
                 
             }.background(Color(red: 0.13333333333333333, green: 0.1568627450980392, blue: 0.19215686274509805))
-        }
+        }.navigationBarBackButtonHidden(true)
         
         
     }

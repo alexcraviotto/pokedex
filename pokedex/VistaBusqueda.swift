@@ -18,6 +18,7 @@ struct VistaBusqueda: View {
         Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png")
     ]
     
+    
     let columnas = [
           GridItem(.flexible()),
           GridItem(.flexible())
