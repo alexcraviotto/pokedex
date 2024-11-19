@@ -32,13 +32,14 @@ struct listadoTarjetas: View {
             ScrollView {
                 LazyVGrid(columns: columnas, spacing: 20) {
                     ForEach(pokemons) { pokemon in
-                        PokemonTarjeta(
+                        PokemonTarjeta2(
                             nombre: pokemon.nombre,
                             tipo: pokemon.tipo,
                             tipoS: pokemon.tipoS,
                             numero: pokemon.numero,
                             imagen: pokemon.imagen
-                        ).scaleEffect(0.55).frame(width: (200), height: (300))
+                        ).scaleEffect(0.9)
+                            
                     }
                 }
             }
