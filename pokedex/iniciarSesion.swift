@@ -1,96 +1,95 @@
 //
-//  iniciarSesion.swift
-//  pokedex
+//  IniciarSesion.swift
+//  Pokedex
 //
-//  Created by Antonio Ordóñez on 12/11/24.
+//  Created by Aula03 on 19/11/24.
 //
 
 import SwiftUI
-struct iniciarSesion: View {
-    @Binding var nombreUsuario: String
-    @Binding var contrasena: String
+
+struct IniciarSesion: View {
+    @Binding var usuario: String
+    @Binding var password: String
     @State private var navegarARegistrarse = false
-
+    
     private var camposRellenos: Bool {
-        !nombreUsuario.isEmpty && !contrasena.isEmpty
+        !usuario.isEmpty && !password.isEmpty
     }
-
+    
     var body: some View {
         NavigationView {
-            ZStack {
-                Color(red: 40 / 255, green: 47 / 255, blue: 56 / 255)
-                    .edgesIgnoringSafeArea(.all)
-                VStack {
-                    Image("logoIniciarSesion").padding(.bottom)
+            VStack {
+                Image("iniciarsesion")
+                    .resizable()
+                    .frame(width: 400, height: 150)
+                TextField("Usuario", text: $usuario)
+                    .padding()
+                    .padding(.vertical, -5)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+                    .padding(.horizontal, 40)
+                TextField("Contraseña", text: $password)
+                    .padding()
+                    .padding(.vertical, -5)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+                    .padding(.horizontal, 40)
+                    .padding(.top, 10)
+                    .padding(.bottom, 90)
+                Spacer()
+                GifImage("pikachu")
+                Button(action: {
                     
-                    TextField("Nombre de usuario", text: $nombreUsuario)
-                        .padding(5)
-                        .frame(width: 350, height: 50)
-                        .overlay(Rectangle().stroke(Color.gray, lineWidth: 2))
-                        .disableAutocorrection(true)
-                        .scrollContentBackground(.hidden)
-                        .background(Color.white).cornerRadius(10)
-                    
-                    TextField("Contraseña", text: $contrasena)
-                        .padding(5)
-                        .frame(width: 350, height: 50)
-                        .overlay(Rectangle().stroke(Color.gray, lineWidth: 2))
-                        .disableAutocorrection(true)
-                        .scrollContentBackground(.hidden)
-                        .background(Color.white)
-                        .cornerRadius(10)
-                    
-                    Button("Iniciar Sesión") {
-
-                    }
-                    .frame(width: 350, height: 50)
-                    .overlay(Rectangle().stroke(Color.black, lineWidth: 2))
-                    .background(Color(red: 100 / 255, green: 80 / 255, blue: 0 / 255))
-                    .foregroundColor(.black)
-                    .padding(10)
-                    .cornerRadius(10)
-                    .disabled(!camposRellenos)
-                    
-                    Image("imagenInicioSesion").resizable().scaledToFit().padding()
-                    
-                    Button("Registrarse") {
-                        navegarARegistrarse = true
-                    }
-                    .frame(width: 350, height: 50)
-                    .overlay(Rectangle().stroke(Color.black, lineWidth: 2))
-                    .background(Color(red: 100 / 255, green: 80 / 255, blue: 0 / 255))
-                    .foregroundColor(.black)
-                    .padding(10)
-                    .cornerRadius(10)
-                    
-                    NavigationLink(
-                        destination: NavegacionVistaRegistrarse(),
-                        isActive: $navegarARegistrarse
-                    ) {
-                    }
+                    print("Iniciar Sesión presionado")
+                }) {
+                    Text("Iniciar Sesión")
+                        .font(.headline)
+                        .foregroundColor(.black)
+                        .padding()
+                        .padding(.vertical, -2)
+                        .frame(width: 330)
+                        .background(Color(red: 1.0, green: 0.8, blue: 0.00392156862745098))
+                        .cornerRadius(8)
                 }
-            }
+                .padding(.horizontal, 40)
+                
+                Button("¿No tienes cuenta? Regístrate") {
+                    navegarARegistrarse = true
+                }
+                .font(.headline)
+                .foregroundColor(.white)
+                
+                NavigationLink(
+                    destination: NavegacionVistaRegistrarse(),
+                    isActive: $navegarARegistrarse
+                ) {
+                }
+                
+            }.background(Color(red: 0.13333333333333333, green: 0.1568627450980392, blue: 0.19215686274509805))
         }
-        .navigationBarBackButtonHidden(true)
+        
+        
     }
 }
 
 struct NavegacionVistaRegistrarse: View {
-    @State private var nombreUsuario = ""
-    @State private var contrasena = ""
+    @State private var usuario = ""
+    @State private var password = ""
     @State private var repetirContrasena = ""
-
+    
     var body: some View {
-        VistaRegistrarse(
-            nombreUsuario: $nombreUsuario,
-            contrasena: $contrasena,
+        Registro(
+            usuario: $usuario,
+            password: $password,
             repetirContrasena: $repetirContrasena
         )
     }
 }
 
 #Preview {
-    @State var nombreUsuario = "Nombre de usuario"
-    @State var contrasena = "Contraseña"
-    iniciarSesion(nombreUsuario: $nombreUsuario, contrasena: $contrasena)
+    @Previewable @State var usuario = "Nombre de usuario"
+    @Previewable @State var password = "Contraseña"
+    IniciarSesion(usuario: $usuario, password: $password)
 }

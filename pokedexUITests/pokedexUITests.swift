@@ -1,13 +1,13 @@
 //
-//  pokedexUITests.swift
-//  pokedexUITests
+//  PokedexUITests.swift
+//  PokedexUITests
 //
-//  Created by Antonio Ordóñez on 5/11/24.
+//  Created by Aula03 on 12/11/24.
 //
 
 import XCTest
 
-final class pokedexUITests: XCTestCase {
+final class PokedexUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

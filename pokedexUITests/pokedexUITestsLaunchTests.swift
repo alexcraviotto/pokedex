@@ -1,13 +1,13 @@
 //
-//  pokedexUITestsLaunchTests.swift
-//  pokedexUITests
+//  PokedexUITestsLaunchTests.swift
+//  PokedexUITests
 //
-//  Created by Antonio Ordóñez on 5/11/24.
+//  Created by Aula03 on 12/11/24.
 //
 
 import XCTest
 
-final class pokedexUITestsLaunchTests: XCTestCase {
+final class PokedexUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

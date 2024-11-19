@@ -1,17 +1,17 @@
 //
-//  pokedexApp.swift
-//  pokedex
+//  PokedexApp.swift
+//  Pokedex
 //
-//  Created by Antonio Ordóñez on 5/11/24.
+//  Created by Aula03 on 12/11/24.
 //
 
 import SwiftUI
 
 @main
-struct pokedexApp: App {
+struct PokedexApp: App {
     var body: some Scene {
         WindowGroup {
-            pantallaInicial()
+            Inicio()
         }
     }
 }

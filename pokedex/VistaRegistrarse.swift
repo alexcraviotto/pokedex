@@ -7,8 +7,10 @@
 
 import SwiftUI
 
-struct VistaRegistrarse: View {
+struct git reset --soft HEAD~1
+: View {
     @Binding var nombreUsuario: String
+    @Binding var correo: String
     @Binding var contrasena: String
     @Binding var repetirContrasena: String
     @State private var mensajeError: String = ""
@@ -25,6 +27,13 @@ struct VistaRegistrarse: View {
                     Image("logoRegistrarse").padding(.bottom)
                     
                     TextField("Nombre de usuario", text: $nombreUsuario)
+                        .padding(5)
+                        .frame(width: 350, height: 50)
+                        .overlay(Rectangle().stroke(Color.gray, lineWidth: 2))
+                        .disableAutocorrection(true)
+                        .scrollContentBackground(.hidden)
+                        .background(Color.white).cornerRadius(10)
+                    TextField("Correo electrónico", text: $correo)
                         .padding(5)
                         .frame(width: 350, height: 50)
                         .overlay(Rectangle().stroke(Color.gray, lineWidth: 2))
@@ -56,6 +65,7 @@ struct VistaRegistrarse: View {
                             mensajeError = "Las contraseñas no coinciden. Por favor, inténtalo de nuevo."
                             return
                         }
+                        agregarUsuario($nombreUsuario, $correo, $contrasena)
                         
                     }.frame(width: 350, height: 50)
                         .overlay(Rectangle().stroke(Color.black, lineWidth: 2))
@@ -77,4 +87,4 @@ struct VistaRegistrarse: View {
     @State var contrasena = "Contraseña"
     @State var repetirContrasena = "Repita la contraseña"
 
-    VistaRegistrarse(nombreUsuario: $nombreUsuario, contrasena: $contrasena, repetirContrasena: $repetirContrasena)}
+    VistaRegistrarse(nombreUsuario: $nombreUsuario, correo: correo, contrasena: $contrasena, repetirContrasena: $repetirContrasena)}
