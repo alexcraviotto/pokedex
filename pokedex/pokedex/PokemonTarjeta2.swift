@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PokemonTarjeta: View {
+struct PokemonTarjeta2: View {
     var nombre:String = "Charizard"
     var tipo:String = "fire"
     var tipoS:String = "flying"
@@ -17,32 +17,42 @@ struct PokemonTarjeta: View {
         let color:Color = colorPicker(tipo: tipo)
         ZStack(){
             VStack(spacing: 0){
-                ParteArriba(tipo: tipo, color: color, numero: numero).frame(height: 500)
-                ParteAbajo(nombre: nombre, tipo: tipo, tipoS: tipoS, color: color)
+                ParteArriba2(tipo: tipo, color: color, numero: numero)
                     .clipShape(
                         .rect(
                             topLeadingRadius: 20,
                             topTrailingRadius: 20
                         )
                     )
-                    .offset(CGSize(width: 0, height: -160))
-            }.frame(width: .infinity, height: .infinity, alignment: .top)
+                ParteAbajo2(nombre: nombre, tipo: tipo, tipoS: tipoS, color: color)
+                    .clipShape(
+                        .rect(
+                            topLeadingRadius: 20,
+                            bottomLeadingRadius: 20,
+                            bottomTrailingRadius: 20,
+                            topTrailingRadius: 20
+                        )
+                    )
+                    .offset(CGSize(width: 0, height: -17))
+                Spacer()
+            }
+            .shadow(radius: 10)
             AsyncImage(url: URL(string: imagen)){ image in
                 image
                     .image?.resizable()
                     .scaledToFit()
             }
-            .frame(width: 300, height: 300)
-            .offset(CGSize(width: 0, height: -100))
-        }
+            .frame(width: 150, height: 150)
+            .offset(CGSize(width: 0, height: -50))
+        }.frame(width: 200, height: 300)
     }
 }
 
 #Preview {
-    PokemonTarjeta()
+    PokemonTarjeta2()
 }
 
-struct ParteArriba: View {
+struct ParteArriba2: View {
     var tipo:String
     var color:Color
     var numero:String
@@ -52,30 +62,30 @@ struct ParteArriba: View {
             VStack(){
                 HStack(){
                     Text("#"+numero).padding(.leading)
-                        .font(.custom("Press Start 2P Regular", size: 32))
+                        .font(.custom("Press Start 2P Regular", size: 16))
                         .foregroundColor(.white)
-                        .offset(CGSize(width: 0, height: 50))
+                        .offset(CGSize(width: -10, height: 10))
                     Spacer()
                 }
                 HStack(){
                     Spacer()
                     ZStack{
                         Circle()
-                            .stroke(Color.white, lineWidth: 5)
-                            .frame(width: 190, height: 190)
+                            .stroke(Color.white, lineWidth: 3)
+                            .frame(width: 70, height: 70)
                         Image(tipo)
                             .resizable()
-                            .frame(width: 170, height: 170)
+                            .frame(width: 50, height: 50)
                     }
                 }.padding(.trailing)
-                    .offset(CGSize(width: 0, height: -20))
+                    .offset(CGSize(width: 10, height: -10))
                 Spacer()
-            }.frame(height: .infinity, alignment: .top)
-        }
+            }//.frame(width: 200, height: 150, alignment: .top)
+        }.frame(width: 200, height: 150, alignment: .top)
     }
 }
 
-struct ParteAbajo: View {
+struct ParteAbajo2: View {
     var nombre:String
     var tipo:String
     var tipoS:String
@@ -85,37 +95,40 @@ struct ParteAbajo: View {
             Color.white
             VStack(spacing: 0){
                 Text(nombre)
-                    .font(.custom("Press Start 2P Regular", size: 32))
+                    .font(.custom("Press Start 2P Regular", size: 13))
+                    .offset(CGSize(width: 0, height: 25))
+                Spacer()
                 HStack(){
                     Spacer()
                     VStack(){
                         ZStack(){
                             Circle()
                                 .fill(color)
-                                .frame(width: 70, height: 70)
+                                .frame(width: 50, height: 50)
                             Image(tipo)
                                 .resizable()
-                                .frame(width: 50, height: 50)
+                                .frame(width: 30, height: 30)
                         }
                         Text(espanolizador(tipo: tipo))
-                            .font(.custom("Press Start 2P Regular", size: 16))
+                            .font(.custom("Press Start 2P Regular", size: 11))
                     }
                     Spacer()
                     VStack(){
                         ZStack(){
                             Circle()
                                 .fill(colorPicker(tipo: tipoS))
-                                .frame(width: 70, height: 70)
+                                .frame(width: 50, height: 50)
                             Image(tipoS)
                                 .resizable()
-                                .frame(width: 50, height: 50)
+                                .frame(width: 30, height: 30)
                         }
                         Text(espanolizador(tipo: tipoS))
-                            .font(.custom("Press Start 2P Regular", size: 16))
+                            .font(.custom("Press Start 2P Regular", size: 11))
                     }
                     Spacer()
-                }.offset(CGSize(width: 0, height: 80))
-            }.frame(width: .infinity, alignment: .top)
-        }
+                }//.offset(CGSize(width: 0, height: 80))
+                Spacer()
+            }//.frame(width: 200, height: .infinity, alignment: .top)
+        }.frame(width: 200, height: 150, alignment: .top)
     }
 }
