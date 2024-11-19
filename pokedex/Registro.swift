@@ -8,6 +8,7 @@ struct Registro: View {
     @Binding var repetirContrasena : String
         @State private var mensajeError: String = ""
         @Environment(\.presentationMode) var presentationMode
+    var viewModel = ViewModel()
         private var camposRellenos: Bool {
             !usuario.isEmpty && !password.isEmpty && !repetirContrasena.isEmpty
            }
@@ -55,7 +56,7 @@ struct Registro: View {
                 Button(action: {
                     
                     print("Registrarse presionado")
-                    agregarUsuario(username: $usuario, email: $correo, password: $password)
+                    viewModel.agregarUsuario(username: usuario, email: correo, password: password)
                 }) {
                     Text("Registrarse")
                         .font(.headline)
