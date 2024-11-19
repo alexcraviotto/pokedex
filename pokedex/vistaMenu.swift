@@ -9,6 +9,7 @@ import SwiftUI
 
 struct vistaMenu: View {
     @State var seleccion: Int = 0
+  
     var body: some View {
         TabView(selection: $seleccion) {
             listadoTarjetas()
