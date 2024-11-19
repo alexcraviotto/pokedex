@@ -76,12 +76,14 @@ struct IniciarSesion: View {
 
 struct NavegacionVistaRegistrarse: View {
     @State private var usuario = ""
+    @State private var correo = ""
     @State private var password = ""
     @State private var repetirContrasena = ""
     
     var body: some View {
         Registro(
             usuario: $usuario,
+            correo: $correo,
             password: $password,
             repetirContrasena: $repetirContrasena
         )

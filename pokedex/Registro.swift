@@ -1,22 +1,17 @@
-//
-//  Registro.swift
-//  Pokedex
-//
-//  Created by Aula03 on 12/11/24.
-//
-
 import SwiftUI
 
 
 struct Registro: View {
     @Binding var usuario: String
-    @Binding var password: String 
+    @Binding var correo: String
+    @Binding var password: String
     @Binding var repetirContrasena : String
         @State private var mensajeError: String = ""
         @Environment(\.presentationMode) var presentationMode
         private var camposRellenos: Bool {
             !usuario.isEmpty && !password.isEmpty && !repetirContrasena.isEmpty
            }
+    
     
     var body: some View {
         NavigationView {
@@ -25,6 +20,13 @@ struct Registro: View {
                     .resizable()
                     .frame(width: 400, height: 170)
                 TextField("Usuario", text: $usuario)
+                    .padding()
+                    .padding(.vertical, -5)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+                    .padding(.horizontal, 40)
+                TextField("Correo electrónico", text: $correo)
                     .padding()
                     .padding(.vertical, -5)
                     .background(Color.white)
@@ -53,6 +55,7 @@ struct Registro: View {
                 Button(action: {
                     
                     print("Registrarse presionado")
+                    agregarUsuario(username: $usuario, email: $correo, password: $password)
                 }) {
                     Text("Registrarse")
                         .font(.headline)
@@ -77,7 +80,8 @@ struct Registro: View {
 
 #Preview {
     @Previewable @State var nombreUsuario = "Nombre de usuario"
+    @Previewable @State var correo = "Correo"
     @Previewable @State var contrasena = "Contraseña"
     @Previewable @State var repetirContrasena = "Repita la contraseña"
-    Registro(usuario: $nombreUsuario, password: $contrasena, repetirContrasena: $repetirContrasena)
+    Registro(usuario: $nombreUsuario, correo: $correo, password: $contrasena, repetirContrasena: $repetirContrasena)
 }

@@ -1,5 +1,6 @@
 import Foundation
 import CoreData
+import SwiftUI
 
 class ViewModel: ObservableObject {
     let gestorCoreData = CoreDataManager.instance
