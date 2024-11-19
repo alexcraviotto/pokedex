@@ -106,14 +106,22 @@ class ViewModel: ObservableObject {
     }
 
     // Actualizar un Usuario
-    func actualizarUsuario(userId: UUID, newUsername: String, newEmail: String, newPassword: String) {
+    func actualizarUsuario(userId: UUID, newUsername: String?, newEmail: String?, newPassword: String?) {
         if let user = usersArray.first(where: { $0.id == userId }) {
-            user.username = newUsername
-            user.email = newEmail
-            user.password = newPassword
+            if let username = newUsername {
+                user.username = username
+            }
+            if let email = newEmail {
+                user.email = email
+            }
+            if let password = newPassword {
+                user.password = password
+            }
+            
             guardarDatos()
         }
     }
+
 
     // Obtener Batallas por Usuario
     func obtenerBatallasPorUsuario(userId: UUID) -> [BattleLogEntity] {
