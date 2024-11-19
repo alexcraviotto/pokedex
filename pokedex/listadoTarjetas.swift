@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct listadoTarjetas: View {
-    let pokemons = [
+    /*let pokemons = [
         Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
         Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
         Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
@@ -16,7 +16,9 @@ struct listadoTarjetas: View {
         Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
         Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
         Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png")
-    ]
+    ]*/
+    
+    @State private var pokemons: [Pokemon] = []
     
     let columnas = [
           GridItem(.flexible()),
@@ -33,13 +35,25 @@ struct listadoTarjetas: View {
                 LazyVGrid(columns: columnas, spacing: 20) {
                     ForEach(pokemons) { pokemon in
                         PokemonTarjeta2(
-                            nombre: pokemon.nombre,
-                            tipo: pokemon.tipo,
-                            tipoS: pokemon.tipoS,
-                            numero: pokemon.numero,
-                            imagen: pokemon.imagen
+                            nombre: pokemon.name,
+                            tipo: pokemon.types[0].types.name,
+                            tipoS: pokemon.types[1].types.name,
+                            numero: pokemon.id,
+                            imagen: pokemon.sprites.other.officialArtwork.frontDefault
                         ).scaleEffect(0.9)
                             
+                    }
+                }
+            }
+        }.onAppear(){
+            for i in 1...20{
+                fetchPokemonData(pokemonId: i) { result in
+                    switch result {
+                    case .success(let pokemon):
+                        pokemons.append(pokemon)
+                        print("Imagen de official artwork: \(pokemon.sprites.other.officialArtwork.frontDefault)")
+                    case .failure(let error):
+                        print("Error: \(error)")
                     }
                 }
             }
