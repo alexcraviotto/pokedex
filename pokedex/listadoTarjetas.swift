@@ -8,23 +8,14 @@
 import SwiftUI
 
 struct listadoTarjetas: View {
-    /*let pokemons = [
-        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
-        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
-        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
-        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
-        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
-        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"),
-        Pokemon(nombre: "Charizard", tipo: "fire", tipoS: "flying", numero: "0006", imagen: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png")
-    ]*/
-    
     @State private var pokemons: [Pokemon] = []
-    
     let columnas = [
           GridItem(.flexible()),
           GridItem(.flexible())
       ]
-    
+    @State var count = 0
+    var items = 20
+    @State var isloading = false
     var body: some View {
         VStack {
             HStack{
@@ -33,35 +24,46 @@ struct listadoTarjetas: View {
             }.padding()
             ScrollView {
                 LazyVGrid(columns: columnas, spacing: 20) {
-                    ForEach(pokemons) { pokemon in
+                    ForEach(pokemons.sorted(by: { $0.id < $1.id })){ pokemon in
                         PokemonTarjeta2(
-                            nombre: pokemon.name,
-                            tipo: pokemon.types[0].types.name,
-                            tipoS: pokemon.types[1].types.name,
-                            numero: pokemon.id,
-                            imagen: pokemon.sprites.other.officialArtwork.frontDefault
+                            pokemon: pokemon
                         ).scaleEffect(0.9)
-                            
+                            .onAppear(){
+                                if pokemon.id == self.pokemons.count{
+                                    carga()
+                                }
+                            }
                     }
                 }
-            }
-        }.onAppear(){
-            for i in 1...20{
-                fetchPokemonData(pokemonId: i) { result in
-                    switch result {
-                    case .success(let pokemon):
-                        pokemons.append(pokemon)
-                        print("Imagen de official artwork: \(pokemon.sprites.other.officialArtwork.frontDefault)")
-                    case .failure(let error):
-                        print("Error: \(error)")
-                    }
-                }
+            }.onAppear(){
+                carga()
             }
         }
     }
+    
+    func carga() -> Void {
+        var start = count * items
+        let end = start + items
+        start += 1
+        for i in start...end{
+            //print(i)
+            fetchPokemonData(pokemonId: i) { result in
+                switch result {
+                case .success(let pokemon):
+                    pokemons.append(pokemon)
+                case .failure(let error):
+                    print("Error: \(error)")
+                }
+            }
+        }
+        count += 1
+    }
+    
 }
 
 
 #Preview {
     listadoTarjetas()
 }
+
+

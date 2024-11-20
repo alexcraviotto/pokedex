@@ -17,13 +17,13 @@ import SwiftUI
 }*/
 
 struct Pokemon: Decodable, Identifiable {
-    let id: String
+    let id: Int
     let name: String
     let types: [Types]
     let sprites: Sprites
     
     struct Types: Decodable {
-        let types: PokemonType
+        let type: PokemonType
     }
     
     struct PokemonType: Decodable {
