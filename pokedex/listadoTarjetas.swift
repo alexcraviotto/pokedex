@@ -14,6 +14,7 @@ struct listadoTarjetas: View {
           GridItem(.flexible())
       ]
     @State var count = 0
+    @State var countex = 0
     var items = 20
     @State var isloading = false
     var body: some View {
@@ -42,7 +43,15 @@ struct listadoTarjetas: View {
     }
     
     func carga() -> Void {
-        var start = count * items
+        var start = 0
+        if (pokemons.last?.id ?? 0) >= 1025 {
+            start = 10000 + countex * items
+            countex += 1
+        } else {
+            start = count * items
+            count += 1
+        }
+
         let end = start + items
         start += 1
         for i in start...end{
@@ -56,7 +65,7 @@ struct listadoTarjetas: View {
                 }
             }
         }
-        count += 1
+        //count += 1
     }
     
 }

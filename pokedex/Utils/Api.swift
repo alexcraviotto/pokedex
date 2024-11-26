@@ -82,7 +82,7 @@ func fetchPokemonData(pokemonId: String, completion: @escaping (Result<Pokemon, 
 
 func fetchPokemonNames(completion: @escaping (Result<[PokemonPair], Error>) -> Void) {
     // URL de la API de PokeAPI para obtener los detalles del Pokémon
-    let urlString = "https://pokeapi.co/api/v2/pokemon/"
+    let urlString = "https://pokeapi.co/api/v2/pokemon?limit=100000"
     
     guard let url = URL(string: urlString) else {
         completion(.failure(NSError(domain: "Invalid URL", code: 0, userInfo: nil)))

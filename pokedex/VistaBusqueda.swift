@@ -17,30 +17,35 @@ struct VistaBusqueda: View {
     ]
     
     @State var query: String = ""
+    //@State var aux:[Pokemon] = []
     
-    var filtrado = arrayPoke(pokemons: pokemons, query: query)
-    func arrayPoke(pokemons: [PokemonPair], query: String){
-        var aux:[Pokemon] = []
-        if query.count >= 3 && filterPokemonByName(pokemonArray: pokemons, searchTerm: query).count != aux.count{
-            
-            for nombre in filterPokemonByName(pokemonArray: pokemons, searchTerm: query){
+    @State var filtrado: [Pokemon] = []
+    /*{
+        var names:[String] = []
+        names = filterPokemonByName(pokemonArray: pokemons, searchTerm: query)
+        if(names.count == aux.count){
+            return aux
+        }
+        print(aux.count)
+        print("names \(names.count)")
+        if query.count >= 3 {
+            for nombre in names {
                 fetchPokemonData(pokemonId: nombre) { result in
                     switch result {
                     case .success(let newpokemon):
-                        self.aux.append(newpokemon)
-                        print("tamanno \(aux.count)")
+                        aux.append(newpokemon)
+                        //print("tamanno \(aux.count)")
                     case .failure(let error):
                         print("Error: \(error)")
 
                     }
-                    
-                                 
                 }
             }
+            //print("tamanno al final  \(aux.count)")
+            return aux
         }
-        print("tamanno al final \(aux.count)")
-        return aux
-    }
+        return []
+    }*/
 
     var body: some View {
         VStack {
@@ -51,6 +56,25 @@ struct VistaBusqueda: View {
                 Spacer()
             }.padding()
             BusquedaView(text:$query)
+                .onChange(of: query) { oldValue, newValue in
+                    print(pokemons)
+                    filtrado = []
+                    if query.count >= 3 {
+                        for nombre in filterPokemonByName(pokemonArray: pokemons, searchTerm: query) {
+                            print(nombre)
+                            fetchPokemonData(pokemonId: nombre) { result in
+                                switch result {
+                                case .success(let newpokemon):
+                                    filtrado.append(newpokemon)
+                                    //print("tamanno \(aux.count)")
+                                case .failure(let error):
+                                    print("Error: \(error)")
+
+                                }
+                            }
+                        }
+                    }
+                }
             ScrollView {
                 if !filtrado.isEmpty {
                     LazyVGrid(columns: columnas, spacing: 20) {
