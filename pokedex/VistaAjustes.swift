@@ -12,7 +12,6 @@ struct TextFieldModifier: ViewModifier {
     }
 }
 
-// Modificador para los botones
 struct ButtonModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
@@ -21,7 +20,7 @@ struct ButtonModifier: ViewModifier {
             .padding()
             .padding(.vertical, -2)
             .frame(width: 330)
-            .background(Color.yellow) // Botón amarillo
+            .background(Color.yellow)
             .cornerRadius(8)
             .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
@@ -39,7 +38,7 @@ struct VistaAjustes: View {
     @State private var showAvatarMenu: Bool = false
     @Environment(\.presentationMode) var presentationMode
     var viewModel: ViewModel
-    var userId: UUID  // Asegúrate de pasar el userId correcto
+    var userId: UUID
     
     init(usuario: Binding<String>, correo: Binding<String>, password: Binding<String>, userId: UUID, viewModel: ViewModel) {
         _usuario = usuario
@@ -55,17 +54,16 @@ struct VistaAjustes: View {
     var body: some View {
         NavigationView {
             VStack {
-                // Avatar seleccionable
                 VStack {
                     Button(action: {
-                        showAvatarMenu.toggle() // Muestra el menú para seleccionar un avatar
+                        showAvatarMenu.toggle()
                     }) {
-                        Image(selectedAvatar) // Usa el nombre del avatar seleccionado
+                        Image(selectedAvatar)
                             .resizable()
                             .scaledToFill()
                             .frame(width: 100, height: 100)
                             .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.white, lineWidth: 4)) // Borde blanco alrededor del avatar
+                            .overlay(Circle().stroke(Color.white, lineWidth: 4))
                             .shadow(radius: 10)
                     }
                 }
@@ -140,7 +138,7 @@ struct VistaAjustes: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Text("Ajustes")
                         .font(.custom("Press Start 2P Regular", size: 24))
-                        .foregroundColor(.black) // Color del título
+                        .foregroundColor(.black) 
                 }
             }
             .actionSheet(isPresented: $showAvatarMenu) {
@@ -163,7 +161,7 @@ struct VistaAjustes_Previews: PreviewProvider {
         VistaAjustes(usuario: .constant("Usuario Ejemplo"),
                     correo: .constant("correo@ejemplo.com"),
                     password: .constant("password123"),
-                    userId: UUID(), // Asegúrate de pasar un UUID real
-                    viewModel: ViewModel()) // Asegúrate de inicializar el viewModel correctamente
+                    userId: UUID(),
+                    viewModel: ViewModel())
     }
 }

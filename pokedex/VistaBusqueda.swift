@@ -38,7 +38,9 @@ struct VistaBusqueda: View {
     var body: some View {
         VStack {
             HStack{
-                Image("logoBusqueda").scaledToFit().frame(height: 50)
+                Text("Ajustes")
+                    .font(.custom("Press Start 2P Regular", size: 24))
+                    .foregroundColor(.black)
                 Spacer()
             }.padding()
                 BusquedaView(text:$query)

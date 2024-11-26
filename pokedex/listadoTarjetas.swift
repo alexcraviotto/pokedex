@@ -26,7 +26,9 @@ struct listadoTarjetas: View {
     var body: some View {
         VStack {
             HStack{
-                Image("Pokedex").scaledToFit().frame(height: 50)
+                Text("Pokedex")
+                    .font(.custom("Press Start 2P Regular", size: 24))
+                    .foregroundColor(.black)
                 Spacer()
             }.padding()
             ScrollView {

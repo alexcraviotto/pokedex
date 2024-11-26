@@ -26,7 +26,6 @@ struct vistaMenu: View {
                 }
                 .tag(1)
 
-            // Aquí pasamos los valores requeridos a VistaAjustes
             VistaAjustes(
                 usuario: $usuarioActual,
                 correo: $correoActual,
