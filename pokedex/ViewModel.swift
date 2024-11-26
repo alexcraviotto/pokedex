@@ -83,6 +83,19 @@ class ViewModel: ObservableObject {
         favoritePokemon.pokemonId = pokemonId
         guardarDatos()
     }
+    // Función para verificar las credenciales del usuario
+    func verificarUsuario(email: String, password: String) -> UserEntity? {
+        let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "email == %@ AND password == %@", email, password)
+        
+        do {
+            let resultados = try gestorCoreData.contexto.fetch(fetchRequest)
+            return resultados.first // Retorna el primer usuario que coincida con las credenciales
+        } catch {
+            print("Error al verificar usuario: \(error)")
+            return nil
+        }
+    }
 
     // Agregar un Pokémon a las búsquedas recientes
     func agregarRecentPokemonSearch(userId: UUID, pokemonId: Int64) {

@@ -32,7 +32,7 @@ struct vistaMenu: View {
                 Text("Ajustes")
             }
             .tag(2)
-        }
+        }.navigationBarHidden(true)
     }
 }
 
