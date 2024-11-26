@@ -19,13 +19,7 @@ struct vistaMenu: View {
                 }
                 .tag(0)
 
-            VistaBusqueda()
-                .tabItem {
-                    Image("busqueda")
-                    Text("Búsqueda")
-                }
-                .tag(1)
-
+    
             VistaAjustes(
                 usuario: $usuarioActual,
                 correo: $correoActual,
