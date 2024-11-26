@@ -166,7 +166,7 @@ func fetchPokemonsType(pokemontype: String, completion: @escaping (Result<Pokemo
 func extractPokemonID(from url: String) -> Int? {
     // La URL tiene el formato https://pokeapi.co/api/v2/pokemon/{id}/
     let components = url.split(separator: "/")
-    if let idString = components.dropLast().last, let id = Int(idString) {
+    if let idString = components.last, let id = Int(idString) {
         return id
     }
     return nil

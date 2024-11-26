@@ -18,21 +18,27 @@ struct VistaBusqueda: View {
     
     @State var query: String = ""
     
-    var filtrado: [Pokemon]
-    {
+    var filtrado = arrayPoke(pokemons: pokemons, query: query)
+    func arrayPoke(pokemons: [PokemonPair], query: String){
         var aux:[Pokemon] = []
-        if query.count >= 3 {
+        if query.count >= 3 && filterPokemonByName(pokemonArray: pokemons, searchTerm: query).count != aux.count{
+            
             for nombre in filterPokemonByName(pokemonArray: pokemons, searchTerm: query){
                 fetchPokemonData(pokemonId: nombre) { result in
                     switch result {
                     case .success(let newpokemon):
-                        aux.append(newpokemon)
+                        self.aux.append(newpokemon)
+                        print("tamanno \(aux.count)")
                     case .failure(let error):
                         print("Error: \(error)")
+
                     }
+                    
+                                 
                 }
             }
         }
+        print("tamanno al final \(aux.count)")
         return aux
     }
 
