@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PokemonTypeResponse: Decodable {
-    let pokemon: [PokemonEntry]
+    let results: [PokemonPairResponse]
 }
 
 // Estructura para cada entrada de Pokémon
