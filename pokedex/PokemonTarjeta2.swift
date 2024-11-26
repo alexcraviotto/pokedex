@@ -8,23 +8,24 @@
 import SwiftUI
 
 struct PokemonTarjeta2: View {
-    var nombre:String = "Charizard"
+    /*var nombre:String = "Charizard"
     var tipo:String = "fire"
     var tipoS:String = "flying"
     var numero:String = "0006"
-    var imagen:String = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"
+    var imagen:String = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"*/
+    var pokemon:Pokemon
     var body: some View {
-        let color:Color = colorPicker(tipo: tipo)
+        let color:Color = colorPicker(tipo: pokemon.types[0].type.name)
         ZStack(){
             VStack(spacing: 0){
-                ParteArriba2(tipo: tipo, color: color, numero: numero)
+                ParteArriba2(tipo: pokemon.types[0].type.name, color: color, numero: String(pokemon.id))
                     .clipShape(
                         .rect(
                             topLeadingRadius: 20,
                             topTrailingRadius: 20
                         )
                     )
-                ParteAbajo2(nombre: nombre, tipo: tipo, tipoS: tipoS, color: color)
+                ParteAbajo2(nombre: pokemon.name, /*tipo: tipo, tipoS: tipoS,*/ tipos: pokemon.types, color: color)
                     .clipShape(
                         .rect(
                             topLeadingRadius: 20,
@@ -37,7 +38,7 @@ struct PokemonTarjeta2: View {
                 Spacer()
             }
             .shadow(radius: 10)
-            AsyncImage(url: URL(string: imagen)){ image in
+            AsyncImage(url: URL(string: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/\(pokemon.id).png")){ image in
                 image
                     .image?.resizable()
                     .scaledToFit()
@@ -48,9 +49,9 @@ struct PokemonTarjeta2: View {
     }
 }
 
-#Preview {
+/*#Preview {
     PokemonTarjeta2()
-}
+}*/
 
 struct ParteArriba2: View {
     var tipo:String
@@ -87,8 +88,9 @@ struct ParteArriba2: View {
 
 struct ParteAbajo2: View {
     var nombre:String
-    var tipo:String
-    var tipoS:String
+    /*var tipo:String
+    var tipoS:String*/
+    var tipos:[Pokemon.Types]
     var color:Color
     var body: some View {
         ZStack{
@@ -96,7 +98,7 @@ struct ParteAbajo2: View {
             VStack(spacing: 0){
                 Text(nombre)
                     .font(.custom("Press Start 2P Regular", size: 13))
-                    .offset(CGSize(width: 0, height: 25))
+                    .offset(CGSize(width: 0, height: 40))
                 Spacer()
                 HStack(){
                     Spacer()
@@ -105,28 +107,30 @@ struct ParteAbajo2: View {
                             Circle()
                                 .fill(color)
                                 .frame(width: 50, height: 50)
-                            Image(tipo)
+                            Image(tipos[0].type.name)
                                 .resizable()
                                 .frame(width: 30, height: 30)
                         }
-                        Text(espanolizador(tipo: tipo))
+                        Text(espanolizador(tipo: tipos[0].type.name))
                             .font(.custom("Press Start 2P Regular", size: 11))
                     }
                     Spacer()
-                    VStack(){
-                        ZStack(){
-                            Circle()
-                                .fill(colorPicker(tipo: tipoS))
-                                .frame(width: 50, height: 50)
-                            Image(tipoS)
-                                .resizable()
-                                .frame(width: 30, height: 30)
+                    if tipos.count > 1 {
+                        VStack(){
+                            ZStack(){
+                                Circle()
+                                    .fill(colorPicker(tipo: tipos[1].type.name))
+                                    .frame(width: 50, height: 50)
+                                Image(tipos[1].type.name)
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                            }
+                            Text(espanolizador(tipo: tipos[1].type.name))
+                                .font(.custom("Press Start 2P Regular", size: 11))
                         }
-                        Text(espanolizador(tipo: tipoS))
-                            .font(.custom("Press Start 2P Regular", size: 11))
+                        Spacer()
                     }
-                    Spacer()
-                }//.offset(CGSize(width: 0, height: 80))
+                }.offset(CGSize(width: 0, height: 20))
                 Spacer()
             }//.frame(width: 200, height: .infinity, alignment: .top)
         }.frame(width: 200, height: 150, alignment: .top)
