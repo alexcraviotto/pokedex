@@ -49,6 +49,7 @@ class ViewModel: ObservableObject {
         user.email = email
         user.password = password
         user.createdAt = Date()
+        user.avatar = 1;
         print(user)
         guardarDatos()
     }
@@ -106,7 +107,7 @@ class ViewModel: ObservableObject {
     }
 
     // Actualizar un Usuario
-    func actualizarUsuario(userId: UUID, newUsername: String?, newEmail: String?, newPassword: String?) {
+    func actualizarUsuario(userId: UUID, newUsername: String?, newEmail: String?, newPassword: String?, avatar: Int64?) {
         if let user = usersArray.first(where: { $0.id == userId }) {
             if let username = newUsername {
                 user.username = username
@@ -116,6 +117,9 @@ class ViewModel: ObservableObject {
             }
             if let password = newPassword {
                 user.password = password
+            }
+            if let avatar = avatar {
+                user.avatar = avatar;
             }
             
             guardarDatos()

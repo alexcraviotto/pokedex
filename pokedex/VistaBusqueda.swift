@@ -38,7 +38,7 @@ struct VistaBusqueda: View {
     var body: some View {
         VStack {
             HStack{
-                Text("Ajustes")
+                Text("Búsqueda")
                     .font(.custom("Press Start 2P Regular", size: 24))
                     .foregroundColor(.black)
                 Spacer()

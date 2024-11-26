@@ -7,46 +7,11 @@
 
 import SwiftUI
 
-/*struct Pokemon: Identifiable {
+struct Pokemon: Identifiable {
     let id = UUID()
     var nombre: String
     var tipo: String
     var tipoS: String
     var numero: String
     var imagen: String
-}*/
-
-struct Pokemon: Decodable, Identifiable {
-    let id: Int
-    let name: String
-    let types: [Types]
-    let sprites: Sprites
-    
-    struct Types: Decodable {
-        let type: PokemonType
-    }
-    
-    struct PokemonType: Decodable {
-        let name: String
-    }
-    
-    struct Sprites: Decodable {
-        let other: OtherSprites
-    }
-    
-    struct OtherSprites: Decodable {
-        let officialArtwork: OfficialArtwork
-        
-        enum CodingKeys: String, CodingKey {
-            case officialArtwork = "official-artwork"
-        }
-    }
-    
-    struct OfficialArtwork: Decodable {
-        let frontDefault: String
-        
-        enum CodingKeys: String, CodingKey {
-            case frontDefault = "front_default"
-        }
-    }
 }

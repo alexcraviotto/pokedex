@@ -27,6 +27,7 @@
         <relationship name="recentUser" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserEntity" inverseName="recentUser" inverseEntity="UserEntity"/>
     </entity>
     <entity name="UserEntity" representedClassName="UserEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="avatar" optional="YES" attributeType="Integer 64" usesScalarValueType="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="email" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
