@@ -34,7 +34,7 @@ struct VistaAjustes: View {
     @State private var usuarioInicial: String
     @State private var correoInicial: String
     @State private var passwordInicial: String
-    @State private var selectedAvatar: String = "avatar1"
+    @State private var selectedAvatar: Int64 = 1
     @State private var showAvatarMenu: Bool = false
     @Environment(\.presentationMode) var presentationMode
     var viewModel: ViewModel
@@ -58,7 +58,8 @@ struct VistaAjustes: View {
                     Button(action: {
                         showAvatarMenu.toggle()
                     }) {
-                        Image(selectedAvatar)
+                        // Mostrar avatar basado en el número
+                        Image("avatar\(selectedAvatar)")
                             .resizable()
                             .scaledToFill()
                             .frame(width: 100, height: 100)
@@ -90,13 +91,13 @@ struct VistaAjustes: View {
 
                 Button(action: {
                     if usuario != usuarioInicial {
-                        viewModel.actualizarUsuario(userId: userId, newUsername: usuario, newEmail: nil, newPassword: nil)
+                        viewModel.actualizarUsuario(userId: userId, newUsername: usuario, newEmail: nil, newPassword: nil, avatar: selectedAvatar)
                     }
                     if correo != correoInicial {
-                        viewModel.actualizarUsuario(userId: userId, newUsername: nil, newEmail: correo, newPassword: nil)
+                        viewModel.actualizarUsuario(userId: userId, newUsername: nil, newEmail: correo, newPassword: nil, avatar: selectedAvatar)
                     }
                     if password != passwordInicial {
-                        viewModel.actualizarUsuario(userId: userId, newUsername: nil, newEmail: nil, newPassword: password)
+                        viewModel.actualizarUsuario(userId: userId, newUsername: nil, newEmail: nil, newPassword: password, avatar: selectedAvatar)
                     }
                 }) {
                     Text("Actualizar Información")
@@ -138,16 +139,16 @@ struct VistaAjustes: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Text("Ajustes")
                         .font(.custom("Press Start 2P Regular", size: 24))
-                        .foregroundColor(.black) 
+                        .foregroundColor(.black)
                 }
             }
             .actionSheet(isPresented: $showAvatarMenu) {
                 ActionSheet(
                     title: Text("Selecciona un Avatar"),
                     buttons: [
-                        .default(Text("Avatar 1")) { selectedAvatar = "avatar1" },
-                        .default(Text("Avatar 2")) { selectedAvatar = "avatar2" },
-                        .default(Text("Avatar 3")) { selectedAvatar = "avatar3" },
+                        .default(Text("Avatar 1")) { selectedAvatar = 1 },
+                        .default(Text("Avatar 2")) { selectedAvatar = 2 },
+                        .default(Text("Avatar 3")) { selectedAvatar = 3 },
                         .cancel()
                     ]
                 )
