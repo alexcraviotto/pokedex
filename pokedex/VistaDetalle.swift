@@ -12,66 +12,66 @@ struct VistaDetalle: View {
     
     var body: some View {
         ScrollView {
-                   VStack(spacing: 20) {
-                       // Fondo superior con imagen y tipo
-                       ZStack(alignment: .top) {
-                           RoundedRectangle(cornerRadius: 25)
-                               .fill(Color.red)
-                               .frame(height: 300)
-                           
-                           VStack() {
-                               // Imagen del Pokémon superpuesta
-                               AsyncImage(url: URL(string: pokemon.sprites.other.officialArtwork.frontDefault)) { phase in
-                                   switch phase {
-                                   case .empty:
-                                       ProgressView()
-                                           .frame(width: 250, height: 250)
-                                   case .success(let image):
-                                       image
-                                           .resizable()
-                                           .frame(width: 350, height: 350)
-                                           .shadow(radius: 10)
-                                           .offset(y: 50) // Superposición sobre la franja roja
-                                   case .failure:
-                                       Image(systemName: "xmark.circle")
-                                           .resizable()
-                                           .scaledToFit()
-                                           .frame(width: 250, height: 250)
-                                           .foregroundColor(.gray)
-                                           .offset(y: -50)
-                                   @unknown default:
-                                       EmptyView()
-                                   }
-                               }
-                               .zIndex(1)
-                               
-                               VStack() {
-                                   // Nombre y número del Pokémon
-                                   Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
-                                       .font(.title)
-                                       .fontWeight(.bold)
-                                       .foregroundColor(.black)
-                                   // Tipos del Pokémon
-                                   HStack() {
-                                       ForEach(pokemon.types, id: \.type.name) { tipo in
-                                           Text(tipo.type.name.capitalized)
-                                               .padding(.horizontal, 12)
-                                               .padding(.vertical, 6)
-                                               .background(tipoColor(tipo.type.name))
-                                               .foregroundColor(.white)
-                                               .clipShape(Capsule())
-                                       }
-                                   }
-                               }
-                               .zIndex(0)
-                           }
-                       }
-                       
-                       // Descripción
-                       Text("Cuando se enfurece de verdad, la llama de la punta de su cola se vuelve de color azul claro.")
-                           .font(.body)
-                           .padding(.horizontal)
-                           .multilineTextAlignment(.center)
+            VStack(spacing: 20) {
+                // Fondo superior con imagen y tipo
+                ZStack(alignment: .top) {
+                    RoundedRectangle(cornerRadius: 25)
+                        .fill(Color.red)
+                        .frame(height: 300)
+                    
+                    VStack() {
+                        // Imagen del Pokémon superpuesta
+                        AsyncImage(url: URL(string: pokemon.sprites.other.officialArtwork.frontDefault)) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                                    .frame(width: 250, height: 250)
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .frame(width: 350, height: 350)
+                                    .shadow(radius: 10)
+                                    .offset(y: 50) // Superposición sobre la franja roja
+                            case .failure:
+                                Image(systemName: "xmark.circle")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 250, height: 250)
+                                    .foregroundColor(.gray)
+                                    .offset(y: -50)
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                        .zIndex(1)
+                        
+                        VStack() {
+                            // Nombre y número del Pokémon
+                            Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundColor(.black)
+                            // Tipos del Pokémon
+                            HStack() {
+                                ForEach(pokemon.types, id: \.type.name) { tipo in
+                                    Text(tipo.type.name.capitalized)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .background(tipoColor(tipo.type.name))
+                                        .foregroundColor(.white)
+                                        .clipShape(Capsule())
+                                }
+                            }
+                        }
+                        .zIndex(0)
+                    }
+                }
+                
+                // Descripción
+                Text("Cuando se enfurece de verdad, la llama de la punta de su cola se vuelve de color azul claro.")
+                    .font(.body)
+                    .padding(.horizontal)
+                    .multilineTextAlignment(.center)
                 
                 // Menú interactivo
                 HStack {
@@ -149,11 +149,25 @@ struct VistaDetalle: View {
     
     // Mock de contenido para "Movimientos"
     var movimientosContent: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            Text("Movimientos")
-                .font(.title2)
-                .fontWeight(.bold)
-            Text("Aquí irán los movimientos del Pokémon.") // Mock temporal
+        VStack(alignment: .leading, spacing: 15) {            
+            /*ForEach(pokemon.moves, id: \.move.name) { move in
+                HStack {
+                    Text(move.move.name.capitalized)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Text(move.type.capitalized)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Text("\(move.power ?? 0)")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Text("\(move.accuracy ?? 100)%")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(.vertical, 5)
+                .background(Color.gray.opacity(0.1)) // Fondo gris suave para cada fila
+                .cornerRadius(5)
+            }*/
         }
         .padding()
     }
@@ -217,8 +231,7 @@ struct NavegacionVistaDetalle: View {
         }
     }
 }
-
-// Mock para vista previa
+/*
 struct VistaDetalle_Previews: PreviewProvider {
     static var previews: some View {
         let mockPokemon = Pokemon(
@@ -234,9 +247,41 @@ struct VistaDetalle_Previews: PreviewProvider {
                         frontDefault: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"
                     )
                 )
-            )
+            ),
+            moves: [
+                Pokemon.Move(
+                    move: Pokemon.Move.MoveDetails(
+                        name: "ember",
+                        url: "https://pokeapi.co/api/v2/move/52/"
+                    ),
+                    versionGroupDetails: [],
+                    type: "Fire",
+                    power: 40,
+                    accuracy: 100
+                ),
+                Pokemon.Move(
+                    move: Pokemon.Move.MoveDetails(
+                        name: "flamethrower",
+                        url: "https://pokeapi.co/api/v2/move/53/"
+                    ),
+                    versionGroupDetails: [],
+                    type: "Fire",
+                    power: 90,
+                    accuracy: 100
+                ),
+                Pokemon.Move(
+                    move: Pokemon.Move.MoveDetails(
+                        name: "dragonclaw",
+                        url: "https://pokeapi.co/api/v2/move/161/"
+                    ),
+                    versionGroupDetails: [],
+                    type: "Dragon",
+                    power: 80,
+                    accuracy: 100
+                )
+            ]
         )
         
         NavegacionVistaDetalle(pokemon: mockPokemon)
     }
-}
+}*/
