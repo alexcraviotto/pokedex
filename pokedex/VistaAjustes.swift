@@ -3,11 +3,11 @@ import SwiftUI
 struct TextFieldModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .padding()
+            .padding(16)
             .background(Color.white)
-            .cornerRadius(8)
+            .cornerRadius(12)
             .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-            .padding(.horizontal, 40)
+            .padding(.horizontal, 24)
             .foregroundColor(.black)
     }
 }
@@ -18,11 +18,11 @@ struct ButtonModifier: ViewModifier {
             .font(.headline)
             .foregroundColor(.white)
             .padding()
-            .padding(.vertical, -2)
-            .frame(width: 330)
+            .frame(maxWidth: .infinity)
             .background(Color.yellow)
-            .cornerRadius(8)
+            .cornerRadius(12)
             .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+            .padding(.horizontal, 24)
     }
 }
 
@@ -53,40 +53,39 @@ struct VistaAjustes: View {
 
     var body: some View {
         NavigationView {
-            VStack {
+            VStack(spacing: 20) {
                 VStack {
                     Button(action: {
                         showAvatarMenu.toggle()
                     }) {
-                        // Mostrar avatar basado en el número
-                        Image("avatar\(selectedAvatar)")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 100, height: 100)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                            .shadow(radius: 10)
-                    }
-                }
-                .padding(.bottom, 20)
+                        VStack(spacing: 12) {
+                            Image("avatar\(selectedAvatar)")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 120, height: 120)
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                                .shadow(radius: 10)
 
-                Text("Seleccionar Avatar")
-                    .font(.headline)
-                    .foregroundColor(.gray)
-                    .padding(.bottom, 20)
+                            Text("Seleccionar Avatar")
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                        }
+                    }
+
+              
+                }
+                .padding(16)
 
                 Group {
                     TextField("Usuario", text: $usuario)
                         .modifier(TextFieldModifier())
-                        .onChange(of: usuario) { _ in }
 
                     TextField("Correo electrónico", text: $correo)
                         .modifier(TextFieldModifier())
-                        .onChange(of: correo) { _ in }
 
                     SecureField("Contraseña", text: $password)
                         .modifier(TextFieldModifier())
-                        .onChange(of: password) { _ in }
                 }
 
                 Button(action: {
@@ -113,12 +112,12 @@ struct VistaAjustes: View {
                         .font(.headline)
                         .foregroundColor(.red)
                         .padding()
-                        .frame(width: 330)
+                        .frame(maxWidth: .infinity)
                         .background(Color.white)
-                        .cornerRadius(8)
+                        .cornerRadius(12)
                         .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+                        .padding(.horizontal, 24)
                 }
-                .padding(.horizontal, 40)
                 .alert(isPresented: $confirmDelete) {
                     Alert(
                         title: Text("¿Estás seguro?"),
@@ -133,7 +132,7 @@ struct VistaAjustes: View {
                     )
                 }
             }
-            .background(Color.white)
+            .background(Color(UIColor.systemGroupedBackground))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
