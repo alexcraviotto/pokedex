@@ -4,10 +4,11 @@ struct listadoTarjetas: View {
     @State private var pokemons: [Pokemon] = []
     @State private var isLoading = false
     let columnas = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
-    ]
-    @State private var count = 0
+          GridItem(.flexible()),
+          GridItem(.flexible())
+      ]
+    @State var count = 0
+    @State var countex = 0
     var items = 20
     
     var body: some View {
@@ -44,11 +45,16 @@ struct listadoTarjetas: View {
         }
     }
     
-    func carga() {
-        guard !isLoading else { return }
-        isLoading = true
-        
-        let start = count * items
+    func carga() -> Void {
+        var start = 0
+        if (pokemons.last?.id ?? 0) >= 1025 {
+            start = 10000 + countex * items
+            countex += 1
+        } else {
+            start = count * items
+            count += 1
+        }
+
         let end = start + items
         for i in start..<end {
             fetchPokemonData(pokemonId: i) { result in
