@@ -43,8 +43,10 @@ func colorPicker(tipo: String) -> Color{
         return Color(CGColor(red: 105/255, green: 169/255, blue: 199/255, alpha: 1))
     case "fairy":
         return Color(CGColor(red: 116/255, green: 81/255, blue: 153/255, alpha: 1))
-    default:
+    case "normal":
         return Color(CGColor(red: 217/255, green: 180/255, blue: 211/255, alpha: 1))
+    default:
+        return Color.white
     }
 }
 

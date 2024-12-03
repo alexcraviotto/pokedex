@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct VistaDetalle: View {
-    var pokemon: Pokemon
+    var id: Int
+    @State var pokemon: Pokemon2?
     
     // Estado para cambiar de pestaña
     @State private var selectedTab: Tab = .about
@@ -16,55 +17,24 @@ struct VistaDetalle: View {
                 // Fondo superior con imagen y tipo
                 ZStack(alignment: .top) {
                     RoundedRectangle(cornerRadius: 25)
-                        .fill(Color.red)
+                        .fill(colorPicker(tipo: pokemon?.types[0] ?? ""))
                         .frame(height: 300)
                     
-                    VStack() {
-                        // Imagen del Pokémon superpuesta
-                        AsyncImage(url: URL(string: pokemon.sprites.other.officialArtwork.frontDefault)) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                                    .frame(width: 250, height: 250)
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .frame(width: 350, height: 350)
-                                    .shadow(radius: 10)
-                                    .offset(y: 50) // Superposición sobre la franja roja
-                            case .failure:
-                                Image(systemName: "xmark.circle")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 250, height: 250)
-                                    .foregroundColor(.gray)
-                                    .offset(y: -50)
-                            @unknown default:
-                                EmptyView()
-                            }
-                        }
-                        .zIndex(1)
-                        
-                        VStack() {
-                            // Nombre y número del Pokémon
+                    VStack {
+                        // Nombre y número del Pokémon
+                        if let pokemon = pokemon {
                             Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
                                 .font(.title)
                                 .fontWeight(.bold)
                                 .foregroundColor(.black)
-                            // Tipos del Pokémon
-                            HStack() {
-                                ForEach(pokemon.types, id: \.type.name) { tipo in
-                                    Text(tipo.type.name.capitalized)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(tipoColor(tipo.type.name))
-                                        .foregroundColor(.white)
-                                        .clipShape(Capsule())
-                                }
-                            }
+                        } else {
+                            Text("Cargando...")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundColor(.gray)
                         }
-                        .zIndex(0)
                     }
+                    .zIndex(0)
                 }
                 
                 // Descripción
@@ -97,7 +67,16 @@ struct VistaDetalle: View {
                 }
             }
         }
-        .edgesIgnoringSafeArea(.top)
+        .onAppear {
+            Task {
+                await cargarPokemon()
+            }
+        }
+    }
+    
+    // Método para cargar datos asíncronamente
+    func cargarPokemon() async {
+        self.pokemon = await pokemonPorId(id: id)
     }
     
     // Función para asignar color según el tipo
@@ -149,7 +128,7 @@ struct VistaDetalle: View {
     
     // Mock de contenido para "Movimientos"
     var movimientosContent: some View {
-        VStack(alignment: .leading, spacing: 15) {            
+        VStack(alignment: .leading, spacing: 15) {
             /*ForEach(pokemon.moves, id: \.move.name) { move in
                 HStack {
                     Text(move.move.name.capitalized)
@@ -218,70 +197,3 @@ struct InfoRow: View {
         }
     }
 }
-
-
-struct NavegacionVistaDetalle: View {
-    var pokemon: Pokemon
-    
-    var body: some View {
-        NavigationView {
-            VistaDetalle(pokemon: pokemon)
-                .navigationBarTitle("", displayMode: .inline)
-                .navigationBarHidden(true)
-        }
-    }
-}
-/*
-struct VistaDetalle_Previews: PreviewProvider {
-    static var previews: some View {
-        let mockPokemon = Pokemon(
-            id: 6,
-            name: "charizard",
-            types: [
-                Pokemon.Types(type: Pokemon.PokemonType(name: "fuego")),
-                Pokemon.Types(type: Pokemon.PokemonType(name: "dragón"))
-            ],
-            sprites: Pokemon.Sprites(
-                other: Pokemon.OtherSprites(
-                    officialArtwork: Pokemon.OfficialArtwork(
-                        frontDefault: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"
-                    )
-                )
-            ),
-            moves: [
-                Pokemon.Move(
-                    move: Pokemon.Move.MoveDetails(
-                        name: "ember",
-                        url: "https://pokeapi.co/api/v2/move/52/"
-                    ),
-                    versionGroupDetails: [],
-                    type: "Fire",
-                    power: 40,
-                    accuracy: 100
-                ),
-                Pokemon.Move(
-                    move: Pokemon.Move.MoveDetails(
-                        name: "flamethrower",
-                        url: "https://pokeapi.co/api/v2/move/53/"
-                    ),
-                    versionGroupDetails: [],
-                    type: "Fire",
-                    power: 90,
-                    accuracy: 100
-                ),
-                Pokemon.Move(
-                    move: Pokemon.Move.MoveDetails(
-                        name: "dragonclaw",
-                        url: "https://pokeapi.co/api/v2/move/161/"
-                    ),
-                    versionGroupDetails: [],
-                    type: "Dragon",
-                    power: 80,
-                    accuracy: 100
-                )
-            ]
-        )
-        
-        NavegacionVistaDetalle(pokemon: mockPokemon)
-    }
-}*/

@@ -51,9 +51,9 @@ struct VistaBusqueda: View {
                 ScrollView {
                     if !filtrado.isEmpty {
                         LazyVGrid(columns: columnas, spacing: 20) {
-                            ForEach(filtrado) { pokemon in
+                            ForEach(filtrado, id: \.id) { pokemon in
                                 NavigationLink(
-                                    destination: NavegacionVistaDetalle(pokemon: pokemon)
+                                    destination: VistaDetalle(id: pokemon.id)
                                 ) {
                                     PokemonTarjeta2(
                                         pokemon: pokemon

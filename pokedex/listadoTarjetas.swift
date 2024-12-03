@@ -24,7 +24,7 @@ struct listadoTarjetas: View {
                     LazyVGrid(columns: columnas, spacing: 20) {
                         ForEach(pokemons.sorted(by: { $0.id < $1.id })) { pokemon in
                             NavigationLink(
-                                destination: NavegacionVistaDetalle(pokemon: pokemon) // Pasamos el objeto pokemon directamente
+                                destination: VistaDetalle(id: pokemon.id) // Pasamos el objeto pokemon directamente
                             ) {
                                 PokemonTarjeta2(pokemon: pokemon)
                                     .scaleEffect(0.9)
