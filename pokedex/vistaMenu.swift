@@ -28,23 +28,14 @@ struct vistaMenu: View {
             )
             .tabItem {
                 Image("busqueda")
-                    .scaledToFit()
-                    .scaleEffect(0.2)
                 Text("Búsqueda")
             }
             .tag(1)
             
-            VistaAjustes(
-                usuario: $usuarioActual,
-                correo: $correoActual,
-                password: $passwordActual,
-                userId: userId,
-                viewModel: viewModel
+            VistaCombate(
             )
             .tabItem {
                 Image("pelea")
-                    .scaledToFit()
-                    .scaleEffect(0.2)
                 Text("Combate")
             }
             .tag(2)
