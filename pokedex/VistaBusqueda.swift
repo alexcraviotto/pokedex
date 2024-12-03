@@ -59,6 +59,8 @@ struct VistaBusqueda: View {
                                         pokemon: pokemon
                                     )
                                     .scaleEffect(0.9)
+                                    .foregroundColor(.black)
+
                                 }
                             }
                         }
