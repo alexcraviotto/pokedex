@@ -51,3 +51,17 @@ struct Pokemon: Decodable, Identifiable {
         }
     }
 }
+
+struct Pokemon2: Identifiable {
+        let id: Int
+        let name: String
+        let description: String
+        let types: [String]
+        let weight: Float
+        let height: Float
+        let stats: [String: Int]
+        let image: Image
+        let image_shiny: Image
+        let evolution_chain_id: Int
+    }
+
