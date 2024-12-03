@@ -1,16 +1,9 @@
-//
-//  Inicio.swift
-//  Pokedex
-//
-//  Created by Aula03 on 12/11/24.
-//
-
 import SwiftUI
 
 struct Inicio: View {
     var body: some View {
         NavigationView {
-            NavigationLink(destination:navegarIniciarSession()) {
+            NavigationLink(destination: navegarIniciarSession()) {
                 ZStack {
                     GifImage("inicio")
                         .frame(height: 1000)
@@ -26,9 +19,9 @@ struct Inicio: View {
                             .padding(.bottom, 180)
                     }
                 }
-            }.frame(maxWidth: .infinity, maxHeight: .infinity)
-            .navigationBarHidden(true)
-        }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }.navigationBarHidden(true)
     }
 }
 
@@ -37,7 +30,9 @@ struct navegarIniciarSession: View {
     @State private var contrasena = ""
 
     var body: some View {
-        IniciarSesion(usuario: $nombreUsuario, password: $contrasena)
+        let viewModel = ViewModel()
+
+        IniciarSesion(email: $nombreUsuario, password: $contrasena, viewModel: viewModel)
     }
 }
 

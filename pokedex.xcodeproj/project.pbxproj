@@ -6,6 +6,10 @@
 	objectVersion = 70;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3547237D2CF63579007D7261 /* PokemonAPI in Frameworks */ = {isa = PBXBuildFile; productRef = 3547237C2CF63579007D7261 /* PokemonAPI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A9FBC7642CDA858200C4A0DF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -50,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3547237D2CF63579007D7261 /* PokemonAPI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -110,6 +115,7 @@
 			);
 			name = pokedex;
 			packageProductDependencies = (
+				3547237C2CF63579007D7261 /* PokemonAPI */,
 			);
 			productName = pokedex;
 			productReference = A9FBC7532CDA858100C4A0DF /* pokedex.app */;
@@ -194,6 +200,9 @@
 			);
 			mainGroup = A9FBC74A2CDA858100C4A0DF;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3547237B2CF63579007D7261 /* XCRemoteSwiftPackageReference "PokemonAPI" */,
+			);
 			productRefGroup = A9FBC7542CDA858100C4A0DF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -552,6 +561,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3547237B2CF63579007D7261 /* XCRemoteSwiftPackageReference "PokemonAPI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kinkofer/PokemonAPI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3547237C2CF63579007D7261 /* PokemonAPI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3547237B2CF63579007D7261 /* XCRemoteSwiftPackageReference "PokemonAPI" */;
+			productName = PokemonAPI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A9FBC74B2CDA858100C4A0DF /* Project object */;
 }

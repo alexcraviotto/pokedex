@@ -42,8 +42,9 @@ struct Pokemon: Decodable, Identifiable {
         }
     }
     
-    struct OfficialArtwork: Decodable {
+    struct OfficialArtwork: Decodable  {
         let frontDefault: String
+        
         
         enum CodingKeys: String, CodingKey {
             case frontDefault = "front_default"
