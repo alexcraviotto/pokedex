@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct VistaDetalle: View {
     var id: Int
@@ -14,13 +15,19 @@ struct VistaDetalle: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                
+               
                 // Fondo superior con imagen y tipo
                 ZStack(alignment: .top) {
                     RoundedRectangle(cornerRadius: 25)
                         .fill(colorPicker(tipo: pokemon?.types[0] ?? ""))
                         .frame(height: 300)
-                    
-                    VStack {
+                    VStack() {
+                        pokemon?.image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200, height: 200)
+                        .zIndex(0)
                         // Nombre y número del Pokémon
                         if let pokemon = pokemon {
                             Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
@@ -34,7 +41,7 @@ struct VistaDetalle: View {
                                 .foregroundColor(.gray)
                         }
                     }
-                    .zIndex(0)
+                    .zIndex(2)
                 }
                 
                 // Descripción
@@ -77,6 +84,7 @@ struct VistaDetalle: View {
     // Método para cargar datos asíncronamente
     func cargarPokemon() async {
         self.pokemon = await pokemonPorId(id: id)
+        
     }
     
     // Función para asignar color según el tipo
@@ -196,4 +204,8 @@ struct InfoRow: View {
                 .fontWeight(.bold)
         }
     }
+}
+
+#Preview {
+    VistaDetalle(id:1)
 }
