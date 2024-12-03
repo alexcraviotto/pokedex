@@ -2,7 +2,7 @@ import SwiftUI
 
 struct listadoTarjetas: View {
     @State private var pokemons: [Pokemon] = []
-    @State private var isLoading = false
+    @State private var isLoading = true
     let columnas = [
           GridItem(.flexible()),
           GridItem(.flexible())
@@ -32,6 +32,9 @@ struct listadoTarjetas: View {
                                         if pokemon.id == self.pokemons.count && !isLoading {
                                             carga() // Cargar más Pokémon si hemos llegado al final
                                         }
+                                        if self.pokemons.count >= 1045 && !isLoading {
+                                            carga() // Cargar más Pokémon si hemos llegado al final
+                                        }
                                     }
                             }
                             .buttonStyle(PlainButtonStyle()) // Previene el estilo predeterminado del NavigationLink
@@ -46,16 +49,19 @@ struct listadoTarjetas: View {
     }
     
     func carga() -> Void {
+        isLoading = true
         var start = 0
-        if (pokemons.last?.id ?? 0) >= 1025 {
+        if pokemons.count >= 1025 {
             start = 10000 + countex * items
             countex += 1
+            //print(start)
         } else {
             start = count * items
             count += 1
         }
-
+        start += 1
         let end = start + items
+        //print(end)
         for i in start..<end {
             fetchPokemonData(pokemonId: i) { result in
                 switch result {
@@ -64,12 +70,13 @@ struct listadoTarjetas: View {
                         pokemons.append(pokemon)
                     }
                 case .failure(let error):
-                    print("Error: \(error)")
+                    break
+                    //print("Error: \(error)")
                 }
             }
+            //print(i)
         }
-        
-        count += 1
+        pokemons = pokemons.sorted(by: { $0.id < $1.id })
         isLoading = false
     }
 }
