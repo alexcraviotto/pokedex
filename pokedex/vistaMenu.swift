@@ -18,8 +18,38 @@ struct vistaMenu: View {
                     Text("Inicio")
                 }
                 .tag(0)
-
+            
+            VistaAjustes(
+                usuario: $usuarioActual,
+                correo: $correoActual,
+                password: $passwordActual,
+                userId: userId,
+                viewModel: viewModel
+            )
+            .tabItem {
+                Image("busqueda")
+                    .scaledToFit()
+                    .scaleEffect(0.2)
+                Text("Búsqueda")
+            }
+            .tag(1)
+            
+            VistaAjustes(
+                usuario: $usuarioActual,
+                correo: $correoActual,
+                password: $passwordActual,
+                userId: userId,
+                viewModel: viewModel
+            )
+            .tabItem {
+                Image("pelea")
+                    .scaledToFit()
+                    .scaleEffect(0.2)
+                Text("Combate")
+            }
+            .tag(2)
     
+            
             VistaAjustes(
                 usuario: $usuarioActual,
                 correo: $correoActual,
@@ -31,7 +61,7 @@ struct vistaMenu: View {
                 Image("ajustes")
                 Text("Ajustes")
             }
-            .tag(2)
+            .tag(3)
         }.navigationBarHidden(true)
     }
 }
