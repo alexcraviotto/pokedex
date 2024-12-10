@@ -17,7 +17,7 @@ struct Pokemon: Decodable, Identifiable {
     let id: Int
     let name: String
     let types: [Types]
-    let sprites: Sprites
+    //let sprites: Sprites
     
     struct Types: Decodable {
         let type: PokemonType
@@ -27,7 +27,7 @@ struct Pokemon: Decodable, Identifiable {
         let name: String
     }
     
-    struct Sprites: Decodable {
+    /*struct Sprites: Decodable {
         let other: OtherSprites
     }
     
@@ -46,7 +46,7 @@ struct Pokemon: Decodable, Identifiable {
         enum CodingKeys: String, CodingKey {
             case frontDefault = "front_default"
         }
-    }
+    }*/
 }
 struct Pokemon2: Identifiable {
         let id: Int
