@@ -4,9 +4,7 @@
 //
 //  Created by Antonio Ordóñez on 16/11/24.
 //
-
 import SwiftUI
-
 /*struct Pokemon: Identifiable {
     let id = UUID()
     var nombre: String
@@ -15,7 +13,6 @@ import SwiftUI
     var numero: String
     var imagen: String
 }*/
-
 struct Pokemon: Decodable, Identifiable {
     let id: Int
     let name: String
@@ -51,12 +48,12 @@ struct Pokemon: Decodable, Identifiable {
         }
     }
 }
-
 struct Pokemon2: Identifiable {
         let id: Int
         let name: String
         let description: String
         let types: [String]
+        let weakTypes: [String]
         let weight: Float
         let height: Float
         let stats: [String: Int]
@@ -64,4 +61,3 @@ struct Pokemon2: Identifiable {
         let image_shiny: Image
         let evolution_chain_id: Int
     }
-

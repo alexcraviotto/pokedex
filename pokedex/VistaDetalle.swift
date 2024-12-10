@@ -1,12 +1,18 @@
 import SwiftUI
 import UIKit
-
 struct VistaDetalle: View {
     var id: Int
     @State var pokemon: Pokemon2?
+    @State private var evolutions: [(Pokemon2, String, Pokemon2)] = []
     
     // Estado para cambiar de pestaña
     @State private var selectedTab: Tab = .about
+    
+    // Estado para los movimientos y la paginación
+    @State private var movimientos: [(String, String, Int, Int)] = [] // Almacenar movimientos
+    @State private var offset = 0 // Índice de inicio para la paginación
+    @State private var limit = 10 // Número de movimientos a cargar por página
+    @State private var isLoading = false // Controlar si está cargando más movimientos
     
     enum Tab {
         case about, movimientos, evoluciones
@@ -15,25 +21,42 @@ struct VistaDetalle: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                
-               
                 // Fondo superior con imagen y tipo
                 ZStack(alignment: .top) {
                     RoundedRectangle(cornerRadius: 25)
-                        .fill(colorPicker(tipo: pokemon?.types[0] ?? ""))
-                        .frame(height: 300)
-                    VStack() {
-                        pokemon?.image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 200, height: 200)
-                        .zIndex(0)
-                        // Nombre y número del Pokémon
+                        .fill(colorPicker(tipo: pokemon?.types.first ?? "")) // Reemplazamos tipoColor con colorPicker
+                        .frame(height: 350) // Aumenté la altura
+                        .offset(y: -100) // Mantuve el offset superior
+                        .ignoresSafeArea()
+                    
+                    VStack(spacing: 10) { // Compacto
                         if let pokemon = pokemon {
+                            pokemon.image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 350, height: 350) // Tamaño ajustado
+                                .zIndex(0)
+                                .offset(y:-30)
+                            
+                            // Nombre del Pokémon
                             Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
                                 .font(.title)
                                 .fontWeight(.bold)
                                 .foregroundColor(.black)
+                                .padding(.top, -60)
+                            
+                            // Tipos del Pokémon
+                            HStack(spacing: 10) {
+                                ForEach(pokemon.types, id: \.self) { type in
+                                    Text(type.capitalized)
+                                        .font(.caption)
+                                        .padding(.horizontal, 20)
+                                        .padding(.vertical, 6)
+                                        .background(colorPicker(tipo: type)) // Reemplazamos tipoColor con colorPicker
+                                        .foregroundColor(.white)
+                                        .clipShape(Capsule())
+                                }
+                            }
                         } else {
                             Text("Cargando...")
                                 .font(.title)
@@ -45,7 +68,7 @@ struct VistaDetalle: View {
                 }
                 
                 // Descripción
-                Text("Cuando se enfurece de verdad, la llama de la punta de su cola se vuelve de color azul claro.")
+                Text(pokemon?.description ?? "Sin descripción disponible.")
                     .font(.body)
                     .padding(.horizontal)
                     .multilineTextAlignment(.center)
@@ -77,6 +100,7 @@ struct VistaDetalle: View {
         .onAppear {
             Task {
                 await cargarPokemon()
+                loadMoreMoves() // Cargar los primeros movimientos al aparecer
             }
         }
     }
@@ -84,77 +108,125 @@ struct VistaDetalle: View {
     // Método para cargar datos asíncronamente
     func cargarPokemon() async {
         self.pokemon = await pokemonPorId(id: id)
-        
     }
     
-    // Función para asignar color según el tipo
-    func tipoColor(_ tipo: String) -> Color {
-        switch tipo.lowercased() {
-        case "fuego": return .red
-        case "agua": return .blue
-        case "eléctrico": return .yellow
-        case "roca": return .brown
-        case "dragón": return .purple
-        default: return .gray
+    // Función para cargar más movimientos cuando se llega al final
+    private func loadMoreMoves() {
+        guard !isLoading else { return }
+        isLoading = true
+        
+        Task {
+            // Usamos el método ya implementado en otro archivo para obtener los movimientos
+            let newMoves = await getPokemonMoves(id: id, offset: offset, limit: limit)
+            await MainActor.run {
+                movimientos.append(contentsOf: newMoves)
+                offset += limit
+                isLoading = false
+            }
         }
     }
     
     // Vista del contenido para "About"
-    var aboutContent: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            Text("About")
-                .font(.title2)
-                .fontWeight(.bold)
-            
-            HStack {
-                InfoRow(title: "Altura", value: "1.7m") // Mock
-                Spacer()
-                InfoRow(title: "Peso", value: "90.5kg") // Mock
-                Spacer()
-                InfoRow(title: "Habilidad", value: "Mar Llamas") // Mock
-            }
-            
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Debilidad")
+        var aboutContent: some View {
+            VStack(alignment: .leading, spacing: 15) {
+                Text("About")
                     .font(.title2)
                     .fontWeight(.bold)
                 
-                HStack(spacing: 10) {
-                    ForEach(["Agua", "Eléctrico", "Roca"], id: \.self) { debilidad in
-                        Text(debilidad)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(tipoColor(debilidad))
-                            .foregroundColor(.white)
-                            .clipShape(Capsule())
+                HStack {
+                    // Se utiliza un VStack para que cada InfoRow ocupe una porción del espacio
+                    VStack {
+                        InfoRow(
+                            title: "Altura",
+                            value: "\(String(format: "%.1f", (pokemon?.height ?? 0) / 10))m" // Ajuste de altura
+                        )
+                    }
+                    .frame(maxWidth: .infinity) // Centrado del campo
+                    VStack {
+                        InfoRow(
+                            title: "Peso",
+                            value: "\(String(format: "%.1f", (pokemon?.weight ?? 0) / 10))kg" // Ajuste de peso
+                        )
+                    }
+                    .frame(maxWidth: .infinity) // Centrado del campo
+                    
+                    VStack {
+                        // Obtener los HP de pokemon.stats
+                        if let hp = pokemon?.stats["hp"] {
+                            InfoRow(
+                                title: "Health Points",
+                                value: "\(hp)" // Muestra los puntos de vida (HP)
+                            )
+                        } else {
+                            InfoRow(
+                                title: "Health Points",
+                                value: "N/A" // Si no hay HP, muestra N/A
+                            )
+                        }
+                    }
+                    .frame(maxWidth: .infinity) // Centrado del campo
+                }
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Debilidad")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    
+                    // Usar un LazyVGrid para que las debilidades se distribuyan en varias líneas
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
+                        ForEach(pokemon?.weakTypes ?? [], id: \.self) { debilidad in
+                            Text(debilidad)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(colorPicker(tipo: debilidad)) // Usamos colorPicker en lugar de tipoColor
+                                .foregroundColor(.white)
+                                .clipShape(Capsule())
+                        }
                     }
                 }
             }
+            .padding()
         }
-        .padding()
-    }
     
-    // Mock de contenido para "Movimientos"
+    // Vista del contenido para "Movimientos"
     var movimientosContent: some View {
         VStack(alignment: .leading, spacing: 15) {
-            /*ForEach(pokemon.moves, id: \.move.name) { move in
-                HStack {
-                    Text(move.move.name.capitalized)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+            Text("Movimientos")
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            ScrollView {
+                LazyVStack {
+                    // Mostrar los movimientos cargados
+                    ForEach(Array(movimientos.enumerated()), id: \.offset) { index, move in
+                        VStack(alignment: .leading) {
+                            Text("\(index + 1). \(move.0)") // Nombre del movimiento
+                                .font(.headline)
+                            Text("Descripción: \(move.1)") // Descripción del movimiento
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            HStack {
+                                Text("Precisión: \(move.2)")
+                                Text("Poder: \(move.3)")
+                            }
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 5)
+                        .onAppear {
+                            // Si estamos en el último movimiento cargado, cargamos más
+                            if index == movimientos.count - 1 && !isLoading {
+                                loadMoreMoves()
+                            }
+                        }
+                    }
                     
-                    Text(move.type.capitalized)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Text("\(move.power ?? 0)")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Text("\(move.accuracy ?? 100)%")
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    // Indicador de carga mientras se traen más movimientos
+                    if isLoading {
+                        ProgressView()
+                            .padding()
+                    }
                 }
-                .padding(.vertical, 5)
-                .background(Color.gray.opacity(0.1)) // Fondo gris suave para cada fila
-                .cornerRadius(5)
-            }*/
+            }
         }
         .padding()
     }
@@ -165,12 +237,43 @@ struct VistaDetalle: View {
             Text("Evoluciones")
                 .font(.title2)
                 .fontWeight(.bold)
-            Text("Aquí irán las evoluciones del Pokémon.") // Mock temporal
+            
+            // Mostrar un mensaje de "Cargando..." si aún no tenemos las evoluciones
+            if evolutions.isEmpty {
+                Text("Cargando evoluciones...")
+                    .font(.body)
+                    .foregroundColor(.gray)
+                    .onAppear {
+                        Task {
+                            evolutions = await obtenerEvoluciones(evolutionChainId: pokemon?.evolution_chain_id ?? 2)
+                        }
+                    }
+            } else {
+                // Mostrar las evoluciones
+                ForEach(evolutions, id: \.0.id) { evolution in
+                    HStack {
+                        evolution.0.image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 150, height: 150)
+                        
+                        Text(evolution.1)
+                            .font(.body)
+                            .foregroundColor(.black)
+                            .padding(.horizontal, 5)
+                        
+                        evolution.2.image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 150, height: 150)
+                    }
+                    .padding(.vertical, 5)
+                }
+            }
         }
         .padding()
     }
 }
-
 // Vista para un botón de pestaña
 struct TabButton: View {
     var title: String
@@ -189,7 +292,6 @@ struct TabButton: View {
         }
     }
 }
-
 // Vista para filas de información
 struct InfoRow: View {
     var title: String
@@ -205,7 +307,7 @@ struct InfoRow: View {
         }
     }
 }
-
 #Preview {
-    VistaDetalle(id:1)
+    VistaDetalle(id: 6)
+
 }
