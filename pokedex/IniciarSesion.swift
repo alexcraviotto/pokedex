@@ -8,7 +8,6 @@ struct IniciarSesion: View {
     @State private var mensajeError = ""
     @State private var inicioCorrecto = false  // Estado para saber si el login fue exitoso
     @State private var navegarAVistaMenu = false  // Estado para controlar la navegación a vistaMenu
-    
     @ObservedObject var viewModel: ViewModel
     
     private var camposRellenos: Bool {
@@ -40,7 +39,7 @@ struct IniciarSesion: View {
                     .padding(.horizontal, 40)
                     .padding(.top, 10)
                     .padding(.bottom, 90)
-                    .autocapitalization(.none) 
+                    .autocapitalization(.none)
                 
                 Spacer()
                 
@@ -51,6 +50,9 @@ struct IniciarSesion: View {
                         if let usuarioValido = viewModel.verificarUsuario(email: email, password: password) {
                             // Si el usuario es encontrado, iniciar animación de éxito y luego navegar
                             print("Sesión iniciada para el usuario: \(usuarioValido.username ?? "Desconocido")")
+                            
+                            // Guardar el userId en UserDefaults
+                            UserDefaults.standard.set(usuarioValido.id?.uuidString, forKey: "userId")
                             
                             // Establecer que el login fue exitoso y luego navegar a vistaMenu
                             inicioCorrecto = true
@@ -86,13 +88,11 @@ struct IniciarSesion: View {
                 .foregroundColor(.white)
                 
                 NavigationLink(
-                    destination: Registro(
-              
-                                    ),
-                                    isActive: $navegarARegistrarse
-                                ) {
-                                    EmptyView()
-                                }.navigationBarHidden(true)
+                    destination: Registro(),
+                    isActive: $navegarARegistrarse
+                ) {
+                    EmptyView()
+                }.navigationBarHidden(true)
                 
                 // Mostrar mensaje de error si es necesario
                 if mostrarError {
@@ -101,11 +101,9 @@ struct IniciarSesion: View {
                         .padding()
                 }
                 
-         
-                
                 // Navegar a la vistaMenu después del inicio correcto
                 NavigationLink(
-                    destination: vistaMenu(viewModel: viewModel),
+                    destination: vistaMenu(userId: obtenerUserIdDesdeLocalStorage(), viewModel: viewModel),
                     isActive: $navegarAVistaMenu
                 ) {
                     EmptyView()
@@ -115,4 +113,6 @@ struct IniciarSesion: View {
         }
         .navigationBarBackButtonHidden(true)
     }
+    
+
 }

@@ -145,11 +145,38 @@ class ViewModel: ObservableObject {
         return battleLogsArray.filter { $0.userId == userId }
     }
 
-    // Eliminar un Pokémon Favorito
-    func eliminarFavoritePokemon(favoritePokemon: FavoritePokemonEntity) {
-        gestorCoreData.contexto.delete(favoritePokemon)
-        guardarDatos()
+    // Eliminar un Pokémon Favorito dado el userId y pokemonId
+    // Eliminar un Pokémon Favorito dado el userId y pokemonId
+    func eliminarFavoritePokemon(userId: UUID, pokemonId: Int64) {
+    
+        
+        // Verificar que pokemonId sea válido
+        if pokemonId == 0 {
+            print("pokemonId no es válido")
+            return
+        }
+        
+        // Buscar el Pokémon favorito en Core Data utilizando el userId y pokemonId
+        let fetchRequest: NSFetchRequest<FavoritePokemonEntity> = FavoritePokemonEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "userId == %@ AND pokemonId == %@", userId as CVarArg, pokemonId as CVarArg)
+        
+        do {
+            // Ejecutar la consulta
+            let result = try gestorCoreData.contexto.fetch(fetchRequest)
+            
+            // Si encontramos el Pokémon favorito, lo eliminamos
+            if let favoritePokemon = result.first {
+                gestorCoreData.contexto.delete(favoritePokemon)
+                guardarDatos()
+                print("Pokémon eliminado de favoritos")
+            } else {
+                print("No se encontró el Pokémon en favoritos")
+            }
+        } catch {
+            print("Error al eliminar el Pokémon de favoritos: \(error)")
+        }
     }
+
 
     // Obtener Pokémon Favoritos por Usuario
     func obtenerFavoritePokemonsPorUsuario(userId: UUID) -> [FavoritePokemonEntity] {
@@ -159,6 +186,14 @@ class ViewModel: ObservableObject {
     func eliminarRecentPokemonSearch(recentSearch: RecentPokemonSearchEntity) {
         gestorCoreData.contexto.delete(recentSearch)
         guardarDatos()
+    }
+    // Función para verificar si un Pokémon es favorito para un usuario dado
+    func esPokemonFavorito(userId: UUID, pokemonId: Int64) -> Bool {
+        // Filtra los Pokémon favoritos del usuario por el ID del Pokémon
+        let favoritosDelUsuario = obtenerFavoritePokemonsPorUsuario(userId: userId)
+        
+        // Devuelve true si el Pokémon está en los favoritos del usuario, de lo contrario false
+        return favoritosDelUsuario.contains { $0.pokemonId == pokemonId }
     }
 
     func obtenerRecentPokemonSearchesPorUsuario(userId: UUID) -> [RecentPokemonSearchEntity] {

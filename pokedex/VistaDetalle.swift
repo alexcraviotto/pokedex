@@ -5,7 +5,8 @@ struct VistaDetalle: View {
     var id: Int
     @State var pokemon: Pokemon2?
     @State private var evolutions: [(Pokemon2, String, Pokemon2)] = []
-    
+    @State private var isFavorite: Bool = false
+
     // Estado para cambiar de pestaña
     @State private var selectedTab: Tab = .about
     
@@ -22,52 +23,73 @@ struct VistaDetalle: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Fondo superior con imagen y tipo
-                ZStack(alignment: .top) {
-                    RoundedRectangle(cornerRadius: 25)
-                        .fill(colorPicker(tipo: pokemon?.types.first ?? "")) // Reemplazamos tipoColor con colorPicker
-                        .frame(height: 350) // Aumenté la altura
-                        .offset(y: -100) // Mantuve el offset superior
-                        .ignoresSafeArea()
-                    
-                    VStack(spacing: 10) { // Compacto
-                        if let pokemon = pokemon {
-                            pokemon.image
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 350, height: 350) // Tamaño ajustado
-                                .zIndex(0)
-                                .offset(y:-30)
-                            
-                            // Nombre del Pokémon
-                            Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .foregroundColor(.black)
-                                .padding(.top, -60)
-                            
-                            // Tipos del Pokémon
-                            HStack(spacing: 10) {
-                                ForEach(pokemon.types, id: \.self) { type in
-                                    Text(type.capitalized)
-                                        .font(.caption)
-                                        .padding(.horizontal, 20)
-                                        .padding(.vertical, 6)
-                                        .background(colorPicker(tipo: type)) // Reemplazamos tipoColor con colorPicker
-                                        .foregroundColor(.white)
-                                        .clipShape(Capsule())
-                                }
-                            }
-                        } else {
-                            Text("Cargando...")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    .zIndex(2)
-                }
-                
+                          // Fondo superior con imagen y tipo
+                          ZStack(alignment: .top) {
+                              RoundedRectangle(cornerRadius: 25)
+                                  .fill(colorPicker(tipo: pokemon?.types.first ?? "")) // Reemplazamos tipoColor con colorPicker
+                                  .frame(height: 350) // Aumenté la altura
+                                  .offset(y: -100) // Mantuve el offset superior
+                                  .ignoresSafeArea()
+                              
+                              VStack(spacing: 10) { // Compacto
+                                  if let pokemon = pokemon {
+                                      pokemon.image
+                                          .resizable()
+                                          .scaledToFit()
+                                          .frame(width: 350, height: 350) // Tamaño ajustado
+                                          .zIndex(0)
+                                          .offset(y:-30)
+                                      
+                                      // Nombre del Pokémon
+                                          Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
+                                              .font(.title)
+                                              .fontWeight(.bold)
+                                              .foregroundColor(.black)
+                                              .padding(.top, -60)
+                                      
+                                      // Imagen de corazón, cambiar dependiendo si es favorito
+                                      Image(isFavorite ? "pokeheart_filled" : "pokeheart") // Cambiar imagen si es favorito
+                                          .resizable()
+                                          .scaledToFit()
+                                          .frame(width: 50, height: 50) // Ajusta el tamaño si es necesario
+                                          .onTapGesture {
+                                              let userId = obtenerUserIdDesdeLocalStorage()
+                                              var vm = ViewModel()
+
+                                              if isFavorite {
+                                                  // Si es favorito, eliminarlo
+                                                  vm.eliminarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon.id))
+                                                  print("Eliminado de favoritos")
+                                                  isFavorite = false
+                                              } else {
+                                                  // Si no es favorito, agregarlo
+                                                  vm.agregarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon.id))
+                                                  print("Agregado a favoritos")
+                                                  isFavorite = true
+                                              }
+                                          }
+                                      
+                                      // Tipos del Pokémon
+                                      HStack(spacing: 10) {
+                                          ForEach(pokemon.types, id: \.self) { type in
+                                              Text(type.capitalized)
+                                                  .font(.caption)
+                                                  .padding(.horizontal, 20)
+                                                  .padding(.vertical, 6)
+                                                  .background(colorPicker(tipo: type)) // Reemplazamos tipoColor con colorPicker
+                                                  .foregroundColor(.white)
+                                                  .clipShape(Capsule())
+                                          }
+                                      }
+                                  } else {
+                                      Text("Cargando...")
+                                          .font(.title)
+                                          .fontWeight(.bold)
+                                          .foregroundColor(.gray)
+                                  }
+                              }
+                              .zIndex(2)
+                          }
                 // Descripción
                 Text(pokemon?.description ?? "Sin descripción disponible.")
                     .font(.body)
@@ -101,6 +123,40 @@ struct VistaDetalle: View {
         .onAppear {
             Task {
                 self.pokemon = await apiCalls.pokemonPorId(id: id)
+                await cargarPokemon()
+                loadMoreMoves() // Cargar los primeros movimientos al aparecer
+            }
+        }
+    }
+    
+    // Método para cargar datos asíncronamente
+    func cargarPokemon() async {
+       
+        self.pokemon = await apiCalls.pokemonPorId(id: id)
+    }
+    func checkIfFavorite() {
+        let userId = obtenerUserIdDesdeLocalStorage()
+        let vm = ViewModel()
+        var favoritePokemon = vm.esPokemonFavorito(userId: userId, pokemonId: Int64(id))
+        if favoritePokemon {
+            isFavorite = true
+        }
+        else {
+            isFavorite = false
+        }
+    }
+    // Función para cargar más movimientos cuando se llega al final
+    private func loadMoreMoves() {
+        guard !isLoading else { return }
+        isLoading = true
+        
+        Task {
+            // Usamos el método ya implementado en otro archivo para obtener los movimientos
+            let newMoves = await apiCalls.getPokemonMoves(id: id, offset: offset, limit: limit)
+            await MainActor.run {
+                movimientos.append(contentsOf: newMoves)
+                offset += limit
+                isLoading = false
             }
         }
     }
