@@ -14,7 +14,6 @@ struct VistaDetalle: View {
     @State private var offset = 0 // Índice de inicio para la paginación
     @State private var limit = 10 // Número de movimientos a cargar por página
     @State private var isLoading = false // Controlar si está cargando más movimientos
-    @State var apiCalls = ApiCalls()
     
     enum Tab {
         case about, movimientos, evoluciones
@@ -109,8 +108,7 @@ struct VistaDetalle: View {
     
     // Método para cargar datos asíncronamente
     func cargarPokemon() async {
-       
-        self.pokemon = await apiCalls.pokemonPorId(id: id)
+        self.pokemon = await pokemonPorId(id: id)
     }
     
     // Función para cargar más movimientos cuando se llega al final
@@ -120,7 +118,7 @@ struct VistaDetalle: View {
         
         Task {
             // Usamos el método ya implementado en otro archivo para obtener los movimientos
-            let newMoves = await apiCalls.getPokemonMoves(id: id, offset: offset, limit: limit)
+            let newMoves = await getPokemonMoves(id: id, offset: offset, limit: limit)
             await MainActor.run {
                 movimientos.append(contentsOf: newMoves)
                 offset += limit
@@ -145,6 +143,7 @@ struct VistaDetalle: View {
                         )
                     }
                     .frame(maxWidth: .infinity) // Centrado del campo
+
                     VStack {
                         InfoRow(
                             title: "Peso",
@@ -169,6 +168,7 @@ struct VistaDetalle: View {
                     }
                     .frame(maxWidth: .infinity) // Centrado del campo
                 }
+
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Debilidad")
                         .font(.title2)
@@ -232,72 +232,43 @@ struct VistaDetalle: View {
             }
         }
         .padding()
-        .onAppear {
-            Task {
-                // Cargar los IDs de los movimientos y obtener los primeros movimientos
-                let moveNames = await apiCalls.loadMoves(pokemon_id: id)  // Cargar los nombres de los movimientos
-                apiCalls.move_names = moveNames  // Guardar los nombres de los movimientos en el estado
-                
-                loadMoreMoves()  // Cargar los primeros 10 movimientos
-            }
-        }
     }
-
-
     
+    // Mock de contenido para "Evoluciones"
     var evolucionesContent: some View {
         VStack(alignment: .leading, spacing: 15) {
             Text("Evoluciones")
                 .font(.title2)
                 .fontWeight(.bold)
             
+            // Mostrar un mensaje de "Cargando..." si aún no tenemos las evoluciones
             if evolutions.isEmpty {
-                // Mostrar un mensaje de carga mientras las evoluciones no están disponibles
-                Text("No tiene evoluciones")
+                Text("Cargando evoluciones...")
                     .font(.body)
                     .foregroundColor(.gray)
                     .onAppear {
                         Task {
-                            evolutions = await apiCalls.obtenerEvoluciones(evolutionChainId: pokemon?.evolution_chain_id ?? 1)
+                            evolutions = await obtenerEvoluciones(evolutionChainId: pokemon?.evolution_chain_id ?? 2)
                         }
                     }
             } else {
                 // Mostrar las evoluciones
-                ForEach(Array(evolutions.enumerated()), id: \.offset) { index, evolution in
-                    VStack {
-                        HStack(spacing: 10) {
-                            // Pokémon inicial
-                            VStack {
-                                evolution.0.image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                                Text(evolution.0.name.capitalized)
-                                    .font(.caption)
-                                    .fontWeight(.semibold)
-                            }
-                            
-                            // Método de evolución
-                            VStack {
-                                Text(evolution.1)
-                                    .font(.caption)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 5)
-                                    .foregroundColor(.gray)
-                            }
-                            .frame(width: 100) // Ancho fijo para consistencia
-                            
-                            // Pokémon evolucionado
-                            VStack {
-                                evolution.2.image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                                Text(evolution.2.name.capitalized)
-                                    .font(.caption)
-                                    .fontWeight(.semibold)
-                            }
-                        }
+                ForEach(evolutions, id: \.0.id) { evolution in
+                    HStack {
+                        evolution.0.image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 150, height: 150)
+                        
+                        Text(evolution.1)
+                            .font(.body)
+                            .foregroundColor(.black)
+                            .padding(.horizontal, 5)
+                        
+                        evolution.2.image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 150, height: 150)
                     }
                     .padding(.vertical, 5)
                 }
@@ -305,9 +276,7 @@ struct VistaDetalle: View {
         }
         .padding()
     }
-
-
-    }
+}
 
 // Vista para un botón de pestaña
 struct TabButton: View {
@@ -327,6 +296,7 @@ struct TabButton: View {
         }
     }
 }
+
 // Vista para filas de información
 struct InfoRow: View {
     var title: String
@@ -342,7 +312,7 @@ struct InfoRow: View {
         }
     }
 }
-#Preview {
-    VistaDetalle(id: 133)
 
+#Preview {
+    VistaDetalle(id: 6)
 }

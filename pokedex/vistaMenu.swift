@@ -19,18 +19,12 @@ struct vistaMenu: View {
                 }
                 .tag(0)
             
-            VistaAjustes(
-                usuario: $usuarioActual,
-                correo: $correoActual,
-                password: $passwordActual,
-                userId: userId,
-                viewModel: viewModel
-            )
-            .tabItem {
-                Image("busqueda")
-                Text("Búsqueda")
-            }
-            .tag(1)
+            VistaBusqueda()
+                .tabItem(){
+                    Image("busqueda")
+                    Text("Busqueda")
+                }
+                .tag(1)
             
             VistaCombate(
             )
@@ -40,6 +34,7 @@ struct vistaMenu: View {
             }
             .tag(2)
     
+
             
             VistaAjustes(
                 usuario: $usuarioActual,

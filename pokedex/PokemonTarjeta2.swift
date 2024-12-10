@@ -96,7 +96,7 @@ struct ParteAbajo2: View {
         ZStack{
             Color.white
             VStack(spacing: 0){
-                Text(nombre)
+                Text(nombre.capitalized.replacing("-", with: " "))
                     .font(.custom("Press Start 2P Regular", size: 13))
                     .offset(CGSize(width: 0, height: 40))
                 Spacer()

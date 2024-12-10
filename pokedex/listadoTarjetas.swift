@@ -2,12 +2,13 @@ import SwiftUI
 
 struct listadoTarjetas: View {
     @State private var pokemons: [Pokemon] = []
-    @State private var isLoading = false
+    @State private var isLoading = true
     let columnas = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
-    ]
-    @State private var count = 0
+          GridItem(.flexible()),
+          GridItem(.flexible())
+      ]
+    @State var count = 0
+    @State var countex = 0
     var items = 20
     
     var body: some View {
@@ -23,12 +24,15 @@ struct listadoTarjetas: View {
                     LazyVGrid(columns: columnas, spacing: 20) {
                         ForEach(pokemons.sorted(by: { $0.id < $1.id })) { pokemon in
                             NavigationLink(
-                                destination: NavegacionVistaDetalle(pokemon: pokemon) // Pasamos el objeto pokemon directamente
+                                destination: VistaDetalle(id: pokemon.id) // Pasamos el objeto pokemon directamente
                             ) {
                                 PokemonTarjeta2(pokemon: pokemon)
                                     .scaleEffect(0.9)
                                     .onAppear {
                                         if pokemon.id == self.pokemons.count && !isLoading {
+                                            carga() // Cargar más Pokémon si hemos llegado al final
+                                        }
+                                        if self.pokemons.count >= 1045 && !isLoading {
                                             carga() // Cargar más Pokémon si hemos llegado al final
                                         }
                                     }
@@ -44,12 +48,20 @@ struct listadoTarjetas: View {
         }
     }
     
-    func carga() {
-        guard !isLoading else { return }
+    func carga() -> Void {
         isLoading = true
-        
-        let start = count * items
+        var start = 0
+        if pokemons.count >= 1025 {
+            start = 10000 + countex * items
+            countex += 1
+            //print(start)
+        } else {
+            start = count * items
+            count += 1
+        }
+        start += 1
         let end = start + items
+        //print(end)
         for i in start..<end {
             fetchPokemonData(pokemonId: i) { result in
                 switch result {
@@ -58,12 +70,13 @@ struct listadoTarjetas: View {
                         pokemons.append(pokemon)
                     }
                 case .failure(let error):
-                    print("Error: \(error)")
+                    break
+                    //print("Error: \(error)")
                 }
             }
+            //print(i)
         }
-        
-        count += 1
+        pokemons = pokemons.sorted(by: { $0.id < $1.id })
         isLoading = false
     }
 }
