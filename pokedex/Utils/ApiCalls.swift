@@ -134,7 +134,7 @@ class ApiCalls{
         }
         return pokemonArray
     }
-    func getPokemonMoves(id: Int, offset: Int, limit: Int) async -> [(String, String, Int, Int)] {
+    /*func getPokemonMoves(id: Int, offset: Int, limit: Int) async -> [(String, String, Int, Int)] {
         // Llamar a la API para obtener los detalles del Pokémon
         let poke = await pokeApi(endpoint: "pokemon/\(id)")
         
@@ -172,7 +172,7 @@ class ApiCalls{
         }
         
         return moveDetails
-    }
+    }*/
     func obtenerEvoluciones(evolutionChainId: Int) async -> [(Pokemon2, String, Pokemon2)] {
         // Llamar al endpoint de evolución
         let evolutionData = await pokeApi(endpoint: "evolution-chain/\(evolutionChainId)")
@@ -258,137 +258,74 @@ class ApiCalls{
     }
     
     private func loadMoreMoves() async {
-        
         guard move_offset < move_names.count else {
-            
             return
             
         }
-        
         let newMoves = await listMoves(
-            
             move_names: move_names, offset: move_offset, limit: 10)
-        
         if !newMoves.isEmpty {
-            
             DispatchQueue.main.async {
-                
                 self.moves.append(contentsOf: newMoves)
-                
                 self.move_offset += newMoves.count
-                
             }
-            
         }
-        
     }
     
     
     
     func loadMoves(pokemon_id: Int) async -> [String] {
-        
         let moves =
-        
         await pokeApi(endpoint: "pokemon/\(pokemon_id)")["moves"]
-        
         as? [[String: Any]] ?? []
-        
         var result: [String] = []
-        
         for move in moves {
-            
             result.append((move["move"] as! [String: Any])["name"] as! String)
-            
         }
-        
+        print(result)
         return result
-        
     }
     
-    
-    
-    func listMoves(move_names: [String], offset: Int, limit: Int) async
-    
-    -> [Move]
-    
+    func listMoves(move_names: [String], offset: Int, limit: Int) async -> [Move]
     {
-        
         guard offset < move_names.count else {
-            
             return []
-            
         }
-        
         let endIndex = min(offset + limit, move_names.count)
-        
         let batchNames = Array(move_names[offset..<endIndex])
-        
         var moves: [Move] = []
-        
         for name in batchNames {
-            
             let move = await loadMove(name: name)
-            
             moves.append(move)
-            
         }
-        
         return moves
-        
     }
     
     
     
     func loadMove(name: String) async -> Move {
-        
         let info = await pokeApi(endpoint: "move/" + name)
-        
         let id = info["id"] as! Int
-        
         var description = ""
-        
         if let flavorTextEntries = info["flavor_text_entries"]
-            
             as? [[String: Any]]
-            
         {
-            
             if let englishEntry = flavorTextEntries.first(where: {
-                
                 ($0["language"] as? [String: Any])?["name"] as? String == "en"
-                
             }) {
-                
                 description = (englishEntry["flavor_text"] as! String)
-                
                     .replacingOccurrences(of: "\n", with: " ")
-                
                     .replacingOccurrences(of: "\u{0C}", with: " ")
-                
             }
-            
         }
-        
         let accuracy = info["accuracy"] as? Int ?? 0
-        
         let power = info["power"] as? Int ?? 0
-        
         return Move(
-            
             id: id,
-            
             name: name,
-            
             description: description,
-            
             accuracy: accuracy,
-            
             power: power
-            
         )
-        
     }
-    
-    
-    
 }

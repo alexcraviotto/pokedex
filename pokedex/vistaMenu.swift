@@ -18,13 +18,23 @@ struct vistaMenu: View {
                     Text("Inicio")
                 }
                 .tag(0)
-    
+            
             VistaBusqueda()
                 .tabItem(){
                     Image("busqueda")
                     Text("Busqueda")
                 }
                 .tag(1)
+            
+            VistaCombate(
+            )
+            .tabItem {
+                Image("pelea")
+                Text("Combate")
+            }
+            .tag(2)
+    
+
             
             VistaAjustes(
                 usuario: $usuarioActual,
@@ -37,7 +47,7 @@ struct vistaMenu: View {
                 Image("ajustes")
                 Text("Ajustes")
             }
-            .tag(2)
+            .tag(3)
         }.navigationBarHidden(true)
     }
 }

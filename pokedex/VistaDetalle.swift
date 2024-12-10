@@ -11,8 +11,7 @@ struct VistaDetalle: View {
     
     // Estado para los movimientos y la paginación
     @State private var movimientos: [(String, String, Int, Int)] = [] // Almacenar movimientos
-    @State private var offset = 0 // Índice de inicio para la paginación
-    @State private var limit = 10 // Número de movimientos a cargar por página
+    @State private var moveNames: [String] = [] // Lista de nombres de movimientos
     @State private var isLoading = false // Controlar si está cargando más movimientos
     @State var apiCalls = ApiCalls()
     
@@ -101,30 +100,7 @@ struct VistaDetalle: View {
         }
         .onAppear {
             Task {
-                await cargarPokemon()
-                loadMoreMoves() // Cargar los primeros movimientos al aparecer
-            }
-        }
-    }
-    
-    // Método para cargar datos asíncronamente
-    func cargarPokemon() async {
-       
-        self.pokemon = await apiCalls.pokemonPorId(id: id)
-    }
-    
-    // Función para cargar más movimientos cuando se llega al final
-    private func loadMoreMoves() {
-        guard !isLoading else { return }
-        isLoading = true
-        
-        Task {
-            // Usamos el método ya implementado en otro archivo para obtener los movimientos
-            let newMoves = await apiCalls.getPokemonMoves(id: id, offset: offset, limit: limit)
-            await MainActor.run {
-                movimientos.append(contentsOf: newMoves)
-                offset += limit
-                isLoading = false
+                self.pokemon = await apiCalls.pokemonPorId(id: id)
             }
         }
     }
@@ -189,7 +165,6 @@ struct VistaDetalle: View {
             }
             .padding()
         }
-    
     // Vista del contenido para "Movimientos"
     var movimientosContent: some View {
         VStack(alignment: .leading, spacing: 15) {
@@ -198,50 +173,96 @@ struct VistaDetalle: View {
                 .fontWeight(.bold)
             
             ScrollView {
-                LazyVStack {
-                    // Mostrar los movimientos cargados
-                    ForEach(Array(movimientos.enumerated()), id: \.offset) { index, move in
-                        VStack(alignment: .leading) {
+                LazyVStack(spacing: 15) { // Separación consistente entre elementos
+                    ForEach(movimientos.indices, id: \.self) { index in
+                        let move = movimientos[index]
+                        
+                        VStack(alignment: .leading, spacing: 10) {
                             Text("\(index + 1). \(move.0)") // Nombre del movimiento
                                 .font(.headline)
-                            Text("Descripción: \(move.1)") // Descripción del movimiento
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                            HStack {
-                                Text("Precisión: \(move.2)")
-                                Text("Poder: \(move.3)")
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
+                            
+                            // Descripción sin indentación
+                            Text("Descripción: \(move.1.isEmpty ? "Sin descripción disponible" : move.1)") // Descripción del movimiento
+                            
+                            HStack() {
+                                Label {
+                                    Text("\(move.2)")
+                                        .font(.body)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.blue)
+                                } icon: {
+                                    Image(systemName: "scope")
+                                        .foregroundColor(.blue)
+                                }
+                                
+                                Label {
+                                    Text("\(move.3)")
+                                        .font(.body)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.red)
+                                } icon: {
+                                    Image(systemName: "bolt.fill")
+                                        .foregroundColor(.red)
+                                }
                             }
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
+                            .padding(.top, 5)
                         }
-                        .padding(.vertical, 5)
+                        .padding()
+                        .frame(maxWidth: .infinity) // Se asegura de que el contenedor ocupe todo el ancho
+                        .background(Color(UIColor.systemGray6)) // Fondo sutil para destacar
+                        .cornerRadius(10)
+                        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                         .onAppear {
-                            // Si estamos en el último movimiento cargado, cargamos más
-                            if index == movimientos.count - 1 && !isLoading {
-                                loadMoreMoves()
+                            // Cargar más movimientos si se acerca al final
+                            if index >= movimientos.count - 2 && !isLoading {
+                                Task { await fetchMoreMoves() }
                             }
                         }
                     }
                     
-                    // Indicador de carga mientras se traen más movimientos
                     if isLoading {
                         ProgressView()
                             .padding()
                     }
                 }
+                .padding(.horizontal) // Espaciado general
             }
         }
         .padding()
         .onAppear {
             Task {
-                // Cargar los IDs de los movimientos y obtener los primeros movimientos
-                let moveNames = await apiCalls.loadMoves(pokemon_id: id)  // Cargar los nombres de los movimientos
-                apiCalls.move_names = moveNames  // Guardar los nombres de los movimientos en el estado
-                
-                loadMoreMoves()  // Cargar los primeros 10 movimientos
+                // Si los nombres de los movimientos no están cargados, los obtenemos
+                if moveNames.isEmpty {
+                    moveNames = await apiCalls.loadMoves(pokemon_id: id)
+                }
+                await fetchMoreMoves()
             }
         }
     }
+
+
+    // Método para cargar más movimientos
+    private func fetchMoreMoves() async {
+        guard !isLoading else { return }
+        isLoading = true
+        
+        let newMoves = await apiCalls.listMoves(
+            move_names: moveNames,
+            offset: movimientos.count, // Cargar a partir de donde terminamos
+            limit: 10
+        )
+        
+        await MainActor.run {
+            movimientos.append(contentsOf: newMoves.map { move in
+                (move.name, move.description, move.accuracy, move.power)
+            })
+            isLoading = false
+        }
+    }
+        
+    
 
 
     
@@ -343,6 +364,6 @@ struct InfoRow: View {
     }
 }
 #Preview {
-    VistaDetalle(id: 133)
+    VistaDetalle(id: 6)
 
 }
