@@ -11,7 +11,8 @@ struct VistaBusqueda: View {
     
     @State var pokemons: [PokemonPair] = []
     @State private var showFilters = false
-        @StateObject private var filterManager = FilterManager()
+    @StateObject private var filterManager = FilterManager()
+    @State private var tipoSeleccionado:String = ""
     
     let columnas = [
         GridItem(.flexible()),
@@ -31,22 +32,12 @@ struct VistaBusqueda: View {
                             .foregroundColor(.black)
                         Spacer()
                     }.padding()
-                    
-                    Button{
-                        
-                    }label: {
-                        Image("filtro")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 15, height: 15)
-                        Text("Tipo")
-                    }
-                    
+
                     BusquedaView(text: $query)
                         .onChange(of: query) { oldValue, newValue in
                             print(pokemons)
                             filtrado = []
-                            if query.count >= 3 {
+                            if query.count >= 1 {
                                 for nombre in filterPokemonByName(pokemonArray: pokemons, searchTerm: query) {
                                     print(nombre)
                                     fetchPokemonData(pokemonId: nombre) { result in
@@ -60,20 +51,56 @@ struct VistaBusqueda: View {
                                 }
                             }
                         }
+                    HStack {
+                        Button{
+                            withAnimation {
+                                showFilters = true
+                            }
+                        }label: {
+                            Image("filtro")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 15, height: 15)
+                            Text("Tipos")
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                        }
+                        .frame(width: 120, height: 30)
+                        .shadow(radius: 9)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color.gray.opacity(0.1))
+                        )
+                        .offset(CGSize(width: 40, height: 0))
+                        Spacer()
+                    }
                     
                     ScrollView {
                         if !filtrado.isEmpty {
                             LazyVGrid(columns: columnas, spacing: 20) {
-                                ForEach(filtrado, id: \.id) { pokemon in
-                                    NavigationLink(
-                                        destination: VistaDetalle(id: pokemon.id)
-                                    ) {
-                                        PokemonTarjeta2(
-                                            pokemon: pokemon
-                                        )
-                                        .scaleEffect(0.9)
-                                        .foregroundColor(.black)
-                                        
+                                ForEach(filtrado.sorted(by: {$0.id < $1.id}), id: \.id) { pokemon in
+                                    if tipoSeleccionado.isEmpty && tipoSeleccionado.lowercased().contains( pokemon.types[0].type.name){
+                                        NavigationLink(
+                                            destination: VistaDetalle(id: pokemon.id)
+                                        ) {
+                                            PokemonTarjeta2(
+                                                pokemon: pokemon
+                                            )
+                                            .scaleEffect(0.9)
+                                            .foregroundColor(.black)
+                                            
+                                        }
+                                    } else {
+                                        NavigationLink(
+                                            destination: VistaDetalle(id: pokemon.id)
+                                        ) {
+                                            PokemonTarjeta2(
+                                                pokemon: pokemon
+                                            )
+                                            .scaleEffect(0.9)
+                                            .foregroundColor(.black)
+                                            
+                                        }
                                     }
                                 }
                             }
@@ -93,7 +120,7 @@ struct VistaBusqueda: View {
                     }
                 }
                 if showFilters {
-                    FilterView(isShowing: $showFilters, filterManager: filterManager)
+                    FilterView(isShowing: $showFilters, filterManager: filterManager, seleccionado: $tipoSeleccionado)
                         .transition(.move(edge: .leading))
                 }
             }
@@ -124,7 +151,7 @@ struct BusquedaView: View {
             }.opacity(text.isEmpty ? 0.0 : 1.0)
         }
         .frame(width: 320, height: 30)
-        .shadow(radius: 9)
+        .shadow(radius: 20)
         .background(
             RoundedRectangle(cornerRadius: 9)
                 .fill(Color.gray.opacity(0.1))
@@ -135,31 +162,201 @@ struct BusquedaView: View {
 struct FilterView: View {
     @Binding var isShowing: Bool
     @ObservedObject var filterManager: FilterManager
+    @Binding var seleccionado:String
     
     var body: some View {
         GeometryReader { geometry in
             HStack {
                 VStack {
-                    Text("Filtros")
-                        .font(.title)
-                        .padding()
+                    Text("Tipos")
+                        .font(.custom("Press Start 2P Regular", size: 24))
+                        .foregroundColor(.black)
                     
                     // ScrollView para los filtros
                     ScrollView {
                         VStack(spacing: 15) {
-                            // Ejemplo con muchos filtros
-                            Toggle("Filtro 1", isOn: $filterManager.filter1)
-                            Toggle("Filtro 2", isOn: $filterManager.filter2)
-                            Toggle("Filtro 3", isOn: $filterManager.filter3)
-                            Toggle("Filtro 4", isOn: $filterManager.filter4)
-                            Toggle("Filtro 5", isOn: $filterManager.filter5)
-                            Toggle("Filtro 6", isOn: $filterManager.filter6)
-                            Toggle("Filtro 7", isOn: $filterManager.filter7)
-                            Toggle("Filtro 8", isOn: $filterManager.filter8)
-                            Toggle("Filtro 9", isOn: $filterManager.filter9)
-                            Toggle("Filtro 10", isOn: $filterManager.filter10)
                             
-                            // Puedes añadir más filtros según necesites
+                            Toggle("Bicho", isOn: $filterManager.bicho)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.bicho) {
+                                    filterManager.resetExcluding(tipo: "bug")
+                                    seleccionado = "bug"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+
+                                }
+                            Toggle("Siniestro", isOn: $filterManager.siniestro)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onTapGesture {
+                                    filterManager.resetExcluding(tipo: "dark")
+                                    seleccionado = "dark"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Dragon", isOn: $filterManager.dragon)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.dragon) {
+                                    filterManager.resetExcluding(tipo: "dragon")
+                                    seleccionado = "dragon"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Electrico", isOn: $filterManager.electrico)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.electrico) {
+                                    filterManager.resetExcluding(tipo: "electric")
+                                    seleccionado = "electric"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Hada", isOn: $filterManager.hada)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.hada) {
+                                    filterManager.resetExcluding(tipo: "fairy")
+                                    seleccionado = "fairy"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Lucha", isOn: $filterManager.lucha)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.lucha) {
+                                    filterManager.resetExcluding(tipo: "fighting")
+                                    seleccionado = "fighting"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Fuego", isOn: $filterManager.fuego)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.fuego) {
+                                    filterManager.resetExcluding(tipo: "fire")
+                                    seleccionado = "fire"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Volador", isOn: $filterManager.volador)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.volador) {
+                                    filterManager.resetExcluding(tipo: "flying")
+                                    seleccionado = "flying"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Fantasma", isOn: $filterManager.fantasma)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.fantasma) {
+                                    filterManager.resetExcluding(tipo: "ghost")
+                                    seleccionado = "ghost"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Planta", isOn: $filterManager.planta)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.planta) {
+                                    filterManager.resetExcluding(tipo: "grass")
+                                    seleccionado = "grass"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Hielo", isOn: $filterManager.hielo)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.hielo) {
+                                    filterManager.resetExcluding(tipo: "ice")
+                                    seleccionado = "ice"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Veneno", isOn: $filterManager.veneno)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.veneno) {
+                                    filterManager.resetExcluding(tipo: "poison")
+                                    seleccionado = "poison"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Psiquico", isOn: $filterManager.psiquico)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.psiquico) {
+                                    filterManager.resetExcluding(tipo: "psychic")
+                                    seleccionado = "psychic"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Roca", isOn: $filterManager.roca)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.roca) {
+                                    filterManager.resetExcluding(tipo: "rock")
+                                    seleccionado = "rock"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Metal", isOn: $filterManager.metal)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.metal) {
+                                    filterManager.resetExcluding(tipo: "steel")
+                                    seleccionado = "steel"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Agua", isOn: $filterManager.agua)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.agua) {
+                                    filterManager.resetExcluding(tipo: "water")
+                                    seleccionado = "water"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Normal", isOn: $filterManager.normal)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.normal) {
+                                    filterManager.resetExcluding(tipo: "normal")
+                                    seleccionado = "normal"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
+                            Toggle("Tierra", isOn: $filterManager.tierra)
+                                .font(.custom("Press Start 2P Regular", size: 12))
+                                .foregroundColor(.black)
+                                .onChange(of: filterManager.tierra) {
+                                    filterManager.resetExcluding(tipo: "ground")
+                                    seleccionado = "ground"
+                                    withAnimation(.easeInOut.speed(0.4)) {
+                                        isShowing = false
+                                    }
+                                }
                         }
                         .padding()
                     }
@@ -167,7 +364,7 @@ struct FilterView: View {
                     Spacer()
                     
                     // Botones de acción
-                    HStack {
+                    /*HStack {
                         Button("Resetear") {
                             filterManager.resetFilters()
                         }
@@ -184,13 +381,11 @@ struct FilterView: View {
                         .background(Color.blue.opacity(0.1))
                         .cornerRadius(10)
                     }
-                    .padding(.bottom)
+                    .padding(.bottom)*/
                 }
-                .frame(width: geometry.size.width * 0.7)
+                .frame(width: geometry.size.width * 0.6)
                 .background(Color.white)
-                .edgesIgnoringSafeArea(.all)
                 
-                // Área para descartar el menú
                 Color.black.opacity(0.3)
                     .onTapGesture {
                         withAnimation {
@@ -204,30 +399,73 @@ struct FilterView: View {
 }
 
 class FilterManager: ObservableObject {
-    @Published var filter1 = false
-    @Published var filter2 = false
-    @Published var filter3 = false
-    @Published var filter4 = false
-    @Published var filter5 = false
-    @Published var filter6 = false
-    @Published var filter7 = false
-    @Published var filter8 = false
-    @Published var filter9 = false
-    @Published var filter10 = false
-    
-    func resetFilters() {
-        filter1 = false
-        filter2 = false
-        filter3 = false
-        filter4 = false
-        filter5 = false
-        filter6 = false
-        filter7 = false
-        filter8 = false
-        filter9 = false
-        filter10 = false
+    @Published var bicho = false
+    @Published var siniestro = false
+    @Published var dragon = false
+    @Published var electrico = false
+    @Published var hada = false
+    @Published var lucha = false
+    @Published var fuego = false
+    @Published var volador = false
+    @Published var fantasma = false
+    @Published var planta = false
+    @Published var tierra = false
+    @Published var hielo = false
+    @Published var veneno = false
+    @Published var psiquico = false
+    @Published var roca = false
+    @Published var metal = false
+    @Published var agua = false
+    @Published var normal = false
+
+    // Función para resetear todos los toggles excepto el que corresponde al tipo
+    func resetExcluding(tipo: String) {
+        // Desactivamos todos los toggles
+        bicho = false
+        siniestro = false
+        dragon = false
+        electrico = false
+        hada = false
+        lucha = false
+        fuego = false
+        volador = false
+        fantasma = false
+        planta = false
+        tierra = false
+        hielo = false
+        veneno = false
+        psiquico = false
+        roca = false
+        metal = false
+        agua = false
+        normal = false
+
+        // Activamos el toggle correspondiente al tipo seleccionado
+        switch tipo {
+        case "bug": bicho = true
+        case "dark": siniestro = true
+        case "dragon": dragon = true
+        case "electric": electrico = true
+        case "fairy": hada = true
+        case "fighting": lucha = true
+        case "fire": fuego = true
+        case "flying": volador = true
+        case "ghost": fantasma = true
+        case "grass": planta = true
+        case "ground": tierra = true
+        case "ice": hielo = true
+        case "poison": veneno = true
+        case "psychic": psiquico = true
+        case "rock": roca = true
+        case "steel": metal = true
+        case "water": agua = true
+        case "normal": normal = true
+        default: break
+        }
     }
 }
+
+
 
 #Preview(){
     VistaBusqueda()
