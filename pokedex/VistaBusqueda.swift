@@ -105,7 +105,7 @@ struct VistaBusqueda: View {
                             Text("No se encontraron resultados").padding()
                         }
                     }
-                    .onChange(of: tipoSeleccionado) { newValue in
+                    .onChange(of: tipoSeleccionado) {
                         if filtrado.isEmpty {
                             return
                         }
@@ -114,6 +114,7 @@ struct VistaBusqueda: View {
                     }
                 }
                 .onAppear {
+                    showFilters = false
                     fetchPokemonNames { result in
                         switch result {
                         case .success(let pokemons):
