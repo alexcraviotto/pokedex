@@ -1,228 +1,155 @@
 import SwiftUI
-import UIKit
 
 struct VistaDetalle: View {
     var id: Int
-    @State var pokemon: Pokemon2?
+    @State private var pokemon: Pokemon2?
     @State private var evolutions: [(Pokemon2, String, Pokemon2)] = []
-    @State private var isFavorite: Bool = false
-
-    // Estado para cambiar de pestaña
+    @State private var movimientos: [(String, String, Int, Int)] = []
+    @State private var moveNames: [String] = []
+    @State private var offset = 0
+    @State private var isLoading = false
     @State private var selectedTab: Tab = .about
+    @State private var apiCalls = ApiCalls()
     
-    // Estado para los movimientos y la paginación
-    @State private var movimientos: [(String, String, Int, Int)] = [] // Almacenar movimientos
-    @State private var moveNames: [String] = [] // Lista de nombres de movimientos
-    @State private var isLoading = false // Controlar si está cargando más movimientos
-    @State var apiCalls = ApiCalls()
-    
-    enum Tab {
-        case about, movimientos, evoluciones
+    enum Tab: String, CaseIterable {
+        case about = "About"
+        case movimientos = "Movimientos"
+        case evoluciones = "Evoluciones"
     }
+
     
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                          // Fondo superior con imagen y tipo
-                          ZStack(alignment: .top) {
-                              RoundedRectangle(cornerRadius: 25)
-                                  .fill(colorPicker(tipo: pokemon?.types.first ?? "")) // Reemplazamos tipoColor con colorPicker
-                                  .frame(height: 350) // Aumenté la altura
-                                  .offset(y: -100) // Mantuve el offset superior
-                                  .ignoresSafeArea()
-                              
-                              VStack(spacing: 10) { // Compacto
-                                  if let pokemon = pokemon {
-                                      pokemon.image
-                                          .resizable()
-                                          .scaledToFit()
-                                          .frame(width: 350, height: 350) // Tamaño ajustado
-                                          .zIndex(0)
-                                          .offset(y:-30)
-                                      
-                                      // Nombre del Pokémon
-                                          Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
-                                              .font(.title)
-                                              .fontWeight(.bold)
-                                              .foregroundColor(.black)
-                                              .padding(.top, -60)
-                                      
-                                      // Imagen de corazón, cambiar dependiendo si es favorito
-                                      Image(isFavorite ? "pokeheart_filled" : "pokeheart") // Cambiar imagen si es favorito
-                                          .resizable()
-                                          .scaledToFit()
-                                          .frame(width: 50, height: 50) // Ajusta el tamaño si es necesario
-                                          .onTapGesture {
-                                              let userId = obtenerUserIdDesdeLocalStorage()
-                                              var vm = ViewModel()
-
-                                              if isFavorite {
-                                                  // Si es favorito, eliminarlo
-                                                  vm.eliminarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon.id))
-                                                  print("Eliminado de favoritos")
-                                                  isFavorite = false
-                                              } else {
-                                                  // Si no es favorito, agregarlo
-                                                  vm.agregarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon.id))
-                                                  print("Agregado a favoritos")
-                                                  isFavorite = true
-                                              }
-                                          }
-                                      
-                                      // Tipos del Pokémon
-                                      HStack(spacing: 10) {
-                                          ForEach(pokemon.types, id: \.self) { type in
-                                              Text(type.capitalized)
-                                                  .font(.caption)
-                                                  .padding(.horizontal, 20)
-                                                  .padding(.vertical, 6)
-                                                  .background(colorPicker(tipo: type)) // Reemplazamos tipoColor con colorPicker
-                                                  .foregroundColor(.white)
-                                                  .clipShape(Capsule())
-                                          }
-                                      }
-                                  } else {
-                                      Text("Cargando...")
-                                          .font(.title)
-                                          .fontWeight(.bold)
-                                          .foregroundColor(.gray)
-                                  }
-                              }
-                              .zIndex(2)
-                          }
-                // Descripción
-                Text(pokemon?.description ?? "Sin descripción disponible.")
-                    .font(.body)
-                    .padding(.horizontal)
-                    .multilineTextAlignment(.center)
+                // Encabezado
+                ZStack(alignment: .top) {
+                    RoundedRectangle(cornerRadius: 25)
+                        .fill(colorPicker(tipo: pokemon?.types.first ?? ""))
+                        .frame(height: 350)
+                        .offset(y: -100)
+                        .ignoresSafeArea()
+                    
+                    VStack(spacing: 10) {
+                        if let pokemon = pokemon {
+                            pokemon.image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 350, height: 350)
+                                .offset(y: -30)
+                            Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
+                                .font(.title).fontWeight(.bold).padding(.top, -60)
+                            HStack(spacing: 10) {
+                                ForEach(pokemon.types, id: \.self) { type in
+                                    Text(type.capitalized)
+                                        .font(.caption).padding(.horizontal, 20).padding(.vertical, 6)
+                                        .background(colorPicker(tipo: type))
+                                        .foregroundColor(.white).clipShape(Capsule())
+                                }
+                            }
+                        } else {
+                            Text("Cargando...").font(.title).foregroundColor(.gray)
+                        }
+                    }
+                }
                 
-                // Menú interactivo
+                // Descripción y pestañas
+                Text(pokemon?.description ?? "Sin descripción disponible.")
+                    .font(.body).padding(.horizontal).multilineTextAlignment(.center)
+                
                 HStack {
-                    TabButton(title: "About", isSelected: selectedTab == .about) {
-                        selectedTab = .about
-                    }
-                    TabButton(title: "Movimientos", isSelected: selectedTab == .movimientos) {
-                        selectedTab = .movimientos
-                    }
-                    TabButton(title: "Evoluciones", isSelected: selectedTab == .evoluciones) {
-                        selectedTab = .evoluciones
+                    ForEach(Tab.allCases, id: \.self) { tab in
+                        TabButton(title: tab.rawValue.capitalized, isSelected: selectedTab == tab) {
+                            selectedTab = tab
+                        }
                     }
                 }
                 .padding(.vertical, 10)
                 
-                // Contenido dinámico según la pestaña seleccionada
-                if selectedTab == .about {
-                    aboutContent
-                } else if selectedTab == .movimientos {
-                    movimientosContent
-                } else if selectedTab == .evoluciones {
-                    evolucionesContent
+                // Contenido dinámico
+                Group {
+                    if selectedTab == .about { aboutContent }
+                    else if selectedTab == .movimientos { movimientosContent }
+                    else { evolucionesContent }
                 }
             }
         }
-        .onAppear {
-            Task {
-                self.pokemon = await apiCalls.pokemonPorId(id: id)
-                await cargarPokemon()
-                loadMoreMoves() // Cargar los primeros movimientos al aparecer
-            }
-        }
+        .onAppear { Task { await cargarPokemon() } }
     }
     
-    // Método para cargar datos asíncronamente
-    func cargarPokemon() async {
-       
-        self.pokemon = await apiCalls.pokemonPorId(id: id)
-    }
-    func checkIfFavorite() {
-        let userId = obtenerUserIdDesdeLocalStorage()
-        let vm = ViewModel()
-        var favoritePokemon = vm.esPokemonFavorito(userId: userId, pokemonId: Int64(id))
-        if favoritePokemon {
-            isFavorite = true
-        }
-        else {
-            isFavorite = false
-        }
-    }
-    // Función para cargar más movimientos cuando se llega al final
-    private func loadMoreMoves() {
-        guard !isLoading else { return }
-        isLoading = true
-        
-        Task {
-            // Usamos el método ya implementado en otro archivo para obtener los movimientos
-            let newMoves = await apiCalls.getPokemonMoves(id: id, offset: offset, limit: limit)
-            await MainActor.run {
-                movimientos.append(contentsOf: newMoves)
-                offset += limit
-                isLoading = false
+    // Contenido "About"
+    private var aboutContent: some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text("About")
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
+                .padding(.bottom, 5)
+            
+            // Sección de Altura, Peso y HP
+            HStack(spacing: 0) {
+                InfoRow(title: "Altura", value: "\(String(format: "%.1f", (pokemon?.height ?? 0) / 10))m")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                
+                Divider()
+                    .frame(width: 1, height: 60)
+                    .background(Color.gray.opacity(0.4))
+                
+                InfoRow(title: "Peso", value: "\(String(format: "%.1f", (pokemon?.weight ?? 0) / 10))kg")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.red.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                
+                Divider()
+                    .frame(width: 1, height: 60)
+                    .background(Color.gray.opacity(0.4))
+                
+                InfoRow(title: "HP", value: "\(pokemon?.stats["hp"] ?? 0)")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.green.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-        }
-    }
-    
-    // Vista del contenido para "About"
-        var aboutContent: some View {
-            VStack(alignment: .leading, spacing: 15) {
-                Text("About")
+            .frame(maxWidth: .infinity)
+            .background(Color(UIColor.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 15))
+            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+            
+            // Sección de Debilidades
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Debilidad")
                     .font(.title2)
                     .fontWeight(.bold)
+                    .foregroundColor(.primary)
                 
-                HStack {
-                    // Se utiliza un VStack para que cada InfoRow ocupe una porción del espacio
-                    VStack {
-                        InfoRow(
-                            title: "Altura",
-                            value: "\(String(format: "%.1f", (pokemon?.height ?? 0) / 10))m" // Ajuste de altura
-                        )
-                    }
-                    .frame(maxWidth: .infinity) // Centrado del campo
-                    VStack {
-                        InfoRow(
-                            title: "Peso",
-                            value: "\(String(format: "%.1f", (pokemon?.weight ?? 0) / 10))kg" // Ajuste de peso
-                        )
-                    }
-                    .frame(maxWidth: .infinity) // Centrado del campo
-                    
-                    VStack {
-                        // Obtener los HP de pokemon.stats
-                        if let hp = pokemon?.stats["hp"] {
-                            InfoRow(
-                                title: "Health Points",
-                                value: "\(hp)" // Muestra los puntos de vida (HP)
-                            )
-                        } else {
-                            InfoRow(
-                                title: "Health Points",
-                                value: "N/A" // Si no hay HP, muestra N/A
-                            )
-                        }
-                    }
-                    .frame(maxWidth: .infinity) // Centrado del campo
-                }
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Debilidad")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    
-                    // Usar un LazyVGrid para que las debilidades se distribuyan en varias líneas
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
-                        ForEach(pokemon?.weakTypes ?? [], id: \.self) { debilidad in
-                            Text(debilidad)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(colorPicker(tipo: debilidad)) // Usamos colorPicker en lugar de tipoColor
-                                .foregroundColor(.white)
-                                .clipShape(Capsule())
-                        }
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
+                    ForEach(pokemon?.weakTypes ?? [], id: \.self) { debilidad in
+                        Text(debilidad.capitalized)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(colorPicker(tipo: debilidad))
+                            .foregroundColor(.white)
+                            .fontWeight(.semibold)
+                            .clipShape(Capsule())
+                            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
                     }
                 }
             }
-            .padding()
+            .padding(.top, 10)
         }
-    // Vista del contenido para "Movimientos"
-    var movimientosContent: some View {
+        .padding()
+        .background(Color(UIColor.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 15))
+        .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
+        .padding(.horizontal)
+    }
+
+    
+    // Contenido "Movimientos"
+    private var movimientosContent: some View {
         VStack(alignment: .leading, spacing: 15) {
             Text("Movimientos")
                 .font(.title2)
@@ -239,10 +166,13 @@ struct VistaDetalle: View {
                                 .fontWeight(.bold)
                                 .foregroundColor(.primary)
                             
-                            // Descripción sin indentación
+                            // Asegurarse de que la descripción no tenga indentación
                             Text("Descripción: \(move.1.isEmpty ? "Sin descripción disponible" : move.1)") // Descripción del movimiento
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .padding(.bottom, 5) // Asegurarse de que no haya indentación extra
                             
-                            HStack() {
+                            HStack(spacing: 20) {
                                 Label {
                                     Text("\(move.2)")
                                         .font(.body)
@@ -289,92 +219,50 @@ struct VistaDetalle: View {
         .padding()
         .onAppear {
             Task {
-                // Si los nombres de los movimientos no están cargados, los obtenemos
                 if moveNames.isEmpty {
+                    // Cargar nombres de movimientos del Pokémon
                     moveNames = await apiCalls.loadMoves(pokemon_id: id)
                 }
-                await fetchMoreMoves()
+                
+                // Cargar los primeros movimientos
+                if movimientos.isEmpty {
+                    await fetchMoreMoves()
+                }
             }
         }
+
     }
-
-
-    // Método para cargar más movimientos
+    
     private func fetchMoreMoves() async {
         guard !isLoading else { return }
         isLoading = true
-        
-        let newMoves = await apiCalls.listMoves(
-            move_names: moveNames,
-            offset: movimientos.count, // Cargar a partir de donde terminamos
-            limit: 10
-        )
-        
+        let newMoves = await apiCalls.listMoves(move_names: moveNames, offset: movimientos.count, limit: 10)
         await MainActor.run {
-            movimientos.append(contentsOf: newMoves.map { move in
-                (move.name, move.description, move.accuracy, move.power)
-            })
+            movimientos.append(contentsOf: newMoves.map { ($0.name, $0.description, $0.accuracy, $0.power) })
             isLoading = false
         }
     }
-        
     
-
-
-    
-    var evolucionesContent: some View {
+    // Contenido "Evoluciones"
+    private var evolucionesContent: some View {
         VStack(alignment: .leading, spacing: 15) {
-            Text("Evoluciones")
-                .font(.title2)
-                .fontWeight(.bold)
-            
+            Text("Evoluciones").font(.title2).fontWeight(.bold)
             if evolutions.isEmpty {
-                // Mostrar un mensaje de carga mientras las evoluciones no están disponibles
-                Text("No tiene evoluciones")
-                    .font(.body)
-                    .foregroundColor(.gray)
+                Text("No tiene evoluciones").font(.body).foregroundColor(.gray)
                     .onAppear {
                         Task {
                             evolutions = await apiCalls.obtenerEvoluciones(evolutionChainId: pokemon?.evolution_chain_id ?? 1)
                         }
                     }
             } else {
-                // Mostrar las evoluciones
-                ForEach(Array(evolutions.enumerated()), id: \.offset) { index, evolution in
-                    VStack {
-                        HStack(spacing: 10) {
-                            // Pokémon inicial
-                            VStack {
-                                evolution.0.image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                                Text(evolution.0.name.capitalized)
-                                    .font(.caption)
-                                    .fontWeight(.semibold)
-                            }
-                            
-                            // Método de evolución
-                            VStack {
-                                Text(evolution.1)
-                                    .font(.caption)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 5)
-                                    .foregroundColor(.gray)
-                            }
-                            .frame(width: 100) // Ancho fijo para consistencia
-                            
-                            // Pokémon evolucionado
-                            VStack {
-                                evolution.2.image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                                Text(evolution.2.name.capitalized)
-                                    .font(.caption)
-                                    .fontWeight(.semibold)
-                            }
+                ForEach(evolutions, id: \.0.id) { evolution in
+                    HStack(spacing: 10) {
+                        evolutionView(evolution.0)
+                        VStack {
+                            Text(evolution.1).font(.caption).foregroundColor(.gray)
                         }
+                        .frame(width: 100)
+                        evolutionView(evolution.2)
                     }
                     .padding(.vertical, 5)
                 }
@@ -382,11 +270,24 @@ struct VistaDetalle: View {
         }
         .padding()
     }
-
-
+    
+    private func evolutionView(_ pokemon: Pokemon2) -> some View {
+        VStack {
+            pokemon.image
+                .resizable()
+                .scaledToFit()
+                .frame(width: 100, height: 100)
+            Text(pokemon.name.capitalized)
+                .font(.caption).fontWeight(.semibold)
+        }
     }
+    
+    private func cargarPokemon() async {
+        pokemon = await apiCalls.pokemonPorId(id: id)
+    }
+}
 
-// Vista para un botón de pestaña
+// Componentes reutilizables
 struct TabButton: View {
     var title: String
     var isSelected: Bool
@@ -397,29 +298,25 @@ struct TabButton: View {
             Text(title)
                 .fontWeight(isSelected ? .bold : .regular)
                 .foregroundColor(isSelected ? .black : .gray)
-                .padding(.vertical, 6)
-                .padding(.horizontal, 12)
+                .padding(.vertical, 6).padding(.horizontal, 12)
                 .background(isSelected ? Color.gray.opacity(0.2) : Color.clear)
                 .cornerRadius(10)
         }
     }
 }
-// Vista para filas de información
+
 struct InfoRow: View {
     var title: String
     var value: String
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.gray)
-            Text(value)
-                .fontWeight(.bold)
+            Text(title).font(.caption).foregroundColor(.gray)
+            Text(value).fontWeight(.bold)
         }
     }
 }
-#Preview {
-    VistaDetalle(id: 6)
 
+#Preview {
+    VistaDetalle(id: 147)
 }
