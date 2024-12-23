@@ -1,20 +1,26 @@
-//
-//  VistaCombate.swift
-//  pokedex
-//
-//  Created by Antonio Ordóñez on 3/12/24.
-//
-
 import SwiftUI
 
 struct VistaCombate: View {
-    @State var contrincante: Bool = false // Si se selecciona IA, es false. Si es multijugador, es true.
+    @State private var contrincante: Bool = false // Si es false, combate contra la IA. Si es true, combate multijugador.
     
     var body: some View {
         NavigationView {
             VStack {
                 VStack(spacing: 20) {
-                    NavigationLink(destination: eleccionPokemon(contrincante: false)) {
+                    // Opción: Combate contra la IA
+                    NavigationLink(destination: eleccionPokemon(contrincante: false, pokemonActual: Pokemon2(
+                        id: 0,
+                        name: "",
+                        description: "",
+                        types: [],
+                        weakTypes: [],
+                        weight: 0.0,
+                        height: 0.0,
+                        stats: [:],
+                        image: Image(""),
+                        image_shiny: Image(""),
+                        evolution_chain_id: 0
+                    ), huecoARellenar: -1)) {
                         VStack(spacing: 20) {
                             Image("Mewtwo")
                                 .renderingMode(.original)
@@ -31,7 +37,20 @@ struct VistaCombate: View {
                             .stroke(Color.gray, lineWidth: 2)
                     ).shadow(radius: 10)
                     
-                    NavigationLink(destination: eleccionPokemon(contrincante: true)) {
+                    // Opción: Combate multijugador
+                    NavigationLink(destination: eleccionPokemon(contrincante: true, pokemonActual: Pokemon2(
+                        id: 0,
+                        name: "",
+                        description: "",
+                        types: [],
+                        weakTypes: [],
+                        weight: 0.0,
+                        height: 0.0,
+                        stats: [:],
+                        image: Image(""),
+                        image_shiny: Image(""),
+                        evolution_chain_id: 0
+                    ), huecoARellenar: -1)) {
                         VStack {
                             HStack(spacing: 10) {
                                 Image("Zekrom")
