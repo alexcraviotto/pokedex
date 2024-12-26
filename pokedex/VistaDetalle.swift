@@ -10,13 +10,13 @@ struct VistaDetalle: View {
     @State private var isLoading = false
     @State private var selectedTab: Tab = .about
     @State private var apiCalls = ApiCalls()
+    @State private var isFavorite: Bool = false
     
     enum Tab: String, CaseIterable {
         case about = "About"
         case movimientos = "Movimientos"
         case evoluciones = "Evoluciones"
     }
-
     
     var body: some View {
         ScrollView {
@@ -28,6 +28,30 @@ struct VistaDetalle: View {
                         .frame(height: 350)
                         .offset(y: -100)
                         .ignoresSafeArea()
+                    
+                    // Botón de favorito arriba a la derecha
+                    Image(isFavorite ? "pokeheart_filled" : "pokeheart") // Cambiar imagen si es favorito
+                        .resizable()
+                        .scaledToFit()
+                        .offset(x: 150, y: -50)
+                        .frame(width: 50, height: 50)
+                        .zIndex(1)
+                        .onTapGesture {
+                            let userId = obtenerUserIdDesdeLocalStorage()
+                            var vm = ViewModel()
+                            
+                            if isFavorite {
+                                vm.eliminarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon!.id))
+                                print("Eliminado de favoritos")
+                                isFavorite = false
+                            } else {
+                                // Si no es favorito, agregarlo
+                                vm.agregarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon!.id))
+                                print("Agregado a favoritos")
+                                isFavorite = true
+                            }
+                        
+                        }
                     
                     VStack(spacing: 10) {
                         if let pokemon = pokemon {
@@ -73,7 +97,18 @@ struct VistaDetalle: View {
                 }
             }
         }
-        .onAppear { Task { await cargarPokemon() } }
+        .onAppear {
+            Task {
+                await cargarPokemon()
+                checkIfFavorite()
+            }
+        }
+    }
+    
+    func checkIfFavorite() {
+        let userId = obtenerUserIdDesdeLocalStorage()
+        let vm = ViewModel()
+        isFavorite = vm.esPokemonFavorito(userId: userId, pokemonId: Int64(id))
     }
     
     // Contenido "About"
@@ -146,7 +181,6 @@ struct VistaDetalle: View {
         .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
         .padding(.horizontal)
     }
-
     
     // Contenido "Movimientos"
     private var movimientosContent: some View {
@@ -156,21 +190,20 @@ struct VistaDetalle: View {
                 .fontWeight(.bold)
             
             ScrollView {
-                LazyVStack(spacing: 15) { // Separación consistente entre elementos
+                LazyVStack(spacing: 15) {
                     ForEach(movimientos.indices, id: \.self) { index in
                         let move = movimientos[index]
                         
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("\(index + 1). \(move.0)") // Nombre del movimiento
+                            Text("\(index + 1). \(move.0)")
                                 .font(.headline)
                                 .fontWeight(.bold)
                                 .foregroundColor(.primary)
                             
-                            // Asegurarse de que la descripción no tenga indentación
-                            Text("Descripción: \(move.1.isEmpty ? "Sin descripción disponible" : move.1)") // Descripción del movimiento
+                            Text("Descripción: \(move.1.isEmpty ? "Sin descripción disponible" : move.1)")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
-                                .padding(.bottom, 5) // Asegurarse de que no haya indentación extra
+                                .padding(.bottom, 5)
                             
                             HStack(spacing: 20) {
                                 Label {
@@ -196,12 +229,11 @@ struct VistaDetalle: View {
                             .padding(.top, 5)
                         }
                         .padding()
-                        .frame(maxWidth: .infinity) // Se asegura de que el contenedor ocupe todo el ancho
-                        .background(Color(UIColor.systemGray6)) // Fondo sutil para destacar
+                        .frame(maxWidth: .infinity)
+                        .background(Color(UIColor.systemGray6))
                         .cornerRadius(10)
                         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                         .onAppear {
-                            // Cargar más movimientos si se acerca al final
                             if index >= movimientos.count - 2 && !isLoading {
                                 Task { await fetchMoreMoves() }
                             }
@@ -213,24 +245,21 @@ struct VistaDetalle: View {
                             .padding()
                     }
                 }
-                .padding(.horizontal) // Espaciado general
+                .padding(.horizontal)
             }
         }
         .padding()
         .onAppear {
             Task {
                 if moveNames.isEmpty {
-                    // Cargar nombres de movimientos del Pokémon
                     moveNames = await apiCalls.loadMoves(pokemon_id: id)
                 }
                 
-                // Cargar los primeros movimientos
                 if movimientos.isEmpty {
                     await fetchMoreMoves()
                 }
             }
         }
-
     }
     
     private func fetchMoreMoves() async {

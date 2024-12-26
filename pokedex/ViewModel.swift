@@ -158,7 +158,8 @@ class ViewModel: ObservableObject {
         
         // Buscar el Pokémon favorito en Core Data utilizando el userId y pokemonId
         let fetchRequest: NSFetchRequest<FavoritePokemonEntity> = FavoritePokemonEntity.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "userId == %@ AND pokemonId == %@", userId as CVarArg, pokemonId as CVarArg)
+        fetchRequest.predicate = NSPredicate(format: "userId == %@ AND pokemonId == %lld", userId as CVarArg, pokemonId)
+
         
         do {
             // Ejecutar la consulta

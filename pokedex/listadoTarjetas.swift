@@ -4,7 +4,6 @@ struct listadoTarjetas: View {
     var usuarioId = obtenerUserIdDesdeLocalStorage() // Obtenemos el ID de usuario desde el almacenamiento local
     @State private var pokemons: [Pokemon] = []
     @State private var isLoading = false
-    @State private var showingFavoritesView = false
     @State private var favoritePokemons: [Pokemon] = []
     
     let columnas = [
@@ -16,17 +15,24 @@ struct listadoTarjetas: View {
     @State var countex = 0
     var items = 20
     
+    // Incluimos el tipo de letra
+    let font = Font.custom("Inter", size: 18)
+
     var body: some View {
         NavigationView {
             VStack {
                 HStack {
                     Image("Pokedex").scaledToFit().frame(height: 50)
                     Spacer()
-                    Image("pokeheart")
-                        .onTapGesture {
-                            toggleFavorites() // Llamar a toggleFavorites al hacer clic en el ícono
-                        }
-                        .padding()
+                    NavigationLink(
+                        destination: FavoritesView(favoritePokemons: favoritePokemons)
+                            .onAppear {
+                                loadFavoritePokemons()
+                            }
+                    ) {
+                        Image("pokeheart")
+                            .padding()
+                    }
                 }
                 .padding()
                 
@@ -44,6 +50,8 @@ struct listadoTarjetas: View {
                                         }
                                     }
                             }
+                            .zIndex(0)
+                        
                             .buttonStyle(PlainButtonStyle()) // Previene el estilo predeterminado del NavigationLink
                         }
                     }
@@ -52,32 +60,24 @@ struct listadoTarjetas: View {
                     carga() // Cargar Pokémon cuando la vista aparece
                 }
             }
-        }
-        .sheet(isPresented: $showingFavoritesView) {
-            // Mostrar la vista de favoritos
-            FavoritesView(favoritePokemons: favoritePokemons)
+            .font(font) // Aplica la fuente a todo el VStack
         }
     }
     
-    func toggleFavorites() {
-        // Alternamos la vista de favoritos
-        showingFavoritesView.toggle()
-        
+    func loadFavoritePokemons() {
         // Obtener los Pokémon favoritos para el usuario desde el ViewModel
         var viewModel = ViewModel()
         let favoritos = viewModel.obtenerFavoritePokemonsPorUsuario(userId: usuarioId)
         
         // Cargar los detalles de los Pokémon favoritos por pokemonId
-        loadFavoritePokemons(favoritos)
-    }
-    func loadFavoritePokemons(_ favoritos: [FavoritePokemonEntity]) {
-        // Recorremos los favoritos y cargamos los detalles de cada Pokémon
         for favorito in favoritos {
             fetchPokemonData(pokemonId: String(favorito.pokemonId)) { result in
                 switch result {
                 case .success(let pokemon):
                     DispatchQueue.main.async {
-                        favoritePokemons.append(pokemon) // Añadimos el Pokémon a la lista de favoritos
+                        if !favoritePokemons.contains(where: { $0.id == pokemon.id }) {
+                            favoritePokemons.append(pokemon)
+                        }
                     }
                 case .failure(let error):
                     print("Error al cargar el Pokémon \(favorito.pokemonId): \(error)")
@@ -105,7 +105,7 @@ struct listadoTarjetas: View {
                     DispatchQueue.main.async {
                         pokemons.append(pokemon)
                     }
-                case .failure(let error):
+                case .failure:
                     break
                 }
             }
@@ -118,7 +118,15 @@ struct listadoTarjetas: View {
 struct FavoritesView: View {
     var favoritePokemons: [Pokemon]
     
+    let font = Font.custom("Inter", size: 18)
+
     var body: some View {
+        HStack {
+            Text("Favoritos")
+                .font(.custom("Press Start 2P Regular", size: 24))
+                .foregroundColor(.black)
+            Spacer()
+        }.padding()
         VStack {
             if favoritePokemons.isEmpty {
                 Text("Aún no tienes Pokémon favoritos.")
@@ -139,6 +147,7 @@ struct FavoritesView: View {
             }
         }
         .padding()
+        .font(font) 
     }
 }
 
