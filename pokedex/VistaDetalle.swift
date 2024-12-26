@@ -29,7 +29,7 @@ struct VistaDetalle: View {
                         .offset(y: -100)
                         .ignoresSafeArea()
                     
-                  
+                    
                     VStack(spacing: 10) {
                         if let pokemon = pokemon {
                             pokemon.image
@@ -37,34 +37,35 @@ struct VistaDetalle: View {
                                 .scaledToFit()
                                 .frame(width: 350, height: 350)
                                 .offset(y: -30)
-                           
-                            Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .padding(.top, -60)
                             
-                            Spacer()
-                            
-                            // Mover el botón de favoritos aquí
-                            Image(isFavorite ? "pokeheart_filled" : "pokeheart")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 50, height: 50)
-                                .zIndex(1)
-                                .onTapGesture {
-                                    let userId = obtenerUserIdDesdeLocalStorage()
-                                    var vm = ViewModel()
-                                    
-                                    if isFavorite {
-                                        vm.eliminarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon.id))
-                                        print("Eliminado de favoritos")
-                                        isFavorite = false
-                                    } else {
-                                        vm.agregarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon.id))
-                                        print("Agregado a favoritos")
-                                        isFavorite = true
+                            HStack(spacing: 2) {
+                                
+                                Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
+                                    .font(.title)
+                                    .fontWeight(.bold)
+                                
+                                
+                                // Mover el botón de favoritos aquí
+                                Image(isFavorite ? "pokeheart_filled" : "pokeheart")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 40, height: 40)
+                                    .offset(y: 2)                                    .zIndex(1)
+                                    .onTapGesture {
+                                        let userId = obtenerUserIdDesdeLocalStorage()
+                                        var vm = ViewModel()
+                                        
+                                        if isFavorite {
+                                            vm.eliminarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon.id))
+                                            print("Eliminado de favoritos")
+                                            isFavorite = false
+                                        } else {
+                                            vm.agregarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon.id))
+                                            print("Agregado a favoritos")
+                                            isFavorite = true
+                                        }
                                     }
-                                }
+                            }
                             
                             HStack(spacing: 10) {
                                 ForEach(pokemon.types, id: \.self) { type in
