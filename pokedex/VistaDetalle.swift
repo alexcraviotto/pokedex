@@ -18,10 +18,10 @@ struct VistaDetalle: View {
         case evoluciones = "Evoluciones"
     }
     
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Encabezado
                 ZStack(alignment: .top) {
                     RoundedRectangle(cornerRadius: 25)
                         .fill(colorPicker(tipo: pokemon?.types.first ?? ""))
@@ -29,30 +29,7 @@ struct VistaDetalle: View {
                         .offset(y: -100)
                         .ignoresSafeArea()
                     
-                    // Botón de favorito arriba a la derecha
-                    Image(isFavorite ? "pokeheart_filled" : "pokeheart") // Cambiar imagen si es favorito
-                        .resizable()
-                        .scaledToFit()
-                        .offset(x: 150, y: -50)
-                        .frame(width: 50, height: 50)
-                        .zIndex(1)
-                        .onTapGesture {
-                            let userId = obtenerUserIdDesdeLocalStorage()
-                            var vm = ViewModel()
-                            
-                            if isFavorite {
-                                vm.eliminarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon!.id))
-                                print("Eliminado de favoritos")
-                                isFavorite = false
-                            } else {
-                                // Si no es favorito, agregarlo
-                                vm.agregarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon!.id))
-                                print("Agregado a favoritos")
-                                isFavorite = true
-                            }
-                        
-                        }
-                    
+                  
                     VStack(spacing: 10) {
                         if let pokemon = pokemon {
                             pokemon.image
@@ -60,8 +37,35 @@ struct VistaDetalle: View {
                                 .scaledToFit()
                                 .frame(width: 350, height: 350)
                                 .offset(y: -30)
+                           
                             Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
-                                .font(.title).fontWeight(.bold).padding(.top, -60)
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .padding(.top, -60)
+                            
+                            Spacer()
+                            
+                            // Mover el botón de favoritos aquí
+                            Image(isFavorite ? "pokeheart_filled" : "pokeheart")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 50, height: 50)
+                                .zIndex(1)
+                                .onTapGesture {
+                                    let userId = obtenerUserIdDesdeLocalStorage()
+                                    var vm = ViewModel()
+                                    
+                                    if isFavorite {
+                                        vm.eliminarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon.id))
+                                        print("Eliminado de favoritos")
+                                        isFavorite = false
+                                    } else {
+                                        vm.agregarFavoritePokemon(userId: userId, pokemonId: Int64(pokemon.id))
+                                        print("Agregado a favoritos")
+                                        isFavorite = true
+                                    }
+                                }
+                            
                             HStack(spacing: 10) {
                                 ForEach(pokemon.types, id: \.self) { type in
                                     Text(type.capitalized)
@@ -75,7 +79,6 @@ struct VistaDetalle: View {
                         }
                     }
                 }
-                
                 // Descripción y pestañas
                 Text(pokemon?.description ?? "Sin descripción disponible.")
                     .font(.body).padding(.horizontal).multilineTextAlignment(.center)

@@ -149,6 +149,7 @@ class ViewModel: ObservableObject {
     // Eliminar un Pokémon Favorito dado el userId y pokemonId
     func eliminarFavoritePokemon(userId: UUID, pokemonId: Int64) {
     
+        print("userId: \(userId), pokemonId: \(pokemonId)")
         
         // Verificar que pokemonId sea válido
         if pokemonId == 0 {
@@ -170,6 +171,7 @@ class ViewModel: ObservableObject {
                 gestorCoreData.contexto.delete(favoritePokemon)
                 guardarDatos()
                 print("Pokémon eliminado de favoritos")
+                
             } else {
                 print("No se encontró el Pokémon en favoritos")
             }

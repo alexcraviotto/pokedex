@@ -25,10 +25,7 @@ struct listadoTarjetas: View {
                     Image("Pokedex").scaledToFit().frame(height: 50)
                     Spacer()
                     NavigationLink(
-                        destination: FavoritesView(favoritePokemons: favoritePokemons)
-                            .onAppear {
-                                loadFavoritePokemons()
-                            }
+                        destination: FavoritesView(favoritePokemons: $favoritePokemons, loadFavoritePokemons: loadFavoritePokemons) // Pasar la función
                     ) {
                         Image("pokeheart")
                             .padding()
@@ -51,7 +48,6 @@ struct listadoTarjetas: View {
                                     }
                             }
                             .zIndex(0)
-                        
                             .buttonStyle(PlainButtonStyle()) // Previene el estilo predeterminado del NavigationLink
                         }
                     }
@@ -65,12 +61,12 @@ struct listadoTarjetas: View {
     }
     
     func loadFavoritePokemons() {
-        // Obtener los Pokémon favoritos para el usuario desde el ViewModel
+        
         var viewModel = ViewModel()
         let favoritos = viewModel.obtenerFavoritePokemonsPorUsuario(userId: usuarioId)
-        
-        // Cargar los detalles de los Pokémon favoritos por pokemonId
+        favoritePokemons.removeAll()
         for favorito in favoritos {
+            print(favorito)
             fetchPokemonData(pokemonId: String(favorito.pokemonId)) { result in
                 switch result {
                 case .success(let pokemon):
@@ -116,7 +112,8 @@ struct listadoTarjetas: View {
 }
 
 struct FavoritesView: View {
-    var favoritePokemons: [Pokemon]
+    @Binding var favoritePokemons: [Pokemon] // Usamos Binding para que se actualice cada vez que se recarguen los favoritos
+    var loadFavoritePokemons: () -> Void // Pasamos la función como parámetro
     
     let font = Font.custom("Inter", size: 18)
 
@@ -147,7 +144,10 @@ struct FavoritesView: View {
             }
         }
         .padding()
-        .font(font) 
+        .font(font)
+        .onAppear {
+            loadFavoritePokemons()
+        }
     }
 }
 
