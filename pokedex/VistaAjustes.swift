@@ -27,26 +27,37 @@ struct ButtonModifier: ViewModifier {
 }
 
 struct VistaAjustes: View {
-    @Binding var usuario: String
-    @Binding var correo: String
-    @Binding var password: String
+    @State private var usuario: String
+    @State private var correo: String
+    @State private var password: String
     @State private var confirmDelete: Bool = false
     @State private var usuarioInicial: String
     @State private var correoInicial: String
     @State private var passwordInicial: String
-    @State private var selectedAvatar: Int64 = 1
+    @State private var selectedAvatar: Int64
     @State private var showAvatarMenu: Bool = false
     @Environment(\.presentationMode) var presentationMode
     var viewModel: ViewModel
     var userId: UUID
-    
-    init(usuario: Binding<String>, correo: Binding<String>, password: Binding<String>, userId: UUID, viewModel: ViewModel) {
-        _usuario = usuario
-        _correo = correo
-        _password = password
-        _usuarioInicial = State(initialValue: usuario.wrappedValue)
-        _correoInicial = State(initialValue: correo.wrappedValue)
-        _passwordInicial = State(initialValue: password.wrappedValue)
+
+    init(userId: UUID, viewModel: ViewModel) {
+        if let user = viewModel.usersArray.first(where: { $0.id == userId }) {
+            _usuario = State(initialValue: user.username ?? "")
+            _correo = State(initialValue: user.email ?? "")
+            _password = State(initialValue: user.password ?? "")
+            _usuarioInicial = State(initialValue: user.username ?? "")
+            _correoInicial = State(initialValue: user.email ?? "")
+            _passwordInicial = State(initialValue: user.password ?? "")
+            _selectedAvatar = State(initialValue: user.avatar)
+        } else {
+            _usuario = State(initialValue: "")
+            _correo = State(initialValue: "")
+            _password = State(initialValue: "")
+            _usuarioInicial = State(initialValue: "")
+            _correoInicial = State(initialValue: "")
+            _passwordInicial = State(initialValue: "")
+            _selectedAvatar = State(initialValue: 1)
+        }
         self.userId = userId
         self.viewModel = viewModel
     }
@@ -72,8 +83,6 @@ struct VistaAjustes: View {
                                 .foregroundColor(.gray)
                         }
                     }
-
-              
                 }
                 .padding(16)
 
@@ -88,17 +97,7 @@ struct VistaAjustes: View {
                         .modifier(TextFieldModifier())
                 }
 
-                Button(action: {
-                    if usuario != usuarioInicial {
-                        viewModel.actualizarUsuario(userId: userId, newUsername: usuario, newEmail: nil, newPassword: nil, avatar: selectedAvatar)
-                    }
-                    if correo != correoInicial {
-                        viewModel.actualizarUsuario(userId: userId, newUsername: nil, newEmail: correo, newPassword: nil, avatar: selectedAvatar)
-                    }
-                    if password != passwordInicial {
-                        viewModel.actualizarUsuario(userId: userId, newUsername: nil, newEmail: nil, newPassword: password, avatar: selectedAvatar)
-                    }
-                }) {
+                Button(action: actualizarDatos) {
                     Text("Actualizar Información")
                         .modifier(ButtonModifier())
                 }
@@ -123,10 +122,7 @@ struct VistaAjustes: View {
                         title: Text("¿Estás seguro?"),
                         message: Text("Esta acción eliminará permanentemente tu cuenta y todos los datos asociados."),
                         primaryButton: .destructive(Text("Eliminar")) {
-                            if let user = viewModel.usersArray.first {
-                                viewModel.eliminarUsuario(user: user)
-                                presentationMode.wrappedValue.dismiss()
-                            }
+                            eliminarUsuario()
                         },
                         secondaryButton: .cancel()
                     )
@@ -154,14 +150,23 @@ struct VistaAjustes: View {
             }
         }
     }
-}
 
-struct VistaAjustes_Previews: PreviewProvider {
-    static var previews: some View {
-        VistaAjustes(usuario: .constant("Usuario Ejemplo"),
-                    correo: .constant("correo@ejemplo.com"),
-                    password: .constant("password123"),
-                    userId: UUID(),
-                    viewModel: ViewModel())
+    private func actualizarDatos() {
+        if usuario != usuarioInicial {
+            viewModel.actualizarUsuario(userId: userId, newUsername: usuario, newEmail: nil, newPassword: nil, avatar: selectedAvatar)
+        }
+        if correo != correoInicial {
+            viewModel.actualizarUsuario(userId: userId, newUsername: nil, newEmail: correo, newPassword: nil, avatar: selectedAvatar)
+        }
+        if password != passwordInicial {
+            viewModel.actualizarUsuario(userId: userId, newUsername: nil, newEmail: nil, newPassword: password, avatar: selectedAvatar)
+        }
+    }
+
+    private func eliminarUsuario() {
+        if let user = viewModel.usersArray.first(where: { $0.id == userId }) {
+            viewModel.eliminarUsuario(user: user)
+            presentationMode.wrappedValue.dismiss()
+        }
     }
 }

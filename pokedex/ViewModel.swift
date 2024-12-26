@@ -185,6 +185,10 @@ class ViewModel: ObservableObject {
     func obtenerFavoritePokemonsPorUsuario(userId: UUID) -> [FavoritePokemonEntity] {
         return favoritePokemonsArray.filter { $0.userId == userId }
     }
+    
+    func obtenerUsuarioPorId(userId: UUID) -> UserEntity? {
+        return usersArray.first(where: { $0.id == userId })
+    }
 
     func eliminarRecentPokemonSearch(recentSearch: RecentPokemonSearchEntity) {
         gestorCoreData.contexto.delete(recentSearch)

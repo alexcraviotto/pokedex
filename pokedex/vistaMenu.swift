@@ -37,9 +37,6 @@ struct vistaMenu: View {
 
             
             VistaAjustes(
-                usuario: $usuarioActual,
-                correo: $correoActual,
-                password: $passwordActual,
                 userId: userId,
                 viewModel: viewModel
             )
