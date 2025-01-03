@@ -20,7 +20,7 @@ struct VistaCombate: View {
                         image: Image(""),
                         image_shiny: Image(""),
                         evolution_chain_id: 0
-                    ), huecoARellenar: -1)) {
+                    ))) {
                         VStack(spacing: 20) {
                             Image("Mewtwo")
                                 .renderingMode(.original)
@@ -39,7 +39,7 @@ struct VistaCombate: View {
                     
                     // Opción: Combate multijugador
                     NavigationLink(destination: eleccionPokemon(contrincante: true, pokemonActual: Pokemon2(
-                        id: 0,
+                        id: -1,
                         name: "",
                         description: "",
                         types: [],
@@ -50,7 +50,7 @@ struct VistaCombate: View {
                         image: Image(""),
                         image_shiny: Image(""),
                         evolution_chain_id: 0
-                    ), huecoARellenar: -1)) {
+                    ))) {
                         VStack {
                             HStack(spacing: 10) {
                                 Image("Zekrom")

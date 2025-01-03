@@ -6,9 +6,7 @@ struct VistaBusquedaElegir: View {
     @State var query: String = ""
     @State var filtrado: [Pokemon] = []
     @State private var apiCalls = ApiCalls()
-    var huecoARellenar: Int
     @State private var pokemonSeleccionado: Pokemon2?
-    @Binding var contrincante : Bool
     @State private var navegacionActiva = false
 
     let columnas = [
@@ -69,9 +67,7 @@ struct VistaBusquedaElegir: View {
                     NavigationLink(
                         destination: eleccionPokemon(
                             contrincante: false,
-                            pokemonActual: pokemonSeleccionado,
-                            huecoARellenar: huecoARellenar
-                        ),
+                            pokemonActual: pokemonSeleccionado),
                         isActive: $navegacionActiva
                     ) {
                         EmptyView()
@@ -80,6 +76,7 @@ struct VistaBusquedaElegir: View {
                 }
             }
         )
+        Text("Hola")
     }
 
     func filterPokemonByName(pokemonArray: [PokemonPair], searchTerm: String) -> [String] {
@@ -119,9 +116,9 @@ struct VistaBusquedaElegir: View {
     }
 }
 
-/*
+
 struct VistaBusquedaElegir_Preview: PreviewProvider {
     static var previews: some View {
-        VistaBusquedaElegir(huecoARellenar: 1, contrincante : contrincante)
+        VistaBusquedaElegir()
     }
-}*/
+}
