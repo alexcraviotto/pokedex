@@ -1,10 +1,11 @@
 import SwiftUI
 
 struct listadoTarjetas: View {
-    var usuarioId = obtenerUserIdDesdeLocalStorage() // Obtenemos el ID de usuario desde el almacenamiento local
+    var usuarioId = obtenerUserIdDesdeLocalStorage() // ID del usuario
     @State private var pokemons: [Pokemon] = []
     @State private var isLoading = false
     @State private var favoritePokemons: [Pokemon] = []
+    @State private var navigateTo: String? = nil // Controlador de navegación
     
     let columnas = [
         GridItem(.flexible()),
@@ -14,59 +15,113 @@ struct listadoTarjetas: View {
     @State var count = 0
     @State var countex = 0
     var items = 20
-    
-    // Incluimos el tipo de letra
+
+    // Fuente personalizada
     let font = Font.custom("Inter", size: 18)
 
     var body: some View {
-        NavigationView {
+        NavigationStack { // Uso de NavigationStack para navegación sin botón de volver
             VStack {
+                // Encabezado
                 HStack {
                     Image("Pokedex").scaledToFit().frame(height: 50)
                     Spacer()
-                    NavigationLink(
-                        destination: FavoritesView(favoritePokemons: $favoritePokemons, loadFavoritePokemons: loadFavoritePokemons) // Pasar la función
-                    ) {
+                    NavigationLink(destination: FavoritesView(
+                        favoritePokemons: $favoritePokemons,
+                        loadFavoritePokemons: loadFavoritePokemons
+                    )) {
                         Image("pokeheart")
                             .padding()
                     }
                 }
                 .padding()
                 
+                // Vista principal
                 ScrollView {
                     LazyVGrid(columns: columnas, spacing: 20) {
                         ForEach(pokemons.sorted(by: { $0.id < $1.id })) { pokemon in
-                            NavigationLink(
-                                destination: VistaDetalle(id: pokemon.id)
-                            ) {
+                            NavigationLink(destination: VistaDetalle(id: pokemon.id)) {
                                 PokemonTarjeta2(pokemon: pokemon)
                                     .scaleEffect(0.9)
                                     .onAppear {
                                         if pokemon.id == self.pokemons.count && !isLoading {
-                                            carga() // Cargar más Pokémon si hemos llegado al final
+                                            carga()
                                         }
                                     }
                             }
-                            .zIndex(0)
-                            .buttonStyle(PlainButtonStyle()) // Previene el estilo predeterminado del NavigationLink
                         }
                     }
                 }
                 .onAppear {
-                    carga() // Cargar Pokémon cuando la vista aparece
+                    carga()
+                }
+                
+                // Ocultar Footer solo en ciertas vistas
+                if navigateTo == nil {
+                    footer.navigationBarBackButtonHidden(true)
                 }
             }
-            .font(font) // Aplica la fuente a todo el VStack
+            .font(font)
+            .navigationBarBackButtonHidden(true)
+            .navigationDestination(for: String.self) { view in
+                // Navegación sin opción de regresar
+                switch view {
+                case "Favoritos":
+                    FavoritesView(
+                        favoritePokemons: $favoritePokemons,
+                        loadFavoritePokemons: loadFavoritePokemons
+                    )
+                default:
+                    if view.starts(with: "Detalle-") {
+                        let id = Int(view.split(separator: "-")[1]) ?? 0
+                        VistaDetalle(id: id)
+                    }
+                }
+            }
         }
     }
     
+    // Footer que se oculta en otras vistas
+    var footer: some View {
+        HStack {
+            NavigationLink(destination: listadoTarjetas()) {
+                VStack {
+                    Image("inicio")
+                    Text("Inicio")
+                }
+            }.navigationBarBackButtonHidden(true)
+            Spacer()
+            NavigationLink(destination: VistaBusqueda()) {
+                VStack {
+                    Image("busqueda")
+                    Text("Búsqueda")
+                }.navigationBarBackButtonHidden(true)
+            }.navigationBarBackButtonHidden(true)
+            Spacer()
+            NavigationLink(destination: VistaCombate()) {
+                VStack {
+                    Image("pelea")
+                    Text("Combate")
+                }.navigationBarBackButtonHidden(true)
+            }.navigationBarBackButtonHidden(true)
+            Spacer()
+            NavigationLink(destination: VistaAjustes(userId: usuarioId, viewModel: ViewModel())) {
+                VStack {
+                    Image("ajustes")
+                    Text("Ajustes")
+                }.navigationBarBackButtonHidden(true)
+            }.navigationBarBackButtonHidden(true)
+        }.navigationBarBackButtonHidden(true)
+        .frame(height: 60)
+        .background(Color.gray.opacity(0.1))
+        .padding(.horizontal)
+    }
+
     func loadFavoritePokemons() {
-        
         var viewModel = ViewModel()
         let favoritos = viewModel.obtenerFavoritePokemonsPorUsuario(userId: usuarioId)
         favoritePokemons.removeAll()
         for favorito in favoritos {
-            print(favorito)
             fetchPokemonData(pokemonId: String(favorito.pokemonId)) { result in
                 switch result {
                 case .success(let pokemon):

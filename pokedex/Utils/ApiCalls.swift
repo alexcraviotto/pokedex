@@ -134,7 +134,7 @@ class ApiCalls{
         }
         return pokemonArray
     }
-    /*func getPokemonMoves(id: Int, offset: Int, limit: Int) async -> [(String, String, Int, Int)] {
+    func getPokemonMoves(id: Int, offset: Int, limit: Int) async -> [(String, String, Int, Int)] {
         // Llamar a la API para obtener los detalles del Pokémon
         let poke = await pokeApi(endpoint: "pokemon/\(id)")
         
@@ -172,7 +172,7 @@ class ApiCalls{
         }
         
         return moveDetails
-    }*/
+    }
     func obtenerEvoluciones(evolutionChainId: Int) async -> [(Pokemon2, String, Pokemon2)] {
         // Llamar al endpoint de evolución
         let evolutionData = await pokeApi(endpoint: "evolution-chain/\(evolutionChainId)")
