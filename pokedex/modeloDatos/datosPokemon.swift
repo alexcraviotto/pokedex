@@ -5,6 +5,7 @@
 //  Created by Antonio Ordóñez on 16/11/24.
 //
 import SwiftUI
+
 /*struct Pokemon: Identifiable {
     let id = UUID()
     var nombre: String
@@ -13,51 +14,65 @@ import SwiftUI
     var numero: String
     var imagen: String
 }*/
+struct MoveEntry: Codable {
+    let move: MoveDetail
+}
+
+struct MoveDetail: Codable {
+    let name: String
+    let url: String
+}
+
+struct Move: Codable {
+    let name: String
+    let pp: Int
+}
 struct Pokemon: Decodable, Identifiable {
     let id: Int
     let name: String
     let types: [Types]
+    let moves: [MoveEntry]
     //let sprites: Sprites
-    
+
     struct Types: Decodable {
         let type: PokemonType
     }
-    
+
     struct PokemonType: Decodable {
         let name: String
     }
-    
+
     /*struct Sprites: Decodable {
         let other: OtherSprites
     }
-    
+
     struct OtherSprites: Decodable {
         let officialArtwork: OfficialArtwork
-        
+
         enum CodingKeys: String, CodingKey {
             case officialArtwork = "official-artwork"
         }
     }
-    
+
     struct OfficialArtwork: Decodable  {
         let frontDefault: String
-        
-        
+
+
         enum CodingKeys: String, CodingKey {
             case frontDefault = "front_default"
         }
     }*/
 }
 struct Pokemon2: Identifiable {
-        let id: Int
-        let name: String
-        let description: String
-        let types: [String]
-        let weakTypes: [String]
-        let weight: Float
-        let height: Float
-        let stats: [String: Int]
-        let image: Image
-        let image_shiny: Image
-        let evolution_chain_id: Int
-    }
+    let id: Int
+    let name: String
+    let description: String
+    let types: [String]
+    let weakTypes: [String]
+    let weight: Float
+    let height: Float
+    let stats: [String: Int]
+    let image: Image
+    let image_shiny: Image
+    let evolution_chain_id: Int
+}
