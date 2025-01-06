@@ -31,11 +31,11 @@ struct VistaBusquedaElegir: View {
                     buscar()
                 }
 
-            // Lista de Pokémon filtrados
+            // Lista de Pokémon filtrados con un límite de altura
             ScrollView {
                 if !filtrado.isEmpty {
                     LazyVGrid(columns: columnas, spacing: 20) {
-                        ForEach(filtrado.sorted(by: { $0.id < $1.id }), id: \.id) { pokemon in
+                        ForEach(filtrado.sorted(by: { $0.id < $1.id }), id: \ .id) { pokemon in
                             Button(action: {
                                 Task {
                                     await seleccionarPokemon(id: pokemon.id)
@@ -48,10 +48,14 @@ struct VistaBusquedaElegir: View {
                             .buttonStyle(PlainButtonStyle())  // Evita estilos no deseados
                         }
                     }
+                    .padding(.bottom, 20) // Espacio adicional para evitar solapamiento
                 } else if query.count >= 3 {
                     Text("No se encontraron resultados").padding()
                 }
             }
+            .frame(maxHeight: UIScreen.main.bounds.height * 0.8) // Limita la altura de la lista
+
+            Spacer() // Añade espacio en la parte inferior
         }
         .onAppear {
             fetchPokemonNames { result in
@@ -64,6 +68,7 @@ struct VistaBusquedaElegir: View {
             }
         }
     }
+
 
     // Filtra los Pokémon por nombre
     func filterPokemonByName(pokemonArray: [PokemonPair], searchTerm: String) -> [String] {
