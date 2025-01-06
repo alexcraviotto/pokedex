@@ -33,7 +33,8 @@ struct eleccionPokemon: View {
                         .font(.custom("Press Start 2P Regular", size: 24))
                         .foregroundColor(.black)
                 }
-                .offset(y: -170)
+                .padding(.top, 20) // Asegura espacio superior
+                .padding(.bottom, 80) // Asegura espacio superior
 
                 // Primera fila de Pokémon
                 HStack {
@@ -51,9 +52,11 @@ struct eleccionPokemon: View {
                     pokemonRow(startIndex: 3, endIndex: 6)
                 }
                 .padding()
+
+                Spacer()
             }
 
-            // Botón "Reset" superpuesto en la parte inferior izquierda
+            // Botones "Reset" y navegación a "eleccionCampo"
             VStack {
                 Spacer()
                 HStack {
@@ -65,10 +68,27 @@ struct eleccionPokemon: View {
                             .background(Color.red)
                             .cornerRadius(10)
                     }
-                    .offset(y : -40)
                     .padding(.leading, 20)
+
+                    Button(action: {
+                        // Navegar manualmente a "eleccionCampo"
+                        if let window = UIApplication.shared.windows.first {
+                            let rootView = eleccionCampo()
+                            window.rootViewController = UIHostingController(rootView: rootView)
+                            window.makeKeyAndVisible()
+                        }
+                    }) {
+                        Image(systemName: "arrow.right.circle.fill")
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                            .foregroundColor(.blue)
+                    }
+                    .offset(x : 170)
+
                     Spacer()
                 }
+                .offset(y: -60)
+                .padding(.bottom, 40) // Asegura espacio en la parte inferior
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -82,6 +102,7 @@ struct eleccionPokemon: View {
             }
         }
     }
+
 
 
     @ViewBuilder
