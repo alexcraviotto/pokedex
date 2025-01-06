@@ -58,21 +58,39 @@ class ApiCalls{
         }
         // Extraemos los tipos del Pokémon
         var types: [String] = []
-        var weakTypes: [String] = []
+        var weakTypes: Set<String> = [] // Usamos un conjunto para evitar duplicados automáticamente
+        var immuneTypes: Set<String> = [] // Conjunto para almacenar los tipos inmunes
+        var resistantTypes: Set<String> = [] // Conjunto para almacenar los tipos resistentes
+
         if let typesArray = poke["types"] as? [[String: Any]] {
             for typeEntry in typesArray {
                 if let typeDetail = typeEntry["type"] as? [String: Any],
                    let typeName = typeDetail["name"] as? String {
                     types.append(typeName)
-                    // Llamada para obtener las debilidades de este tipo
+                    // Llamada para obtener las relaciones de daño del tipo
                     let typeData = await pokeApi(endpoint: "type/\(typeName)")
-                    if let damageRelations = typeData["damage_relations"] as? [String: Any],
-                       let doubleDamageFrom = damageRelations["double_damage_from"] as? [[String: Any]] {
-                        // Agregar los tipos débiles al array weakTypes
-                        for weakType in doubleDamageFrom {
-                            if let weakTypeName = weakType["name"] as? String {
-                                if !weakTypes.contains(weakTypeName) {
-                                    weakTypes.append(weakTypeName)
+                    if let damageRelations = typeData["damage_relations"] as? [String: Any] {
+                        // Agregar tipos con double_damage_from al conjunto de debilidades
+                        if let doubleDamageFrom = damageRelations["double_damage_from"] as? [[String: Any]] {
+                            for weakType in doubleDamageFrom {
+                                if let weakTypeName = weakType["name"] as? String {
+                                    weakTypes.insert(weakTypeName)
+                                }
+                            }
+                        }
+                        // Agregar tipos con no_damage_from al conjunto de inmunidades
+                        if let noDamageFrom = damageRelations["no_damage_from"] as? [[String: Any]] {
+                            for immuneType in noDamageFrom {
+                                if let immuneTypeName = immuneType["name"] as? String {
+                                    immuneTypes.insert(immuneTypeName)
+                                }
+                            }
+                        }
+                        // Agregar tipos con half_damage_from al conjunto de resistencias
+                        if let halfDamageFrom = damageRelations["half_damage_from"] as? [[String: Any]] {
+                            for resistantType in halfDamageFrom {
+                                if let resistantTypeName = resistantType["name"] as? String {
+                                    resistantTypes.insert(resistantTypeName)
                                 }
                             }
                         }
@@ -80,8 +98,14 @@ class ApiCalls{
                 }
             }
         }
-        
-        
+
+        // Eliminar los tipos inmunes y resistentes de las debilidades
+        weakTypes.subtract(immuneTypes)
+        weakTypes.subtract(resistantTypes)
+
+        // Crear un array vacío para almacenar los tipos débiles finales
+        let weakTypesArray = Array(weakTypes)
+
         var officialArtworkImage: String = ""
         var shinyOfficialArtworkImage: String = ""
         if let sprites = poke["sprites"] as? [String: Any],
@@ -107,7 +131,7 @@ class ApiCalls{
             name: name,
             description: description,
             types: types,
-            weakTypes: weakTypes,
+            weakTypes: weakTypesArray,
             weight: weight,
             height: height,
             stats: statsDictionary,
