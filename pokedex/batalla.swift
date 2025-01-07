@@ -28,8 +28,10 @@ struct combate: View {
     @State private var attacker: Int = 0
     @State private var damageTeam1: Int = 0
     @State private var damageTeam2: Int = 0
+    @State private var movesTeam1: [[(String, Int)]] = []
+    @State private var movesTeam2: [[(String, Int)]] = []
+    @State private var fin: Bool = false
 
-    
     func calcularVida(team: [Pokemon2]) -> Int {
         var totalHP = 0
         for pokemon in team {
@@ -49,6 +51,82 @@ struct combate: View {
         }
     }
     
+    func cargarMovimientos() {
+        movesTeam1 = Array(repeating: [], count: team1.count)
+        movesTeam2 = Array(repeating: [], count: team2.count)
+
+        for index in team1.indices {
+            getMovesWithPP(id: team1[index].id) { result in
+                switch result {
+                case .success(let moves):
+                    DispatchQueue.main.async {
+                        movesTeam1[index] = moves
+                        log.append("\(team1[index].name) movimientos: \(moves.map { $0.0 }.joined(separator: ", "))")
+                    }
+                case .failure(let error):
+                    print("Error cargando movimientos para \(team1[index].name):", error)
+                }
+            }
+        }
+
+        for index in team2.indices {
+            getMovesWithPP(id: team2[index].id) { result in
+                switch result {
+                case .success(let moves):
+                    DispatchQueue.main.async {
+                        movesTeam2[index] = moves
+                        log.append("\(team2[index].name) movimientos: \(moves.map { $0.0 }.joined(separator: ", "))")
+                    }
+                case .failure(let error):
+                    print("Error cargando movimientos para \(team2[index].name):", error)
+                }
+            }
+        }
+    }
+    
+    func turnDamage() {
+        damageTeam1 = team1.indices.reduce(0) { total, index in
+            guard index < movesTeam1.count, !movesTeam1[index].isEmpty else { return total }
+            let randomMove = movesTeam1[index].randomElement()?.1 ?? 0
+            return total + randomMove
+        }
+
+        damageTeam2 = team2.indices.reduce(0) { total, index in
+            guard index < movesTeam2.count, !movesTeam2[index].isEmpty else { return total }
+            let randomMove = movesTeam2[index].randomElement()?.1 ?? 0
+            return total + randomMove
+        }
+    }
+    
+    func realizarTurno() {
+        guard !fin else { return }
+
+        turnDamage()
+
+        if attacker == 1 {
+            hpTeam2 -= damageTeam1
+            if hpTeam2 < 0 { hpTeam2 = 0 }
+            log.append("Equipo 1 ataca e inflige \(damageTeam1) de daño")
+            if hpTeam2 == 0 {
+                log.append("¡Equipo 1 gana el combate!")
+                fin = true
+                return
+            }
+            attacker = 2
+        } else {
+            hpTeam1 -= damageTeam2
+            if hpTeam1 < 0 { hpTeam1 = 0 }
+            log.append("Equipo 2 ataca e inflige \(damageTeam2) de daño")
+            if hpTeam1 == 0 {
+                log.append("¡Equipo 2 gana el combate!")
+                fin = true
+                return
+            }
+            attacker = 1
+        }
+        currentTurn += 1
+    }
+    
     var body: some View {
         ZStack {
             Image("fondoCombateHierba")
@@ -56,21 +134,27 @@ struct combate: View {
                 .ignoresSafeArea()
             VStack {
                 Text("\n\n\nHP del Equipo 1: \(hpTeam1)")
-                         Text("HP del Equipo 2: \(hpTeam2)")
-                         
-                         Spacer()
-                
-                if(attacker == 1){
-                    
-                }else{
-                    
+                Text("HP del Equipo 2: \(hpTeam2)")
+                Spacer()
+               /* List(log, id: \ .self) { entry in
+                    Text(entry)
+                }*/
+                if !fin {
+                    Button("Siguiente Turno") {
+                        realizarTurno()
+                    }
+                } else {
+                    Text("Combate finalizado")
                 }
+                Spacer()
+
             }
             .padding()
             .onAppear {
-             hpTeam1 = calcularVida(team: team1)
-             hpTeam2 = calcularVida(team: team2)
-            calcularPrimerAtacante()
+                hpTeam1 = calcularVida(team: team1)
+                hpTeam2 = calcularVida(team: team2)
+                calcularPrimerAtacante()
+                cargarMovimientos()
             }
         }
     }
