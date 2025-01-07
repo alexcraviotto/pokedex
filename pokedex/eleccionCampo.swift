@@ -1,13 +1,8 @@
-//
-//  eleccionCampo.swift
-//  pokedex
-//
-//  Created by Antonio Ordóñez on 4/1/25.
-//
-
 import SwiftUI
 
 struct eleccionCampo: View {
+    var pokemonsUsuario: [Pokemon2?]
+
     var body: some View {
         VStack {
             Text("Elección de\ncampo de batalla\n")
@@ -15,14 +10,21 @@ struct eleccionCampo: View {
                 .foregroundColor(.black)
                 .multilineTextAlignment(.center)
                 .padding(.top, 20)
-            
+
+            // Botón de Hierba Alta
             Button(action: {
                 print("Hierba alta seleccionada")
+                // Cambiar la vista raíz programáticamente
+                if let window = UIApplication.shared.windows.first {
+                    let rootView = Combate(
+                        pokemonsUsuario: pokemonsUsuario, campoBatalla: CamposBatalla.hierbaAlta)
+                    window.rootViewController = UIHostingController(rootView: rootView)
+                    window.makeKeyAndVisible()
+                }
             }) {
                 Image("seleccionarHierbaAlta")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-
                     .overlay(
                         Text("Hierba alta")
                             .font(.custom("Press Start 2P Regular", size: 16))
@@ -33,8 +35,16 @@ struct eleccionCampo: View {
             }
             .padding()
 
+            // Botón de Desierto
             Button(action: {
                 print("Desierto seleccionado")
+                // Cambiar la vista raíz programáticamente
+                if let window = UIApplication.shared.windows.first {
+                    let rootView = Combate(
+                        pokemonsUsuario: pokemonsUsuario, campoBatalla: CamposBatalla.desierto)
+                    window.rootViewController = UIHostingController(rootView: rootView)
+                    window.makeKeyAndVisible()
+                }
             }) {
                 Image("seleccionarDesierto")
                     .resizable()
@@ -49,8 +59,16 @@ struct eleccionCampo: View {
             }
             .padding()
 
+            // Botón de Alto Mando
             Button(action: {
                 print("Alto mando seleccionado")
+                // Cambiar la vista raíz programáticamente
+                if let window = UIApplication.shared.windows.first {
+                    let rootView = Combate(
+                        pokemonsUsuario: pokemonsUsuario, campoBatalla: CamposBatalla.altoMando)
+                    window.rootViewController = UIHostingController(rootView: rootView)
+                    window.makeKeyAndVisible()
+                }
             }) {
                 Image("seleccionarAltoMando")
                     .resizable()
@@ -66,8 +84,4 @@ struct eleccionCampo: View {
             .padding()
         }
     }
-}
-
-#Preview {
-    eleccionCampo()
 }

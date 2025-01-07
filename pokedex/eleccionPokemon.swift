@@ -1,25 +1,24 @@
 import SwiftUI
 
 struct eleccionPokemon: View {
+    var esCombateIA: Bool
     @Environment(\.presentationMode) var presentationMode
     @State var contrincante: Bool
+
+    // Estado para almacenar los Pokémon del usuario
     @State private var pokemonsUsuario: [Pokemon2?] = Array(repeating: nil, count: 6)  // Inicializa con nil
 
-    // Asegúrate de que pokemonActual tenga un ID inválido por defecto
-    var pokemonActual: Pokemon2 = Pokemon2(
-        id: -1,  // ID inválido por defecto
-        name: "",
-        description: "",
-        types: [],
-        weakTypes: [],
-        weight: 0.0,
-        height: 0.0,
-        stats: [:],
-        image: Image("PulsaParaElegir"),
-        image_shiny: Image(""),
-        evolution_chain_id: 0
-    )
+    // Pokémon actual
+    var pokemonActual: Pokemon2
+
     @State private var showAlert = false
+
+    // Inicializador personalizado
+    init(esCombateIA: Bool, contrincante: Bool, pokemonActual: Pokemon2) {
+        self.esCombateIA = esCombateIA
+        self.contrincante = contrincante
+        self.pokemonActual = pokemonActual
+    }
 
     var body: some View {
         ZStack {
@@ -33,8 +32,8 @@ struct eleccionPokemon: View {
                         .font(.custom("Press Start 2P Regular", size: 24))
                         .foregroundColor(.black)
                 }
-                .padding(.top, 20) // Asegura espacio superior
-                .padding(.bottom, 80) // Asegura espacio superior
+                .padding(.top, 20)  // Asegura espacio superior
+                .padding(.bottom, 80)  // Asegura espacio inferior
 
                 // Primera fila de Pokémon
                 HStack {
@@ -71,9 +70,8 @@ struct eleccionPokemon: View {
                     .padding(.leading, 20)
 
                     Button(action: {
-                        // Navegar manualmente a "eleccionCampo"
                         if let window = UIApplication.shared.windows.first {
-                            let rootView = eleccionCampo()
+                            let rootView = eleccionCampo(pokemonsUsuario: pokemonsUsuario)
                             window.rootViewController = UIHostingController(rootView: rootView)
                             window.makeKeyAndVisible()
                         }
@@ -83,12 +81,12 @@ struct eleccionPokemon: View {
                             .frame(width: 50, height: 50)
                             .foregroundColor(.blue)
                     }
-                    .offset(x : 170)
+                    .offset(x: 170)
 
                     Spacer()
                 }
                 .offset(y: -60)
-                .padding(.bottom, 40) // Asegura espacio en la parte inferior
+                .padding(.bottom, 40)  // Asegura espacio en la parte inferior
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -102,8 +100,6 @@ struct eleccionPokemon: View {
             }
         }
     }
-
-
 
     @ViewBuilder
     private func pokemonRow(startIndex: Int, endIndex: Int) -> some View {
@@ -142,7 +138,6 @@ struct eleccionPokemon: View {
             }
         }
     }
-
     private func handleOnAppear() {
         // Solo asigna el Pokémon actual si tiene un ID válido
         if pokemonActual.id != -1 && pokemonActual.id != 0 {  // Evita asignar si el ID es 0
@@ -186,21 +181,17 @@ struct eleccionPokemon: View {
             image_shiny: Image(""),
             evolution_chain_id: 0
         )
-        
+
         if contrincante {
             // Resetea los 6 Pokémon
             for index in 0..<6 {
                 pokemonsUsuario[index] = nil
-            }        } else {
+            }
+        } else {
             // Resetea solo los primeros 3 Pokémon
             for index in 0..<3 {
                 pokemonsUsuario[index] = nil
             }
         }
     }
-
-}
-
-#Preview {
-    eleccionPokemon(contrincante: false)
 }

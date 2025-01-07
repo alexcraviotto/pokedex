@@ -115,7 +115,6 @@ struct VistaDetalle: View {
         isFavorite = vm.esPokemonFavorito(userId: userId, pokemonId: Int64(id))
     }
     
-    // Contenido "About"
     private var aboutContent: some View {
         VStack(alignment: .leading, spacing: 15) {
             Text("About")
