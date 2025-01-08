@@ -13,6 +13,8 @@ struct VistaBusqueda: View {
     @State private var showFilters = false
     @StateObject private var filterManager = FilterManager()
     @State private var tipoSeleccionado:String = ""
+    @State private var log : String = ""
+
     
     let columnas = [
         GridItem(.flexible()),
@@ -34,34 +36,10 @@ struct VistaBusqueda: View {
                     }.padding()
 
                     BusquedaView(text: $query)
-                        .onChange(of: query) { oldValue, newValue in
-                            /*filtrado = []
-                            if query.count >= 1 {
-                                for nombre in filterPokemonByName(pokemonArray: pokemons, searchTerm: query) {
-                                    fetchPokemonData(pokemonId: nombre) { result in
-                                        switch result {
-                                        case .success(let newpokemon):
-                                            if tipoSeleccionado.isEmpty {
-                                                filtrado.append(newpokemon)
-                                            } else {
-                                                if(tipoSeleccionado.lowercased().contains(newpokemon.types[0].type.name.lowercased())){
-                                                    filtrado.append(newpokemon)
-                                                }
-                                                if(newpokemon.types.count == 1) {
-                                                    return
-                                                }
-                                                if(tipoSeleccionado.lowercased().contains(newpokemon.types[1].type.name.lowercased())){
-                                                    filtrado.append(newpokemon)
-                                                }
-                                            }
-                                        case .failure(let error):
-                                            print("Error: \(error)")
-                                        }
-                                    }
-                                }
-                            }*/
-                            buscar()
-                        }
+                        .onChange(of: query) { newValue in
+                                log = newValue // Actualizamos la variable de estado `log`
+                                buscar()       // Llamamos al método buscar
+                            }
                     HStack {
                         Button{
                             withAnimation {
@@ -137,33 +115,61 @@ struct VistaBusqueda: View {
             PokemonPair.name
         }
     }
-    func buscar() -> Void {
+    func buscar() {
+        let currentLog = log // Capturamos el valor actual de log al inicio
+
+        // Reiniciamos el filtro antes de realizar la búsqueda
         filtrado = []
-        if query.count >= 1 {
-            for nombre in filterPokemonByName(pokemonArray: pokemons, searchTerm: query) {
-                fetchPokemonData(pokemonId: nombre) { result in
-                    switch result {
-                    case .success(let newpokemon):
-                        if tipoSeleccionado.isEmpty {
-                            filtrado.append(newpokemon)
-                        } else {
-                            if(tipoSeleccionado.lowercased().contains(newpokemon.types[0].type.name.lowercased())){
-                                filtrado.append(newpokemon)
-                            }
-                            if(newpokemon.types.count == 1) {
-                                return
-                            }
-                            if(tipoSeleccionado.lowercased().contains(newpokemon.types[1].type.name.lowercased())){
-                                filtrado.append(newpokemon)
-                            }
-                        }
-                    case .failure(let error):
-                        print("Error: \(error)")
-                    }
+
+        // Si la barra de búsqueda está vacía, no hacemos nada
+        if currentLog.isEmpty {
+            return
+        }
+
+        // Obtener nombres coincidentes
+        let nombres = filterPokemonByName(pokemonArray: pokemons, searchTerm: currentLog)
+
+        // Si no hay nombres coincidentes, no hacemos llamadas adicionales
+        if nombres.isEmpty {
+            return
+        }
+
+        // Consultar datos para los nombres encontrados
+        var pokemonTemp: [Pokemon] = []
+        let group = DispatchGroup()
+
+        for nombre in nombres {
+            group.enter()
+            fetchPokemonData(pokemonId: nombre) { result in
+                defer { group.leave() } // Asegura que se salga del grupo después de cada solicitud
+                if currentLog != log {
+                    return // Salimos si el contenido de log ha cambiado
+                }
+                switch result {
+                case .success(let newpokemon):
+                    pokemonTemp.append(newpokemon)
+                case .failure(let error):
+                    print("Error al buscar \(nombre): \(error)")
                 }
             }
         }
+
+        // Una vez completadas todas las consultas, actualizamos `filtrado`
+        group.notify(queue: .main) {
+            if currentLog != log {
+                return // Salimos si el contenido de log ha cambiado
+            }
+            self.filtrado = pokemonTemp.filter { pokemon in
+                // Aplicar el filtro por tipo solo después de obtener todos los resultados
+                guard !tipoSeleccionado.isEmpty else {
+                    return true
+                }
+                let types = pokemon.types.map { $0.type.name.lowercased() }
+                return types.contains(tipoSeleccionado.lowercased())
+            }
+        }
     }
+
 }
 
 struct BusquedaView: View {
