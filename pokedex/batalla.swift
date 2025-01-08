@@ -10,23 +10,7 @@ struct Combate: View {
     var pokemonsUsuario: [Pokemon2?]  // Lista de Pokémon personalizados por el usuario
     var campoBatalla: String  // Fondo del combate personalizado
     @State private var team1: [Pokemon2] = []  // Equipo 1 que puede ser personalizado
-    @State private var team2: [Pokemon2] = [
-        // Equipo 2 por defecto
-        Pokemon2(
-            id: 4, name: "Squirtle", description: "Water turtle", types: ["Water"],
-            weakTypes: ["Electric", "Grass"], weight: 9.0, height: 0.5,
-            stats: ["HP": 44, "Speed": 43], image: Image("squirtle"),
-            image_shiny: Image("squirtle_shiny"), evolution_chain_id: 4),
-        Pokemon2(
-            id: 5, name: "Jigglypuff", description: "Fairy/Normal", types: ["Fairy", "Normal"],
-            weakTypes: ["Steel", "Poison"], weight: 5.5, height: 0.5,
-            stats: ["HP": 115, "Speed": 20], image: Image("jigglypuff"),
-            image_shiny: Image("jigglypuff_shiny"), evolution_chain_id: 5),
-        Pokemon2(
-            id: 6, name: "Meowth", description: "Cat Pokémon", types: ["Normal"],
-            weakTypes: ["Fighting"], weight: 4.2, height: 0.4, stats: ["HP": 40, "Speed": 90],
-            image: Image("meowth"), image_shiny: Image("meowth_shiny"), evolution_chain_id: 6),
-    ]
+    @State private var team2: [Pokemon2] = []  // Equipo 2 que puede ser personalizado
 
     @State private var log: [String] = []
     @State private var currentTurn: Int = 1
@@ -43,7 +27,6 @@ struct Combate: View {
         self.pokemonsUsuario = pokemonsUsuario
         self.campoBatalla = campoBatalla
         print("Datos pokemon")
-        //for each nombre pokjemonusuario
         for pokemon in pokemonsUsuario {
             if let pokemon = pokemon {
                 print("Pokemon: \(pokemon.name)")
@@ -52,16 +35,12 @@ struct Combate: View {
     }
 
     func calcularVida(team: [Pokemon2]) -> Int {
-        var totalHP = 0
-        for pokemon in team {
-            totalHP += pokemon.stats["HP"] ?? 0
-        }
-        return totalHP
+        return team.reduce(0) { $0 + ($1.stats["hp"] ?? 0) }
     }
 
     func calcularPrimerAtacante() {
-        let velocidadTeam1 = team1.reduce(0) { $0 + ($1.stats["Speed"] ?? 0) }
-        let velocidadTeam2 = team2.reduce(0) { $0 + ($1.stats["Speed"] ?? 0) }
+        let velocidadTeam1 = team1.reduce(0) { $0 + ($1.stats["speed"] ?? 0) }
+        let velocidadTeam2 = team2.reduce(0) { $0 + ($1.stats["speed"] ?? 0) }
 
         if velocidadTeam1 > velocidadTeam2 {
             attacker = 1  // Equipo 1 ataca primero
@@ -80,9 +59,6 @@ struct Combate: View {
                 case .success(let moves):
                     DispatchQueue.main.async {
                         movesTeam1[index] = moves
-                        log.append(
-                            "\(team1[index].name) movimientos: \(moves.map { $0.0 }.joined(separator: ", "))"
-                        )
                     }
                 case .failure(let error):
                     print("Error cargando movimientos para \(team1[index].name):", error)
@@ -96,9 +72,6 @@ struct Combate: View {
                 case .success(let moves):
                     DispatchQueue.main.async {
                         movesTeam2[index] = moves
-                        log.append(
-                            "\(team2[index].name) movimientos: \(moves.map { $0.0 }.joined(separator: ", "))"
-                        )
                     }
                 case .failure(let error):
                     print("Error cargando movimientos para \(team2[index].name):", error)
@@ -127,9 +100,17 @@ struct Combate: View {
         turnDamage()
 
         if attacker == 1 {
-            hpTeam2 -= damageTeam1
-            if hpTeam2 < 0 { hpTeam2 = 0 }
-            log.append("Equipo 1 ataca e inflige \(damageTeam1) de daño")
+            var moveLogs: [String] = []
+            for index in team1.indices {
+                if let move = movesTeam1[index].randomElement() {
+                    let moveName = move.0
+                    let damage = move.1
+                    hpTeam2 -= damage
+                    if hpTeam2 < 0 { hpTeam2 = 0 }
+                    moveLogs.append("\(team1[index].name) usa \(moveName) e inflige \(damage) de daño")
+                }
+            }
+            log.append("Equipo 1: \n" + moveLogs.joined(separator: "\n"))
             if hpTeam2 == 0 {
                 log.append("¡Equipo 1 gana el combate!")
                 fin = true
@@ -137,9 +118,17 @@ struct Combate: View {
             }
             attacker = 2
         } else {
-            hpTeam1 -= damageTeam2
-            if hpTeam1 < 0 { hpTeam1 = 0 }
-            log.append("Equipo 2 ataca e inflige \(damageTeam2) de daño")
+            var moveLogs: [String] = []
+            for index in team2.indices {
+                if let move = movesTeam2[index].randomElement() {
+                    let moveName = move.0
+                    let damage = move.1
+                    hpTeam1 -= damage
+                    if hpTeam1 < 0 { hpTeam1 = 0 }
+                    moveLogs.append("\(team2[index].name) usa \(moveName) e inflige \(damage) de daño")
+                }
+            }
+            log.append("Equipo 2: \n" + moveLogs.joined(separator: "\n"))
             if hpTeam1 == 0 {
                 log.append("¡Equipo 2 gana el combate!")
                 fin = true
@@ -150,40 +139,165 @@ struct Combate: View {
         currentTurn += 1
     }
 
+
+
     var body: some View {
         ZStack {
             Image(campoBatalla)  // Fondo de batalla dinámico
-                .scaledToFit()
+                .resizable()
+                .scaledToFill()
                 .ignoresSafeArea()
+
             VStack {
-                Text("\n\n\nHP del Equipo 1: \(hpTeam1)")
-                Text("HP del Equipo 2: \(hpTeam2)")
+                HStack(alignment: .top) {
+                    VStack {
+                        Text("Ramón")
+                            .font(.headline)
+                            .padding(.bottom, 5)
+                        ProgressView(value: Float(hpTeam1), total: Float(calcularVida(team: team1)))
+                            .frame(width: 180)
+                            .padding(.bottom, 5)
+                        Text("Vida: \(hpTeam1)/\(calcularVida(team: team1))")
+                            .font(.subheadline)
+
+                        ForEach(team1.indices, id: \ .self) { index in
+                            VStack {
+                                team1[index].image
+                                    .resizable()
+                                    .frame(width: 90, height: 90)
+                                    .padding(.bottom, 5)
+                                Text(team1[index].name)
+                                    .font(.caption)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+
+                    VStack {
+                        Text("Paco")
+                            .font(.headline)
+                            .padding(.bottom, 5)
+                        ProgressView(value: Float(hpTeam2), total: Float(calcularVida(team: team2)))
+                            .frame(width: 180)
+                            .padding(.bottom, 5)
+                        Text("Vida: \(hpTeam2)/\(calcularVida(team: team2))")
+                            .font(.subheadline)
+
+                        ForEach(team2.indices, id: \ .self) { index in
+                            VStack {
+                                team2[index].image
+                                    .resizable()
+                                    .frame(width: 90, height: 90)
+                                    .padding(.bottom, 5)
+                                Text(team2[index].name)
+                                    .font(.caption)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                }
+
                 Spacer()
-                /* List(log, id: \.self) { entry in
-                        Text(entry)
-                    } */
-                if !fin {
-                    Button("Siguiente Turno") {
+
+                Button(action: {
+                    if fin {
+                        // Lógica para navegar a VistaCombate
+                        if let window = UIApplication.shared.windows.first {
+                            window.rootViewController = UIHostingController(rootView: VistaCombate())
+                            window.makeKeyAndVisible()
+                        }
+                    } else {
                         realizarTurno()
                     }
-                } else {
-                    Text("Combate finalizado")
+                }) {
+                    Text("Turno actual: \(currentTurn == 1 ? 0 : currentTurn - 1)")
+                        .font(.headline)
+                        .padding(.bottom, 10)
                 }
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+                .shadow(radius: 5)
+
+                if let lastAction = log.last {
+                    Text(lastAction)
+                        .font(.subheadline)
+                        .padding(.bottom, 10)
+                }
+
                 Spacer()
+
+                HStack {
+                    Spacer()
+                    Button("Pasar Turno") {
+                        realizarTurno()
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                    .shadow(radius: 5)
+                    .padding(.trailing, 20)
+                }
+
+                if !fin {
+                    Button("A luchar!") {
+                        realizarTurno()
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                } else {
+                    VStack {
+                        Text("¡Combate finalizado!")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .padding()
+
+                        Button("Volver a la vista de combate") {
+                            // Lógica para volver a la vista de combate
+                        }
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                }
             }
             .padding()
             .onAppear {
-                team1 = pokemonsUsuario.compactMap { $0 }.filter { !$0.name.isEmpty }
+                team1 = pokemonsUsuario.compactMap { $0 }.prefix(3).map { $0 }
+                team2 = pokemonsUsuario.compactMap { $0 }.suffix(3).map { $0 }
 
-                print("TEAM 1")
-                for pokemon in team1 {
-                    print("Pokemon: \(pokemon.name)")
-                }
                 hpTeam1 = calcularVida(team: team1)
                 hpTeam2 = calcularVida(team: team2)
                 calcularPrimerAtacante()
+
+                if attacker == 1 {
+                    log.append("Turno 0: Empieza el equipo 1, sus pokemons tienen mayor velocidad.")
+                } else {
+                    log.append("Turno 0: Empieza el equipo 2, sus pokemons tienen mayor velocidad.")
+                }
+
                 cargarMovimientos()
             }
         }
     }
+
 }
+
+
+
+
+
+
+
+//
+//  PokedexApp.swift
+//  Pokedex
+//
+//  Created by Aula03 on 12/11/24.
+//
