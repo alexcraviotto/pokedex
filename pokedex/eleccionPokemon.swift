@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct eleccionPokemon: View {
-    var esCombateIA: Bool
     @Environment(\.presentationMode) var presentationMode
     @State var contrincante: Bool
 
@@ -13,12 +12,7 @@ struct eleccionPokemon: View {
 
     @State private var showAlert = false
 
-    // Inicializador personalizado
-    init(esCombateIA: Bool, contrincante: Bool, pokemonActual: Pokemon2) {
-        self.esCombateIA = esCombateIA
-        self.contrincante = contrincante
-        self.pokemonActual = pokemonActual
-    }
+   
 
     var body: some View {
         ZStack {
@@ -71,7 +65,7 @@ struct eleccionPokemon: View {
 
                     Button(action: {
                         if let window = UIApplication.shared.windows.first {
-                            let rootView = eleccionCampo(pokemonsUsuario: pokemonsUsuario)
+                            let rootView = eleccionCampo(pokemonsUsuario: $pokemonsUsuario)
                             window.rootViewController = UIHostingController(rootView: rootView)
                             window.makeKeyAndVisible()
                         }

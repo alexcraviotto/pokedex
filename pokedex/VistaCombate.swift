@@ -9,7 +9,6 @@ struct VistaCombate: View {
                 VStack(spacing: 20) {
                     NavigationLink(
                         destination: eleccionPokemon(
-                            esCombateIA: true,
                             contrincante: false,
                             pokemonActual: Pokemon2(
                                 id: 0,
@@ -44,7 +43,6 @@ struct VistaCombate: View {
 
                     NavigationLink(
                         destination: eleccionPokemon(
-                            esCombateIA: false,
                             contrincante: true,
                             pokemonActual: Pokemon2(
                                 id: -1,
