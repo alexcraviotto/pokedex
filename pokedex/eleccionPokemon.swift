@@ -12,8 +12,6 @@ struct eleccionPokemon: View {
 
     @State private var showAlert = false
 
-   
-
     var body: some View {
         ZStack {
             VStack {
@@ -64,10 +62,30 @@ struct eleccionPokemon: View {
                     .padding(.leading, 20)
 
                     Button(action: {
-                        if let window = UIApplication.shared.windows.first {
-                            let rootView = eleccionCampo(pokemonsUsuario: $pokemonsUsuario)
-                            window.rootViewController = UIHostingController(rootView: rootView)
-                            window.makeKeyAndVisible()
+                        // Comprueba si hay mas de tres pokemons con el nombre empty
+
+                        var empty = 0
+                        for i in 0..<3 {
+                            print(pokemonsUsuario[i]?.name)
+                            if pokemonsUsuario[i]?.name == nil {
+                                print("empty")
+                                empty += 1
+                            }
+                        }
+                        if empty >= 3 {
+                            let alert = UIAlertController(
+                                title: "Error", message: "Debes elegir al menos 3 pokemons",
+                                preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: "OK", style: .default))
+                            UIApplication.shared.windows.first?.rootViewController?.present(
+                                alert, animated: true)
+
+                        } else {
+                            if let window = UIApplication.shared.windows.first {
+                                let rootView = eleccionCampo(pokemonsUsuario: $pokemonsUsuario)
+                                window.rootViewController = UIHostingController(rootView: rootView)
+                                window.makeKeyAndVisible()
+                            }
                         }
                     }) {
                         Image(systemName: "arrow.right.circle.fill")
