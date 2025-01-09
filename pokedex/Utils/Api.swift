@@ -174,11 +174,11 @@ func extractPokemonID(from url: String) -> Int? {
 }
 
 func getMovesWithPP(
-    id pokemonId: Int, completion: @escaping (Result<[(String, Int)], Error>) -> Void
+    id pokemonId: Int, completion: @escaping (Result<[(String, Int, Int)], Error>) -> Void
 ) {
     // Obtener los datos del Pokémon
     let pokemonURLString = "https://pokeapi.co/api/v2/pokemon/\(pokemonId)"
-    print("hola")
+
     guard let pokemonURL = URL(string: pokemonURLString) else {
         completion(.failure(NSError(domain: "Invalid Pokémon URL", code: 0, userInfo: nil)))
         return
@@ -196,22 +196,23 @@ func getMovesWithPP(
         }
 
         do {
-            let pokemon = try JSONDecoder().decode(Pokemon.self, from: data)
+            guard let pokemonJSON = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                  let movesArray = pokemonJSON["moves"] as? [[String: Any]] else {
+                throw NSError(domain: "Invalid Pokémon data", code: 0, userInfo: nil)
+            }
 
-            let dispatchGroup: DispatchGroup = DispatchGroup()
-            var movesWithPP: [(String, Int)] = []
+            let dispatchGroup = DispatchGroup()
+            var movesWithDetails: [(String, Int, Int)] = []
             var fetchError: Error?
 
-            // Recorrer cada movimiento del Pokémon
-            for moveEntry in pokemon.moves {
-                dispatchGroup.enter()
-
-                // Obtener los detalles del movimiento
-                guard let moveURL = URL(string: moveEntry.move.url) else {
-                    fetchError = NSError(domain: "Invalid Move URL", code: 0, userInfo: nil)
-                    dispatchGroup.leave()
-                    return
+            for moveEntry in movesArray {
+                guard let moveDetails = moveEntry["move"] as? [String: Any],
+                      let moveURLString = moveDetails["url"] as? String,
+                      let moveURL = URL(string: moveURLString) else {
+                    continue
                 }
+
+                dispatchGroup.enter()
 
                 URLSession.shared.dataTask(with: moveURL) { moveData, moveResponse, moveError in
                     if let moveError = moveError {
@@ -227,9 +228,15 @@ func getMovesWithPP(
                     }
 
                     do {
-                        // Decodificar los detalles del movimiento
-                        let move = try JSONDecoder().decode(Move.self, from: moveData)
-                        movesWithPP.append((move.name, move.pp))
+                        guard let moveJSON = try JSONSerialization.jsonObject(with: moveData, options: []) as? [String: Any],
+                              let moveName = moveJSON["name"] as? String,
+                              let movePP = moveJSON["pp"] as? Int else {
+                            throw NSError(domain: "Invalid move data", code: 0, userInfo: nil)
+                        }
+
+                        // Manejar la ausencia de "accuracy"
+                        let moveAccuracy = moveJSON["accuracy"] as? Int ?? 100
+                        movesWithDetails.append((moveName, movePP, moveAccuracy))
                     } catch {
                         fetchError = error
                     }
@@ -238,12 +245,11 @@ func getMovesWithPP(
                 }.resume()
             }
 
-            // Notificar cuando todas las solicitudes hayan terminado
             dispatchGroup.notify(queue: .main) {
                 if let error = fetchError {
                     completion(.failure(error))
                 } else {
-                    completion(.success(movesWithPP))
+                    completion(.success(movesWithDetails))
                 }
             }
         } catch {
