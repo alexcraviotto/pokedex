@@ -19,8 +19,8 @@ struct Combate: View {
     @State private var attacker: Int = 0
     @State private var damageTeam1: Int = 0
     @State private var damageTeam2: Int = 0
-    @State private var movesTeam1: [[(String, Int)]] = []
-    @State private var movesTeam2: [[(String, Int)]] = []
+    @State private var movesTeam1: [[(String, Int, Int)]] = []
+    @State private var movesTeam2: [[(String, Int, Int)]] = []
     @State private var fin: Bool = false
 
     init(pokemonsUsuario: [Pokemon2?], campoBatalla: String) {
@@ -105,9 +105,15 @@ struct Combate: View {
                 if let move = movesTeam1[index].randomElement() {
                     let moveName = move.0
                     let damage = move.1
-                    hpTeam2 -= damage
-                    if hpTeam2 < 0 { hpTeam2 = 0 }
-                    moveLogs.append("\(team1[index].name) usa \(moveName) e inflige \(damage) de daño")
+                    let accuracy = move.2
+                    let hitChance = Int.random(in: 1...100)
+                    if hitChance <= accuracy {
+                        hpTeam2 -= damage
+                        if hpTeam2 < 0 { hpTeam2 = 0 }
+                        moveLogs.append("\(team1[index].name) usa \(moveName) e inflige \(damage) de daño con accuracy \(accuracy)")
+                    } else {
+                        moveLogs.append("El movimiento de \(team1[index].name) ha fallado con accuracy \(accuracy)")
+                    }
                 }
             }
             log.append("Equipo 1: \n" + moveLogs.joined(separator: "\n"))
@@ -123,9 +129,15 @@ struct Combate: View {
                 if let move = movesTeam2[index].randomElement() {
                     let moveName = move.0
                     let damage = move.1
-                    hpTeam1 -= damage
-                    if hpTeam1 < 0 { hpTeam1 = 0 }
-                    moveLogs.append("\(team2[index].name) usa \(moveName) e inflige \(damage) de daño")
+                    let accuracy = move.2
+                    let hitChance = Int.random(in: 1...100)
+                    if hitChance <= accuracy {
+                        hpTeam1 -= damage
+                        if hpTeam1 < 0 { hpTeam1 = 0 }
+                        moveLogs.append("\(team2[index].name) usa \(moveName) e inflige \(damage) de daño con accuracy \(accuracy)")
+                    } else {
+                        moveLogs.append("El movimiento de \(team2[index].name) ha fallado con accuracy \(accuracy)")
+                    }
                 }
             }
             log.append("Equipo 2: \n" + moveLogs.joined(separator: "\n"))
@@ -212,7 +224,7 @@ struct Combate: View {
                         realizarTurno()
                     }
                 }) {
-                    Text("Turno actual: \(currentTurn == 1 ? 0 : currentTurn - 1)")
+                    Text(!fin ? "Turno actual: \(currentTurn == 1 ? 0 : currentTurn - 1)" : "Fin del combate")
                         .font(.headline)
                         .padding(.bottom, 10)
                 }
@@ -229,43 +241,6 @@ struct Combate: View {
 
                 Spacer()
 
-                HStack {
-                    Spacer()
-                    Button("Pasar Turno") {
-                        realizarTurno()
-                    }
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .shadow(radius: 5)
-                    .padding(.trailing, 20)
-                }
-
-                if !fin {
-                    Button("A luchar!") {
-                        realizarTurno()
-                    }
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                } else {
-                    VStack {
-                        Text("¡Combate finalizado!")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .padding()
-
-                        Button("Volver a la vista de combate") {
-                            // Lógica para volver a la vista de combate
-                        }
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                    }
-                }
             }
             .padding()
             .onAppear {
