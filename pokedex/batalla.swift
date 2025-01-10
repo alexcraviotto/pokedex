@@ -9,6 +9,7 @@ struct CamposBatalla {
 struct Combate: View {
     var pokemonsUsuario: [Pokemon2?]  // Lista de Pokémon personalizados por el usuario
     var campoBatalla: String  // Fondo del combate personalizado
+    var posicion : String
     @State private var team1: [Pokemon2] = []  // Equipo 1 que puede ser personalizado
     @State private var team2: [Pokemon2] = []  // Equipo 2 que puede ser personalizado
 
@@ -26,6 +27,16 @@ struct Combate: View {
     init(pokemonsUsuario: [Pokemon2?], campoBatalla: String) {
         self.pokemonsUsuario = pokemonsUsuario
         self.campoBatalla = campoBatalla
+        switch campoBatalla {
+                case CamposBatalla.hierbaAlta:
+                    self.posicion = "hierba"
+                case CamposBatalla.desierto:
+                    self.posicion = "arena"
+                case CamposBatalla.altoMando:
+                    self.posicion = "morado"
+                default:
+                    self.posicion = "hierba" // Valor por defecto si no hay coincidencias
+                }
         print("Datos pokemon")
         for pokemon in pokemonsUsuario {
             if let pokemon = pokemon {
@@ -111,12 +122,14 @@ struct Combate: View {
                         hpTeam2 -= damage
                         if hpTeam2 < 0 { hpTeam2 = 0 }
                         moveLogs.append("\(team1[index].name) usa \(moveName) e inflige \(damage) de daño con accuracy \(accuracy)")
+                        
                     } else {
                         moveLogs.append("El movimiento de \(team1[index].name) ha fallado con accuracy \(accuracy)")
                     }
                 }
             }
-            log.append("Equipo 1: \n" + moveLogs.joined(separator: "\n"))
+           // log.append("Equipo 1: \n" + moveLogs.joined(separator: "\n"))
+            log.append("Turno \(currentTurn): Equipo 1 inflige un total de \(damageTeam1) de daño.")
             if hpTeam2 == 0 {
                 log.append("¡Equipo 1 gana el combate!")
                 fin = true
@@ -134,13 +147,15 @@ struct Combate: View {
                     if hitChance <= accuracy {
                         hpTeam1 -= damage
                         if hpTeam1 < 0 { hpTeam1 = 0 }
+                        
                         moveLogs.append("\(team2[index].name) usa \(moveName) e inflige \(damage) de daño con accuracy \(accuracy)")
                     } else {
                         moveLogs.append("El movimiento de \(team2[index].name) ha fallado con accuracy \(accuracy)")
                     }
                 }
             }
-            log.append("Equipo 2: \n" + moveLogs.joined(separator: "\n"))
+            //log.append("Equipo 2: \n" + moveLogs.joined(separator: "\n"))
+            log.append("Turno \(currentTurn): Equipo 2 inflige un total de \(damageTeam2) de daño.")
             if hpTeam1 == 0 {
                 log.append("¡Equipo 2 gana el combate!")
                 fin = true
@@ -150,9 +165,7 @@ struct Combate: View {
         }
         currentTurn += 1
     }
-
-
-
+/*
     var body: some View {
         ZStack {
             Image(campoBatalla)  // Fondo de batalla dinámico
@@ -224,23 +237,199 @@ struct Combate: View {
                         realizarTurno()
                     }
                 }) {
-                    Text(!fin ? "Turno actual: \(currentTurn == 1 ? 0 : currentTurn - 1)" : "Fin del combate")
+                    Text(currentTurn == 1 ? "Pulsa aquí" : (!fin ? "Turno actual: \(currentTurn-1)" : "Fin del combate"))
                         .font(.headline)
-                        .padding(.bottom, 10)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 40)
                 }
                 .background(Color.blue)
                 .foregroundColor(.white)
                 .cornerRadius(10)
                 .shadow(radius: 5)
+                Spacer()
+                ZStack {
+                    Image("cuadroTextoCombate")
+                        .resizable()
+                        .frame(height: 250)
+                        .clipped()
+                        .padding(.horizontal)
 
-                if let lastAction = log.last {
-                    Text(lastAction)
-                        .font(.subheadline)
-                        .padding(.bottom, 10)
+                    if let lastAction = log.last {
+                        Text(lastAction)
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 25)
+                            .padding(.vertical, 20)
+                    }
+                }
+                Spacer()
+                Spacer()
+            }
+            .padding()
+            .onAppear {
+                team1 = pokemonsUsuario.compactMap { $0 }.prefix(3).map { $0 }
+                team2 = pokemonsUsuario.compactMap { $0 }.suffix(3).map { $0 }
+
+                hpTeam1 = calcularVida(team: team1)
+                hpTeam2 = calcularVida(team: team2)
+                calcularPrimerAtacante()
+
+                if attacker == 1 {
+                    log.append("Turno 0: Empieza el equipo 1, sus pokemons tienen mayor velocidad.")
+                } else {
+                    log.append("Turno 0: Empieza el equipo 2, sus pokemons tienen mayor velocidad.")
+                }
+
+                cargarMovimientos()
+            }
+        }
+    }*/
+    var body: some View {
+        ZStack {
+            // Fondo de batalla
+            Image(campoBatalla)
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+
+            VStack {
+                Spacer()
+                ZStack {
+                    Image("cuadroVida")
+                        .resizable()
+                        .scaledToFit()
+
+                    VStack {
+                        // Nombre del entrenador o Pokémon
+                        HStack{
+                            Text("Ramón")
+                                .font(.custom("Press Start 2P Regular", size: 20 ))
+                                .foregroundColor(.black)
+                                .offset(x: -50, y: -20)
+                            
+                            Text("HP:\(hpTeam1)/\(calcularVida(team: team1))")
+                                .font(.custom("Press Start 2P Regular", size: 10 ))           .foregroundColor(.black)
+                                .offset(x: -50, y: -20)
+                        }
+                        ZStack(alignment: .leading) {
+                            // Fondo de la barra
+                            RoundedRectangle(cornerRadius: 6)
+                                .frame(width: 172, height: 19) // Ancho y alto de la barra
+                                .foregroundColor(.gray.opacity(0.3)) // Color de fondo de la barra
+
+                            // Progreso actual
+                            RoundedRectangle(cornerRadius: 6)
+                                .frame(width: CGFloat(hpTeam1) / CGFloat(calcularVida(team: team1)) * 172, height: 19) // Calcula la proporción
+                                .foregroundColor(.green) // Color del progreso
+                        }
+                        .offset(x: 41, y: -6)
+                        
+                    }
+                }
+                ZStack{
+                    Image(posicion)
+                        .resizable()
+                        .scaledToFit()
+                        .offset(y: 20)
+                    HStack(spacing: 20) {
+                        ForEach(team1.indices, id: \.self) { index in
+                            team1[index].image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 100)
+                                .shadow(radius: 5)
+                        }
+                    }
                 }
 
                 Spacer()
+                ZStack{
+                    Image(posicion)
+                        .resizable()
+                        .scaledToFit()
+                        .offset(y: 20)
+                    // Pokémon del equipo 2
+                    HStack(spacing: 20) {
+                        ForEach(team2.indices, id: \.self) { index in
+                            team2[index].image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 100)
+                                .shadow(radius: 5)
+                        }
+                    }
+                    .padding(.bottom, 15)
+                }
+                Spacer()
+                ZStack {
+                    Image("cuadroVida")
+                        .resizable()
+                        .scaledToFit()
+              
+                    VStack {
+                        // Nombre del entrenador o Pokémon
+                        HStack{
+                            Text("Paco")
+                                .font(.custom("Press Start 2P Regular", size: 20 ))               .foregroundColor(.black)
+                                .offset(x: -50, y: -20)
+                            
+                            Text("HP:\(hpTeam2)/\(calcularVida(team: team2))")
+                                .font(.custom("Press Start 2P Regular", size: 10 ))             .foregroundColor(.black)
+                                .offset(x: -50, y: -20)
+                        }
+                        ZStack(alignment: .leading) {
+                            // Fondo de la barra
+                            RoundedRectangle(cornerRadius: 6)
+                                .frame(width: 172, height: 19) // Ancho y alto de la barra
+                                .foregroundColor(.gray.opacity(0.3)) // Color de fondo de la barra
 
+                            // Progreso actual
+                            RoundedRectangle(cornerRadius: 6)
+                                .frame(width: CGFloat(hpTeam2) / CGFloat(calcularVida(team: team2)) * 172, height: 19) // Calcula la proporción
+                                .foregroundColor(.green) // Color del progreso
+                        }
+                        .offset(x: 41, y: -6)
+                        
+                    }
+                }
+                Spacer()
+                // Botón de acción
+                Button(action: {
+                    if fin {
+                        if let window = UIApplication.shared.windows.first {
+                            window.rootViewController = UIHostingController(rootView: VistaCombate())
+                            window.makeKeyAndVisible()
+                        }
+                    } else {
+                        realizarTurno()
+                    }
+                }) {
+                    Text(currentTurn == 1 ? "¡A luchar!" : (!fin ? "Turno actual: \(currentTurn-1)" : "Fin del combate"))
+                        .font(.headline)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 40)
+                }
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+                .shadow(radius: 5)
+                .padding(.top, 10)
+                // Cuadro de acción
+                ZStack {
+                    Image("cuadroTextoCombate")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 120)
+
+                    Text(log.last ?? "¡Es tu turno!")
+                        .font(.custom("Press Start 2P Regular", size: 10 ))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding(10)
+                }
+
+   
             }
             .padding()
             .onAppear {
@@ -261,10 +450,44 @@ struct Combate: View {
             }
         }
     }
-
 }
 
-
+#Preview{
+    Combate(pokemonsUsuario: [
+        // Equipo modificado
+        Pokemon2(
+            id: 1, name: "Zekrom", description: "Dragon/Electric Pokémon", types: ["Dragon", "Electric"],
+            weakTypes: ["Ice", "Fairy", "Dragon", "Ground"], weight: 345.0, height: 2.9,
+            stats: ["hp": 100, "speed": 90], image: Image("Zekrom"),
+            image_shiny: Image("Zekrom"), evolution_chain_id: 1),
+        Pokemon2(
+            id: 2, name: "Reshiram", description: "Dragon/Fire Pokémon", types: ["Dragon", "Fire"],
+            weakTypes: ["Rock", "Ground", "Dragon"], weight: 330.0, height: 3.2,
+            stats: ["hp": 100, "speed": 90], image: Image("Reshiram"),
+            image_shiny: Image("Reshiram"), evolution_chain_id: 2),
+        Pokemon2(
+            id: 3, name: "Mewtwo", description: "Psychic Pokémon", types: ["Psychic"],
+            weakTypes: ["Bug", "Ghost", "Dark"], weight: 122.0, height: 2.0,
+            stats: ["hp": 106, "speed": 130], image: Image("Mewtwo"),
+            image_shiny: Image("Mewtwo"), evolution_chain_id: 3),
+        Pokemon2(
+            id: 1, name: "Zekrom", description: "Dragon/Electric Pokémon", types: ["Dragon", "Electric"],
+            weakTypes: ["Ice", "Fairy", "Dragon", "Ground"], weight: 345.0, height: 2.9,
+            stats: ["hp": 100, "speed": 90], image: Image("Zekrom"),
+            image_shiny: Image("Zekrom"), evolution_chain_id: 1),
+        Pokemon2(
+            id: 2, name: "Reshiram", description: "Dragon/Fire Pokémon", types: ["Dragon", "Fire"],
+            weakTypes: ["Rock", "Ground", "Dragon"], weight: 330.0, height: 3.2,
+            stats: ["hp": 100, "speed": 90], image: Image("Reshiram"),
+            image_shiny: Image("Reshiram"), evolution_chain_id: 2),
+        Pokemon2(
+            id: 3, name: "Mewtwo", description: "Psychic Pokémon", types: ["Psychic"],
+            weakTypes: ["Bug", "Ghost", "Dark"], weight: 122.0, height: 2.0,
+            stats: ["hp": 106, "speed": 130], image: Image("Mewtwo"),
+            image_shiny: Image("Mewtwo"), evolution_chain_id: 3)
+    ]
+            , campoBatalla: "fondoCombateHierba")
+}
 
 
 

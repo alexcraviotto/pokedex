@@ -39,5 +39,8 @@ struct PokedexApp: App {
             ]
 , campoBatalla: "fondoCombateHierba")
         }
+       /* WindowGroup {
+              Inicio()
+          }*/
     }
 }

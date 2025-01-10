@@ -3,6 +3,7 @@ import SwiftUI
 struct eleccionPokemon: View {
     @Environment(\.presentationMode) var presentationMode
     @State var contrincante: Bool
+    @State private var apiCalls = ApiCalls()
 
     // Estado para almacenar los Pokémon del usuario
     @State private var pokemonsUsuario: [Pokemon2?] = Array(repeating: nil, count: 6)  // Inicializa con nil
@@ -48,57 +49,74 @@ struct eleccionPokemon: View {
             }
 
             // Botones "Reset" y navegación a "eleccionCampo"
-            VStack {
-                Spacer()
-                HStack {
-                    Button(action: resetPokemons) {
-                        Text("Reset")
-                            .font(.custom("Press Start 2P Regular", size: 18))
+            VStack{
+                if(!contrincante){
+                    Button(action: elegirAleatorios) {
+                        Text("Elegir aleatorios")
+                            .font(.custom("Press Start 2P Regular", size: 12))
                             .foregroundColor(.white)
                             .padding()
-                            .background(Color.red)
+                            .background(Color.blue)
                             .cornerRadius(10)
                     }
                     .padding(.leading, 20)
-
-                    Button(action: {
-                        // Comprueba si hay mas de tres pokemons con el nombre empty
-
-                        var empty = 0
-                        for i in 0..<3 {
-                            print(pokemonsUsuario[i]?.name)
-                            if pokemonsUsuario[i]?.name == nil {
-                                print("empty")
-                                empty += 1
-                            }
-                        }
-                        if empty >= 3 {
-                            let alert = UIAlertController(
-                                title: "Error", message: "Debes elegir al menos 3 pokemons",
-                                preferredStyle: .alert)
-                            alert.addAction(UIAlertAction(title: "OK", style: .default))
-                            UIApplication.shared.windows.first?.rootViewController?.present(
-                                alert, animated: true)
-
-                        } else {
-                            if let window = UIApplication.shared.windows.first {
-                                let rootView = eleccionCampo(pokemonsUsuario: $pokemonsUsuario)
-                                window.rootViewController = UIHostingController(rootView: rootView)
-                                window.makeKeyAndVisible()
-                            }
-                        }
-                    }) {
-                        Image(systemName: "arrow.right.circle.fill")
-                            .resizable()
-                            .frame(width: 50, height: 50)
-                            .foregroundColor(.blue)
-                    }
-                    .offset(x: 170)
-
-                    Spacer()
+                    .offset(x: -10, y : 500)
                 }
-                .offset(y: -60)
-                .padding(.bottom, 40)  // Asegura espacio en la parte inferior
+                
+                VStack {
+                    Spacer()
+                    
+                    HStack {
+                        Button(action: resetPokemons) {
+                            Text("Reset")
+                                .font(.custom("Press Start 2P Regular", size: 16))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.red)
+                                .cornerRadius(10)
+                        }
+                        .padding(.leading, 20)
+                        
+                        Button(action: {
+                            // Comprueba si hay mas de tres pokemons con el nombre empty
+                            
+                            var empty = 0
+                            for i in 0..<3 {
+                                print(pokemonsUsuario[i]?.name)
+                                if pokemonsUsuario[i]?.name == nil {
+                                    print("empty")
+                                    empty += 1
+                                }
+                            }
+                            if empty >= 3 {
+                                let alert = UIAlertController(
+                                    title: "Error", message: "Debes elegir al menos 3 pokemons",
+                                    preferredStyle: .alert)
+                                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                                UIApplication.shared.windows.first?.rootViewController?.present(
+                                    alert, animated: true)
+                                
+                            } else {
+                                if let window = UIApplication.shared.windows.first {
+                                    let rootView = eleccionCampo(pokemonsUsuario: $pokemonsUsuario)
+                                    window.rootViewController = UIHostingController(rootView: rootView)
+                                    window.makeKeyAndVisible()
+                                }
+                            }
+                        }) {
+                            Image(systemName: "arrow.right.circle.fill")
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .foregroundColor(.blue)
+                        }
+                        .offset(x: 170)
+                        
+                        
+                        Spacer()
+                    }
+                    .offset(y: -60)
+                    .padding(.bottom, 40)  // Asegura espacio en la parte inferior
+                }
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -159,23 +177,8 @@ struct eleccionPokemon: View {
         }
 
         // Si no es el contrincante, asigna Pokémon de reemplazo
-        if !contrincante {
-            let replacementPokemon = Pokemon2(
-                id: 0,
-                name: "",
-                description: "",
-                types: [],
-                weakTypes: [],
-                weight: 0.0,
-                height: 0.0,
-                stats: [:],
-                image: Image("Zekrom"),
-                image_shiny: Image(""),
-                evolution_chain_id: 0
-            )
-            for index in 3..<6 {
-                pokemonsUsuario[index] = replacementPokemon
-            }
+        if !contrincante && pokemonsUsuario[3..<6].allSatisfy({ $0 == nil }) {
+            elegirAleatorios()
         }
     }
 
@@ -206,4 +209,39 @@ struct eleccionPokemon: View {
             }
         }
     }
+    
+    private func elegirAleatorios() {
+        let pokemonIds = (1...1000).shuffled().prefix(3)
+        let group = DispatchGroup()
+        var randomPokemons: [Pokemon2?] = []
+
+        for id in pokemonIds {
+            group.enter()
+            Task {
+                do {
+                    let pokemon = await apiCalls.pokemonPorId(id: id)
+                    randomPokemons.append(pokemon)
+                } catch {
+                    print("Error al obtener Pokémon aleatorio: \(error)")
+                }
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) {
+            // Asignar los Pokémon obtenidos a los huecos en pokemonsUsuario
+            for (index, pokemon) in randomPokemons.enumerated() {
+                if 3 + index < pokemonsUsuario.count {
+                    pokemonsUsuario[3 + index] = pokemon
+                }
+            }
+        }
+    }
+
+
+    
+}
+
+#Preview {
+    VistaCombate()
 }
