@@ -211,7 +211,7 @@ struct eleccionPokemon: View {
     }
     
     private func elegirAleatorios() {
-        let pokemonIds = (1...1000).shuffled().prefix(3)
+        let pokemonIds = (1...1025).shuffled().prefix(3)
         let group = DispatchGroup()
         var randomPokemons: [Pokemon2?] = []
 
