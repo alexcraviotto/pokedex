@@ -154,7 +154,7 @@ struct VistaDetalle: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .frame(maxWidth: .infinity)
-            .background(Color(UIColor.systemBackground))
+            .background(Color.clear)
             .clipShape(RoundedRectangle(cornerRadius: 15))
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
             
