@@ -66,6 +66,27 @@ struct eleccionPokemon: View {
     var body: some View {
         ZStack {
             VStack {
+                HStack {
+                    Button(action: {
+                        // Acción para volver atrás
+                        if let window = UIApplication.shared.windows.first {
+                            let rootView = vistaMenu()
+                            window.rootViewController = UIHostingController(rootView: rootView)
+                            window.makeKeyAndVisible()
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                                .foregroundColor(.blue)
+                            Text("Atrás")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .padding(.leading, 20)
+                    Spacer()
+                }
+                .padding(.top, 20)
+
                 VStack {
                     Text("Elección")
                         .font(.custom("Press Start 2P Regular", size: 24))
@@ -93,9 +114,7 @@ struct eleccionPokemon: View {
                 .padding()
 
                 Spacer()
-            }
 
-            VStack {
                 if !contrincante {
                     Button(action: elegirAleatorios) {
                         Text("Elegir aleatorios")
@@ -105,54 +124,48 @@ struct eleccionPokemon: View {
                             .background(Color.blue)
                             .cornerRadius(10)
                     }
-                    .padding(.leading, 20)
-                    .offset(x: -10, y: 500)
+                    .padding(.bottom, 20)
                 }
 
-                VStack {
+                HStack {
+                    Button(action: resetPokemons) {
+                        Text("Reset")
+                            .font(.custom("Press Start 2P Regular", size: 16))
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.red)
+                            .cornerRadius(10)
+                    }
+                    .padding(.leading, 20)
+
                     Spacer()
 
-                    HStack {
-                        Button(action: resetPokemons) {
-                            Text("Reset")
-                                .font(.custom("Press Start 2P Regular", size: 16))
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Color.red)
-                                .cornerRadius(10)
-                        }
-                        .padding(.leading, 20)
-
-                        Button(action: {
-                            var empty = 0
-                            for i in 0..<3 {
-                                if pokemonsUsuario[i]?.name == nil {
-                                    empty += 1
-                                }
+                    Button(action: {
+                        var empty = 0
+                        for i in 0..<3 {
+                            if pokemonsUsuario[i]?.name == nil {
+                                empty += 1
                             }
-                            if empty >= 3 {
-                                showAlert = true
-                            } else {
-                                if let window = UIApplication.shared.windows.first {
-                                    let rootView = eleccionCampo(pokemonsUsuario: $pokemonsUsuario)
-                                    window.rootViewController = UIHostingController(
-                                        rootView: rootView)
-                                    window.makeKeyAndVisible()
-                                }
-                            }
-                        }) {
-                            Image(systemName: "arrow.right.circle.fill")
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .foregroundColor(.blue)
                         }
-                        .offset(x: 170)
-
-                        Spacer()
+                        if empty >= 3 {
+                            showAlert = true
+                        } else {
+                            if let window = UIApplication.shared.windows.first {
+                                let rootView = eleccionCampo(pokemonsUsuario: $pokemonsUsuario)
+                                window.rootViewController = UIHostingController(
+                                    rootView: rootView)
+                                window.makeKeyAndVisible()
+                            }
+                        }
+                    }) {
+                        Image(systemName: "arrow.right.circle.fill")
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                            .foregroundColor(.blue)
                     }
-                    .offset(y: -60)
-                    .padding(.bottom, 40)
+                    .padding(.trailing, 20)
                 }
+                .padding(.bottom, 40)
             }
         }
         .navigationBarBackButtonHidden(true)

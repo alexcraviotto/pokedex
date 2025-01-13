@@ -52,7 +52,7 @@ struct VistaDetalle: View {
                                     .frame(width: 40, height: 40)
                                     .offset(y: 2)                                    .zIndex(1)
                                     .onTapGesture {
-                                        let userId = obtenerUserIdDesdeLocalStorage()
+                                        let userId: UUID = obtenerUserIdDesdeLocalStorage()
                                         var vm = ViewModel()
                                         
                                         if isFavorite {

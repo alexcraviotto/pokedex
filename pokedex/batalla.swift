@@ -9,7 +9,7 @@ struct CamposBatalla {
 struct Combate: View {
     var pokemonsUsuario: [Pokemon2?]  // Lista de Pokémon personalizados por el usuario
     var campoBatalla: String  // Fondo del combate personalizado
-    var posicion : String
+    var posicion: String
     @State private var team1: [Pokemon2] = []  // Equipo 1 que puede ser personalizado
     @State private var team2: [Pokemon2] = []  // Equipo 2 que puede ser personalizado
 
@@ -28,15 +28,15 @@ struct Combate: View {
         self.pokemonsUsuario = pokemonsUsuario
         self.campoBatalla = campoBatalla
         switch campoBatalla {
-                case CamposBatalla.hierbaAlta:
-                    self.posicion = "hierba"
-                case CamposBatalla.desierto:
-                    self.posicion = "arena"
-                case CamposBatalla.altoMando:
-                    self.posicion = "morado"
-                default:
-                    self.posicion = "hierba" // Valor por defecto si no hay coincidencias
-                }
+        case CamposBatalla.hierbaAlta:
+            self.posicion = "hierba"
+        case CamposBatalla.desierto:
+            self.posicion = "arena"
+        case CamposBatalla.altoMando:
+            self.posicion = "morado"
+        default:
+            self.posicion = "hierba"  // Valor por defecto si no hay coincidencias
+        }
         print("Datos pokemon")
         for pokemon in pokemonsUsuario {
             if let pokemon = pokemon {
@@ -48,7 +48,24 @@ struct Combate: View {
     func calcularVida(team: [Pokemon2]) -> Int {
         return team.reduce(0) { $0 + ($1.stats["hp"] ?? 0) }
     }
+    private func guardarResultadoBatalla(resultado: String) {
+        // Obtener IDs de los pokémon del equipo 1
+        let pokemonIds = team1.map { Int64($0.id) }
 
+        // Obtener IDs de los pokémon del equipo 2
+        let opponentPokemonIds = team2.map { Int64($0.id) }
+
+        let viewModel = ViewModel()
+        let userId: UUID = obtenerUserIdDesdeLocalStorage()
+
+        viewModel.agregarBattleLog(
+            userId: userId,
+            pokemonIds: pokemonIds,
+            opponentPokemonIds: opponentPokemonIds,
+            result: resultado
+        )
+        print("Resultado de la batalla guardado")
+    }
     func calcularPrimerAtacante() {
         let velocidadTeam1 = team1.reduce(0) { $0 + ($1.stats["speed"] ?? 0) }
         let velocidadTeam2 = team2.reduce(0) { $0 + ($1.stats["speed"] ?? 0) }
@@ -121,18 +138,24 @@ struct Combate: View {
                     if hitChance <= accuracy {
                         hpTeam2 -= damage
                         if hpTeam2 < 0 { hpTeam2 = 0 }
-                        moveLogs.append("\(team1[index].name) usa \(moveName) e inflige \(damage) de daño con accuracy \(accuracy)")
-                        
+                        moveLogs.append(
+                            "\(team1[index].name) usa \(moveName) e inflige \(damage) de daño con accuracy \(accuracy)"
+                        )
+
                     } else {
-                        moveLogs.append("El movimiento de \(team1[index].name) ha fallado con accuracy \(accuracy)")
+                        moveLogs.append(
+                            "El movimiento de \(team1[index].name) ha fallado con accuracy \(accuracy)"
+                        )
                     }
                 }
             }
-           // log.append("Equipo 1: \n" + moveLogs.joined(separator: "\n"))
+            // log.append("Equipo 1: \n" + moveLogs.joined(separator: "\n"))
             log.append("Turno \(currentTurn): Equipo 1 inflige un total de \(damageTeam1) de daño.")
             if hpTeam2 == 0 {
                 log.append("¡Equipo 1 gana el combate!")
                 fin = true
+                guardarResultadoBatalla(resultado: "Victoria")
+
                 return
             }
             attacker = 2
@@ -147,10 +170,14 @@ struct Combate: View {
                     if hitChance <= accuracy {
                         hpTeam1 -= damage
                         if hpTeam1 < 0 { hpTeam1 = 0 }
-                        
-                        moveLogs.append("\(team2[index].name) usa \(moveName) e inflige \(damage) de daño con accuracy \(accuracy)")
+
+                        moveLogs.append(
+                            "\(team2[index].name) usa \(moveName) e inflige \(damage) de daño con accuracy \(accuracy)"
+                        )
                     } else {
-                        moveLogs.append("El movimiento de \(team2[index].name) ha fallado con accuracy \(accuracy)")
+                        moveLogs.append(
+                            "El movimiento de \(team2[index].name) ha fallado con accuracy \(accuracy)"
+                        )
                     }
                 }
             }
@@ -158,6 +185,8 @@ struct Combate: View {
             log.append("Turno \(currentTurn): Equipo 2 inflige un total de \(damageTeam2) de daño.")
             if hpTeam1 == 0 {
                 log.append("¡Equipo 2 gana el combate!")
+                guardarResultadoBatalla(resultado: "Derrota")
+
                 fin = true
                 return
             }
@@ -165,7 +194,7 @@ struct Combate: View {
         }
         currentTurn += 1
     }
-/*
+    /*
     var body: some View {
         ZStack {
             Image(campoBatalla)  // Fondo de batalla dinámico
@@ -302,32 +331,37 @@ struct Combate: View {
 
                     VStack {
                         // Nombre del entrenador o Pokémon
-                        HStack{
+                        HStack {
                             Text("Ramón")
-                                .font(.custom("Press Start 2P Regular", size: 20 ))
+                                .font(.custom("Press Start 2P Regular", size: 20))
                                 .foregroundColor(.black)
                                 .offset(x: -50, y: -20)
-                            
+
                             Text("HP:\(hpTeam1)/\(calcularVida(team: team1))")
-                                .font(.custom("Press Start 2P Regular", size: 10 ))           .foregroundColor(.black)
+                                .font(.custom("Press Start 2P Regular", size: 10)).foregroundColor(
+                                    .black
+                                )
                                 .offset(x: -50, y: -20)
                         }
                         ZStack(alignment: .leading) {
                             // Fondo de la barra
                             RoundedRectangle(cornerRadius: 6)
-                                .frame(width: 172, height: 19) // Ancho y alto de la barra
-                                .foregroundColor(.gray.opacity(0.3)) // Color de fondo de la barra
+                                .frame(width: 172, height: 19)  // Ancho y alto de la barra
+                                .foregroundColor(.gray.opacity(0.3))  // Color de fondo de la barra
 
                             // Progreso actual
                             RoundedRectangle(cornerRadius: 6)
-                                .frame(width: CGFloat(hpTeam1) / CGFloat(calcularVida(team: team1)) * 172, height: 19) // Calcula la proporción
-                                .foregroundColor(.green) // Color del progreso
+                                .frame(
+                                    width: CGFloat(hpTeam1) / CGFloat(calcularVida(team: team1))
+                                        * 172, height: 19
+                                )  // Calcula la proporción
+                                .foregroundColor(.green)  // Color del progreso
                         }
                         .offset(x: 41, y: -6)
-                        
+
                     }
                 }
-                ZStack{
+                ZStack {
                     Image(posicion)
                         .resizable()
                         .scaledToFit()
@@ -344,7 +378,7 @@ struct Combate: View {
                 }
 
                 Spacer()
-                ZStack{
+                ZStack {
                     Image(posicion)
                         .resizable()
                         .scaledToFit()
@@ -366,31 +400,38 @@ struct Combate: View {
                     Image("cuadroVida")
                         .resizable()
                         .scaledToFit()
-              
+
                     VStack {
                         // Nombre del entrenador o Pokémon
-                        HStack{
+                        HStack {
                             Text("Paco")
-                                .font(.custom("Press Start 2P Regular", size: 20 ))               .foregroundColor(.black)
+                                .font(.custom("Press Start 2P Regular", size: 20)).foregroundColor(
+                                    .black
+                                )
                                 .offset(x: -50, y: -20)
-                            
+
                             Text("HP:\(hpTeam2)/\(calcularVida(team: team2))")
-                                .font(.custom("Press Start 2P Regular", size: 10 ))             .foregroundColor(.black)
+                                .font(.custom("Press Start 2P Regular", size: 10)).foregroundColor(
+                                    .black
+                                )
                                 .offset(x: -50, y: -20)
                         }
                         ZStack(alignment: .leading) {
                             // Fondo de la barra
                             RoundedRectangle(cornerRadius: 6)
-                                .frame(width: 172, height: 19) // Ancho y alto de la barra
-                                .foregroundColor(.gray.opacity(0.3)) // Color de fondo de la barra
+                                .frame(width: 172, height: 19)  // Ancho y alto de la barra
+                                .foregroundColor(.gray.opacity(0.3))  // Color de fondo de la barra
 
                             // Progreso actual
                             RoundedRectangle(cornerRadius: 6)
-                                .frame(width: CGFloat(hpTeam2) / CGFloat(calcularVida(team: team2)) * 172, height: 19) // Calcula la proporción
-                                .foregroundColor(.green) // Color del progreso
+                                .frame(
+                                    width: CGFloat(hpTeam2) / CGFloat(calcularVida(team: team2))
+                                        * 172, height: 19
+                                )  // Calcula la proporción
+                                .foregroundColor(.green)  // Color del progreso
                         }
                         .offset(x: 41, y: -6)
-                        
+
                     }
                 }
                 Spacer()
@@ -398,17 +439,22 @@ struct Combate: View {
                 Button(action: {
                     if fin {
                         if let window = UIApplication.shared.windows.first {
-                            window.rootViewController = UIHostingController(rootView: VistaCombate())
+                            window.rootViewController = UIHostingController(
+                                rootView: VistaCombate())
                             window.makeKeyAndVisible()
                         }
                     } else {
                         realizarTurno()
                     }
                 }) {
-                    Text(currentTurn == 1 ? "¡A luchar!" : (!fin ? "Turno actual: \(currentTurn-1)" : "Fin del combate"))
-                        .font(.headline)
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 40)
+                    Text(
+                        currentTurn == 1
+                            ? "¡A luchar!"
+                            : (!fin ? "Turno actual: \(currentTurn-1)" : "Fin del combate")
+                    )
+                    .font(.headline)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 40)
                 }
                 .background(Color.blue)
                 .foregroundColor(.white)
@@ -423,13 +469,12 @@ struct Combate: View {
                         .frame(height: 120)
 
                     Text(log.last ?? "¡Es tu turno!")
-                        .font(.custom("Press Start 2P Regular", size: 10 ))
+                        .font(.custom("Press Start 2P Regular", size: 10))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .padding(10)
                 }
 
-   
             }
             .padding()
             .onAppear {
@@ -452,46 +497,46 @@ struct Combate: View {
     }
 }
 
-#Preview{
-    Combate(pokemonsUsuario: [
-        // Equipo modificado
-        Pokemon2(
-            id: 1, name: "Zekrom", description: "Dragon/Electric Pokémon", types: ["Dragon", "Electric"],
-            weakTypes: ["Ice", "Fairy", "Dragon", "Ground"], weight: 345.0, height: 2.9,
-            stats: ["hp": 100, "speed": 90], image: Image("Zekrom"),
-            image_shiny: Image("Zekrom"), evolution_chain_id: 1),
-        Pokemon2(
-            id: 2, name: "Reshiram", description: "Dragon/Fire Pokémon", types: ["Dragon", "Fire"],
-            weakTypes: ["Rock", "Ground", "Dragon"], weight: 330.0, height: 3.2,
-            stats: ["hp": 100, "speed": 90], image: Image("Reshiram"),
-            image_shiny: Image("Reshiram"), evolution_chain_id: 2),
-        Pokemon2(
-            id: 3, name: "Mewtwo", description: "Psychic Pokémon", types: ["Psychic"],
-            weakTypes: ["Bug", "Ghost", "Dark"], weight: 122.0, height: 2.0,
-            stats: ["hp": 106, "speed": 130], image: Image("Mewtwo"),
-            image_shiny: Image("Mewtwo"), evolution_chain_id: 3),
-        Pokemon2(
-            id: 1, name: "Zekrom", description: "Dragon/Electric Pokémon", types: ["Dragon", "Electric"],
-            weakTypes: ["Ice", "Fairy", "Dragon", "Ground"], weight: 345.0, height: 2.9,
-            stats: ["hp": 100, "speed": 90], image: Image("Zekrom"),
-            image_shiny: Image("Zekrom"), evolution_chain_id: 1),
-        Pokemon2(
-            id: 2, name: "Reshiram", description: "Dragon/Fire Pokémon", types: ["Dragon", "Fire"],
-            weakTypes: ["Rock", "Ground", "Dragon"], weight: 330.0, height: 3.2,
-            stats: ["hp": 100, "speed": 90], image: Image("Reshiram"),
-            image_shiny: Image("Reshiram"), evolution_chain_id: 2),
-        Pokemon2(
-            id: 3, name: "Mewtwo", description: "Psychic Pokémon", types: ["Psychic"],
-            weakTypes: ["Bug", "Ghost", "Dark"], weight: 122.0, height: 2.0,
-            stats: ["hp": 106, "speed": 130], image: Image("Mewtwo"),
-            image_shiny: Image("Mewtwo"), evolution_chain_id: 3)
-    ]
-            , campoBatalla: "fondoCombateHierba")
+#Preview {
+    Combate(
+        pokemonsUsuario: [
+            // Equipo modificado
+            Pokemon2(
+                id: 1, name: "Zekrom", description: "Dragon/Electric Pokémon",
+                types: ["Dragon", "Electric"],
+                weakTypes: ["Ice", "Fairy", "Dragon", "Ground"], weight: 345.0, height: 2.9,
+                stats: ["hp": 100, "speed": 90], image: Image("Zekrom"),
+                image_shiny: Image("Zekrom"), evolution_chain_id: 1),
+            Pokemon2(
+                id: 2, name: "Reshiram", description: "Dragon/Fire Pokémon",
+                types: ["Dragon", "Fire"],
+                weakTypes: ["Rock", "Ground", "Dragon"], weight: 330.0, height: 3.2,
+                stats: ["hp": 100, "speed": 90], image: Image("Reshiram"),
+                image_shiny: Image("Reshiram"), evolution_chain_id: 2),
+            Pokemon2(
+                id: 3, name: "Mewtwo", description: "Psychic Pokémon", types: ["Psychic"],
+                weakTypes: ["Bug", "Ghost", "Dark"], weight: 122.0, height: 2.0,
+                stats: ["hp": 106, "speed": 130], image: Image("Mewtwo"),
+                image_shiny: Image("Mewtwo"), evolution_chain_id: 3),
+            Pokemon2(
+                id: 1, name: "Zekrom", description: "Dragon/Electric Pokémon",
+                types: ["Dragon", "Electric"],
+                weakTypes: ["Ice", "Fairy", "Dragon", "Ground"], weight: 345.0, height: 2.9,
+                stats: ["hp": 100, "speed": 90], image: Image("Zekrom"),
+                image_shiny: Image("Zekrom"), evolution_chain_id: 1),
+            Pokemon2(
+                id: 2, name: "Reshiram", description: "Dragon/Fire Pokémon",
+                types: ["Dragon", "Fire"],
+                weakTypes: ["Rock", "Ground", "Dragon"], weight: 330.0, height: 3.2,
+                stats: ["hp": 100, "speed": 90], image: Image("Reshiram"),
+                image_shiny: Image("Reshiram"), evolution_chain_id: 2),
+            Pokemon2(
+                id: 3, name: "Mewtwo", description: "Psychic Pokémon", types: ["Psychic"],
+                weakTypes: ["Bug", "Ghost", "Dark"], weight: 122.0, height: 2.0,
+                stats: ["hp": 106, "speed": 130], image: Image("Mewtwo"),
+                image_shiny: Image("Mewtwo"), evolution_chain_id: 3),
+        ], campoBatalla: "fondoCombateHierba")
 }
-
-
-
-
 
 //
 //  PokedexApp.swift
