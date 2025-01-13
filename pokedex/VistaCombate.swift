@@ -83,9 +83,28 @@ struct VistaCombate: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
+                    HStack {
+                        Button(action: {
+                            // Acción para volver atrás
+                            // Deja que el NavigationView maneje automáticamente el retroceso.
+                            if let window = UIApplication.shared.windows.first {
+                                let rootView = vistaMenu()
+                                window.rootViewController = UIHostingController(rootView: rootView)
+                                window.makeKeyAndVisible()
+                            }
+                        }) {
+                            Image(systemName: "chevron.left")
+                                .foregroundColor(.blue)
+                            Text("Atrás")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+                ToolbarItem(placement: .principal) {
                     Text("Combate")
                         .font(.custom("Press Start 2P Regular", size: 24))
                         .foregroundColor(.black)
+                        .padding()
                 }
             }
         }
