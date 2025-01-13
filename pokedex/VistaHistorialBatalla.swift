@@ -40,6 +40,7 @@ struct VistaHistorialBatalla: View {
             // Botón flotante en el centro
             floatingButton
         }
+        .navigationBarBackButtonHidden(true)
     }
     class PokemonViewModel: ObservableObject {
         @Published var pokemon: Pokemon2?

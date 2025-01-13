@@ -28,6 +28,7 @@ struct VistaBusquedaElegir: View {
 
             // Barra de búsqueda
             BusquedaView(text: $query)
+                .padding(.leading,-50)
                 .onChange(of: query) { newValue in
                     log = newValue // Sincronizamos `log` con el contenido actual de la barra de búsqueda
                     buscar()       // Ejecutamos el método `buscar`

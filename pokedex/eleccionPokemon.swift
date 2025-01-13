@@ -55,14 +55,14 @@ struct eleccionPokemon: View {
     @Environment(\.presentationMode) var presentationMode
     @State var contrincante: Bool
     @State private var apiCalls = ApiCalls()
-
+    
     @State private var pokemonsUsuario: [Pokemon2?] = Array(repeating: nil, count: 6)
     var pokemonActual: Pokemon2
-
+    
     @State private var showAlert = false
     @State private var loadingEnemyPokemons = false
     @State private var loadingOpacity = 0.0
-
+    
     var body: some View {
         ZStack {
             VStack {
@@ -86,7 +86,7 @@ struct eleccionPokemon: View {
                     Spacer()
                 }
                 .padding(.top, 20)
-
+                
                 VStack {
                     Text("Elección")
                         .font(.custom("Press Start 2P Regular", size: 24))
@@ -97,38 +97,39 @@ struct eleccionPokemon: View {
                 }
                 .padding(.top, 20)
                 .padding(.bottom, 80)
-
+                
                 HStack {
                     pokemonRow(startIndex: 0, endIndex: 3)
                 }
                 .padding()
-
+                
                 Text("VS")
                     .font(.custom("Press Start 2P Regular", size: 24))
                     .foregroundColor(.black)
                     .padding()
-
+                
                 HStack {
                     pokemonRow(startIndex: 3, endIndex: 6)
                 }
                 .padding()
-
+                
                 Spacer()
-
+                
                 if !contrincante {
                     Button(action: elegirAleatorios) {
-                        Text("Elegir aleatorios")
+                        Text("Aleatorio")
                             .font(.custom("Press Start 2P Regular", size: 12))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(red: 67 / 255, green: 67 / 255, blue: 67 / 255))
                             .padding()
-                            .background(Color.blue)
+                            .background(Color(red: 238 / 255, green: 238 / 255, blue: 238 / 255))
                             .cornerRadius(10)
+                            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 4)
                     }
                     .padding(.bottom, 20)
                 }
-
+                
                 HStack {
-                    Button(action: resetPokemons) {
+                   /* Button(action: resetPokemons) {
                         Text("Reset")
                             .font(.custom("Press Start 2P Regular", size: 16))
                             .foregroundColor(.white)
@@ -136,10 +137,10 @@ struct eleccionPokemon: View {
                             .background(Color.red)
                             .cornerRadius(10)
                     }
-                    .padding(.leading, 20)
-
+                    .padding(.leading, 20)*/
+                    
                     Spacer()
-
+                    
                     Button(action: {
                         var empty = 0
                         for i in 0..<3 {
@@ -158,12 +159,14 @@ struct eleccionPokemon: View {
                             }
                         }
                     }) {
-                        Image(systemName: "arrow.right.circle.fill")
-                            .resizable()
-                            .frame(width: 50, height: 50)
-                            .foregroundColor(.blue)
+                        Text("Siguiente")
+                            .font(.custom("Press Start 2P Regular", size: 16))
+                            .foregroundColor(Color(red: 67 / 255, green: 67 / 255, blue: 67 / 255))
+                            .padding()
+                            .background(Color(red: 1.0, green: 0.8, blue: 0.00392156862745098))
+                            .cornerRadius(10)
                     }
-                    .padding(.trailing, 20)
+                    Spacer()
                 }
                 .padding(.bottom, 40)
             }
@@ -184,98 +187,96 @@ struct eleccionPokemon: View {
             }
         }
     }
-
+    
     @ViewBuilder
-    private func pokemonRow(startIndex: Int, endIndex: Int) -> some View {
-        ForEach(startIndex..<endIndex, id: \.self) { hueco in
-            if let pokemon = pokemonsUsuario[hueco] {
-                pokemon.image
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 90, height: 90)
-                    .cornerRadius(10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray, lineWidth: 2)
-                    )
-                    .shadow(radius: 10)
-            } else {
-                if loadingEnemyPokemons && hueco >= 3 && !contrincante {
-                    Color.gray.opacity(0.2)
+        private func pokemonRow(startIndex: Int, endIndex: Int) -> some View {
+            ForEach(startIndex..<endIndex, id: \.self) { hueco in
+                if let pokemon = pokemonsUsuario[hueco] {
+                    pokemon.image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
                         .frame(width: 90, height: 90)
                         .cornerRadius(10)
-                        .overlay(
-                            PokebolaGiratoriaView()
-                                .scaleEffect(0.8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(red: 238 / 255, green: 238 / 255, blue: 238 / 255))
                         )
-                } else {
-                    NavigationLink(
-                        destination: VistaBusquedaElegir(onPokemonSelected: { selectedPokemon in
-                            pokemonsUsuario[hueco] = selectedPokemon
-                        })
-                    ) {
-                        Image("PulsaParaElegir")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
+                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 4)                } else {
+                    if loadingEnemyPokemons && hueco >= 3 && !contrincante {
+                        Color.gray.opacity(0.2)
                             .frame(width: 90, height: 90)
                             .cornerRadius(10)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.gray, lineWidth: 2)
+                                PokebolaGiratoriaView()
+                                    .scaleEffect(0.8)
                             )
-                            .shadow(radius: 10)
+                    } else {
+                        NavigationLink(
+                            destination: VistaBusquedaElegir(onPokemonSelected: { selectedPokemon in
+                                pokemonsUsuario[hueco] = selectedPokemon
+                            })
+                        ) {
+                            Image("PulsaParaElegir")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 90, height: 90)
+                                .cornerRadius(10)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color(red: 238 / 255, green: 238 / 255, blue: 238 / 255))
+                                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 4)                                )
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                    .buttonStyle(PlainButtonStyle())
                 }
             }
         }
-    }
 
-    private func handleOnAppear() {
-        if pokemonActual.id != -1 && pokemonActual.id != 0 {
-            if let index = pokemonsUsuario.firstIndex(where: { $0 == nil }) {
-                pokemonsUsuario[index] = pokemonActual
-            }
-        }
-
-        if !contrincante && pokemonsUsuario[3..<6].allSatisfy({ $0 == nil }) {
-            elegirAleatorios()
-        }
-    }
-
-    private func resetPokemons() {
-        for index in 0..<(contrincante ? 6 : 3) {
-            pokemonsUsuario[index] = nil
-        }
-    }
-
-    private func elegirAleatorios() {
-        let pokemonIds = (1...1025).shuffled().prefix(3)
-        let group = DispatchGroup()
-        var randomPokemons: [Pokemon2?] = []
-
-        loadingEnemyPokemons = true
-
-        for id in pokemonIds {
-            group.enter()
-            Task {
-                do {
-                    let pokemon = await apiCalls.pokemonPorId(id: id)
-                    randomPokemons.append(pokemon)
-                } catch {
-                    print("Error al obtener Pokémon aleatorio: \(error)")
-                }
-                group.leave()
-            }
-        }
-
-        group.notify(queue: .main) {
-            for (index, pokemon) in randomPokemons.enumerated() {
-                if 3 + index < pokemonsUsuario.count {
-                    pokemonsUsuario[3 + index] = pokemon
+        private func handleOnAppear() {
+            if pokemonActual.id != -1 && pokemonActual.id != 0 {
+                if let index = pokemonsUsuario.firstIndex(where: { $0 == nil }) {
+                    pokemonsUsuario[index] = pokemonActual
                 }
             }
-            loadingEnemyPokemons = false
+
+            if !contrincante && pokemonsUsuario[3..<6].allSatisfy({ $0 == nil }) {
+                elegirAleatorios()
+            }
+        }
+
+        private func resetPokemons() {
+            for index in 0..<(contrincante ? 6 : 3) {
+                pokemonsUsuario[index] = nil
+            }
+        }
+
+        private func elegirAleatorios() {
+            let pokemonIds = (1...1025).shuffled().prefix(3)
+            let group = DispatchGroup()
+            var randomPokemons: [Pokemon2?] = []
+
+            loadingEnemyPokemons = true
+
+            for id in pokemonIds {
+                group.enter()
+                Task {
+                    do {
+                        let pokemon = await apiCalls.pokemonPorId(id: id)
+                        randomPokemons.append(pokemon)
+                    } catch {
+                        print("Error al obtener Pokémon aleatorio: \(error)")
+                    }
+                    group.leave()
+                }
+            }
+
+            group.notify(queue: .main) {
+                for (index, pokemon) in randomPokemons.enumerated() {
+                    if 3 + index < pokemonsUsuario.count {
+                        pokemonsUsuario[3 + index] = pokemon
+                    }
+                }
+                loadingEnemyPokemons = false
+            }
         }
     }
-}

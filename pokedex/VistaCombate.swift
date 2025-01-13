@@ -13,10 +13,21 @@ struct VistaCombate: View {
                         .foregroundColor(.black)
                         .padding(.leading)
                         .padding(.bottom, 30)
-
+                    
                     Spacer()
+                    
+                    NavigationLink(
+                        destination: VistaHistorialBatalla(userId: obtenerUserIdDesdeLocalStorage())
+                    ) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 24))
+                            .foregroundColor(.black)
+                            .padding(.trailing)
+                            .padding(.bottom, 30)
+                    }
                 }
                 .padding(.top)
+                
 
                 // Contenedor principal con centering y spacing reducido
                 VStack(spacing: 20) {
@@ -50,13 +61,12 @@ struct VistaCombate: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(.systemBackground))
                         .cornerRadius(10)
-                        .overlay(
+                        .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.gray, lineWidth: 2)
+                                .fill(Color(red: 238 / 255, green: 238 / 255, blue: 238 / 255))
+                                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 4)
                         )
-                        .shadow(radius: 5)
                     }
 
                     NavigationLink(
@@ -96,13 +106,12 @@ struct VistaCombate: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(.systemBackground))
                         .cornerRadius(10)
-                        .overlay(
+                        .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.gray, lineWidth: 2)
+                                .fill(Color(red: 238 / 255, green: 238 / 255, blue: 238 / 255))
+                                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 4)
                         )
-                        .shadow(radius: 5)
                     }
                 }
                 .padding(.horizontal)
@@ -125,16 +134,6 @@ struct VistaCombate: View {
                 //         .foregroundColor(.blue)
                 //     }
                 // }
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(
-                        destination: VistaHistorialBatalla(userId: obtenerUserIdDesdeLocalStorage())
-                    ) {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .font(.system(size: 15))
-                            .foregroundColor(.blue)
-                    }
-                }
             }
         }
     }

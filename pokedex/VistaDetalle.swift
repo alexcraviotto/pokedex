@@ -41,7 +41,7 @@ struct VistaDetalle: View {
                             HStack(spacing: 2) {
                                 
                                 Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
-                                    .font(.title)
+                                    .font(.custom("Press Start 2P Regular", size: 18))
                                     .fontWeight(.bold)
                                 
                                 
@@ -82,7 +82,9 @@ struct VistaDetalle: View {
                 }
                 // Descripción y pestañas
                 Text(pokemon?.description ?? "Sin descripción disponible.")
-                    .font(.body).padding(.horizontal).multilineTextAlignment(.center)
+                    .font(.body)
+                    .padding(.horizontal)
+                    .multilineTextAlignment(.center)
                 
                 HStack {
                     ForEach(Tab.allCases, id: \.self) { tab in

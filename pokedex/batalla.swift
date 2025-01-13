@@ -324,6 +324,7 @@ struct Combate: View {
 
             VStack {
                 Spacer()
+                // Barra de vida del equipo 1
                 ZStack {
                     Image("cuadroVida")
                         .resizable()
@@ -338,29 +339,28 @@ struct Combate: View {
                                 .offset(x: -50, y: -20)
 
                             Text("HP:\(hpTeam1)/\(calcularVida(team: team1))")
-                                .font(.custom("Press Start 2P Regular", size: 10)).foregroundColor(
-                                    .black
-                                )
+                                .font(.custom("Press Start 2P Regular", size: 10))
+                                .foregroundColor(.black)
                                 .offset(x: -50, y: -20)
                         }
                         ZStack(alignment: .leading) {
-                            // Fondo de la barra
                             RoundedRectangle(cornerRadius: 6)
-                                .frame(width: 172, height: 19)  // Ancho y alto de la barra
-                                .foregroundColor(.gray.opacity(0.3))  // Color de fondo de la barra
+                                .frame(width: 172, height: 19)
+                                .foregroundColor(.gray.opacity(0.3))
 
-                            // Progreso actual
                             RoundedRectangle(cornerRadius: 6)
                                 .frame(
-                                    width: CGFloat(hpTeam1) / CGFloat(calcularVida(team: team1))
-                                        * 172, height: 19
-                                )  // Calcula la proporción
-                                .foregroundColor(.green)  // Color del progreso
+                                    width: CGFloat(hpTeam1) / CGFloat(calcularVida(team: team1)) * 172,
+                                    height: 19
+                                )
+                                .foregroundColor(.green)
                         }
                         .offset(x: 41, y: -6)
-
                     }
                 }
+
+                Spacer()
+                // Zona de equipo 1
                 ZStack {
                     Image(posicion)
                         .resizable()
@@ -378,12 +378,12 @@ struct Combate: View {
                 }
 
                 Spacer()
+                // Zona de equipo 2
                 ZStack {
                     Image(posicion)
                         .resizable()
                         .scaledToFit()
                         .offset(y: 20)
-                    // Pokémon del equipo 2
                     HStack(spacing: 20) {
                         ForEach(team2.indices, id: \.self) { index in
                             team2[index].image
@@ -395,74 +395,43 @@ struct Combate: View {
                     }
                     .padding(.bottom, 15)
                 }
+
                 Spacer()
+                // Barra de vida del equipo 2
                 ZStack {
                     Image("cuadroVida")
                         .resizable()
                         .scaledToFit()
 
                     VStack {
-                        // Nombre del entrenador o Pokémon
                         HStack {
                             Text("Paco")
-                                .font(.custom("Press Start 2P Regular", size: 20)).foregroundColor(
-                                    .black
-                                )
+                                .font(.custom("Press Start 2P Regular", size: 20))
+                                .foregroundColor(.black)
                                 .offset(x: -50, y: -20)
 
                             Text("HP:\(hpTeam2)/\(calcularVida(team: team2))")
-                                .font(.custom("Press Start 2P Regular", size: 10)).foregroundColor(
-                                    .black
-                                )
+                                .font(.custom("Press Start 2P Regular", size: 10))
+                                .foregroundColor(.black)
                                 .offset(x: -50, y: -20)
                         }
                         ZStack(alignment: .leading) {
-                            // Fondo de la barra
                             RoundedRectangle(cornerRadius: 6)
-                                .frame(width: 172, height: 19)  // Ancho y alto de la barra
-                                .foregroundColor(.gray.opacity(0.3))  // Color de fondo de la barra
+                                .frame(width: 172, height: 19)
+                                .foregroundColor(.gray.opacity(0.3))
 
-                            // Progreso actual
                             RoundedRectangle(cornerRadius: 6)
                                 .frame(
-                                    width: CGFloat(hpTeam2) / CGFloat(calcularVida(team: team2))
-                                        * 172, height: 19
-                                )  // Calcula la proporción
-                                .foregroundColor(.green)  // Color del progreso
+                                    width: CGFloat(hpTeam2) / CGFloat(calcularVida(team: team2)) * 172,
+                                    height: 19
+                                )
+                                .foregroundColor(.green)
                         }
                         .offset(x: 41, y: -6)
+                    }
+                }
 
-                    }
-                }
                 Spacer()
-                // Botón de acción
-                Button(action: {
-                    if fin {
-                        let userId = obtenerUserIdDesdeLocalStorage()
-                        if let window = UIApplication.shared.windows.first {
-                            let rootView = VistaHistorialBatalla(
-                                userId: userId)
-                            window.rootViewController = UIHostingController(rootView: rootView)
-                            window.makeKeyAndVisible()
-                        }
-                    } else {
-                        realizarTurno()
-                    }
-                }) {
-                    Text(
-                        currentTurn == 1
-                            ? "¡A luchar!"
-                            : (!fin ? "Turno actual: \(currentTurn-1)" : "Fin del combate")
-                    )
-                    .font(.headline)
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 40)
-                }
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(10)
-                .shadow(radius: 5)
-                .padding(.top, 10)
                 // Cuadro de acción
                 ZStack {
                     Image("cuadroTextoCombate")
@@ -476,27 +445,42 @@ struct Combate: View {
                         .multilineTextAlignment(.center)
                         .padding(10)
                 }
-
             }
             .padding()
-            .onAppear {
-                team1 = pokemonsUsuario.compactMap { $0 }.prefix(3).map { $0 }
-                team2 = pokemonsUsuario.compactMap { $0 }.suffix(3).map { $0 }
-
-                hpTeam1 = calcularVida(team: team1)
-                hpTeam2 = calcularVida(team: team2)
-                calcularPrimerAtacante()
-
-                if attacker == 1 {
-                    log.append("Turno 0: Empieza el equipo 1, sus pokemons tienen mayor velocidad.")
-                } else {
-                    log.append("Turno 0: Empieza el equipo 2, sus pokemons tienen mayor velocidad.")
+        }
+        .onTapGesture {
+            if fin {
+                // Lógica para terminar el combate
+                let userId = obtenerUserIdDesdeLocalStorage()
+                if let window = UIApplication.shared.windows.first {
+                    let rootView = VistaHistorialBatalla(userId: userId)
+                    window.rootViewController = UIHostingController(rootView: rootView)
+                    window.makeKeyAndVisible()
                 }
-
-                cargarMovimientos()
+            } else {
+                // Lógica para avanzar el turno
+                realizarTurno()
             }
         }
+        .onAppear {
+            // Configuración inicial
+            team1 = pokemonsUsuario.compactMap { $0 }.prefix(3).map { $0 }
+            team2 = pokemonsUsuario.compactMap { $0 }.suffix(3).map { $0 }
+
+            hpTeam1 = calcularVida(team: team1)
+            hpTeam2 = calcularVida(team: team2)
+            calcularPrimerAtacante()
+
+            if attacker == 1 {
+                log.append("Turno 0: Empieza el equipo 1, sus pokemons tienen mayor velocidad.")
+            } else {
+                log.append("Turno 0: Empieza el equipo 2, sus pokemons tienen mayor velocidad.")
+            }
+
+            cargarMovimientos()
+        }
     }
+
 }
 
 #Preview {

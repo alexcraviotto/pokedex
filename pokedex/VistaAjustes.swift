@@ -97,25 +97,28 @@ struct VistaAjustes: View {
                         .modifier(TextFieldModifier())
                 }
 
+                Spacer()
+                
                 Button(action: actualizarDatos) {
                     Text("Actualizar Información")
+                        .font(.custom("Press Start 2P Regular", size: 12))
                         .modifier(ButtonModifier())
                 }
 
-                Spacer()
 
                 Button(action: {
                     confirmDelete.toggle()
                 }) {
                     Text("Eliminar Cuenta")
-                        .font(.headline)
-                        .foregroundColor(.red)
+                        .font(.custom("Press Start 2P Regular", size: 12))
+                        .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.white)
+                        .background(Color.red)
                         .cornerRadius(12)
                         .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
                         .padding(.horizontal, 24)
+                        .padding(.bottom, 24)
                 }
                 .alert(isPresented: $confirmDelete) {
                     Alert(
