@@ -47,6 +47,7 @@ struct Registro: View {
                     .cornerRadius(8)
                     .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
                     .padding(.horizontal, 40)
+                    .padding(.top, 10)
                     .autocapitalization(.none)
                 
                 // Campo Contraseña
@@ -68,7 +69,7 @@ struct Registro: View {
                     .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
                     .padding(.horizontal, 40)
                     .padding(.top, 10)
-                    .padding(.bottom, 80)
+                    .padding(.bottom, 40)
                 
                 Spacer()
                 

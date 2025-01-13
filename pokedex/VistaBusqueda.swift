@@ -36,6 +36,7 @@ struct VistaBusqueda: View {
                     }.padding()
 
                     BusquedaView(text: $query)
+                        .padding(.leading,-50)
                         .onChange(of: query) { newValue in
                                 log = newValue // Actualizamos la variable de estado `log`
                                 buscar()       // Llamamos al método buscar
@@ -61,7 +62,9 @@ struct VistaBusqueda: View {
                                 .fill(Color.gray.opacity(0.1))
                         )
                         .offset(CGSize(width: 40, height: 0))
+                        .padding(.leading,-25)
                         Spacer()
+                        
                     }
                     
                     ScrollView {

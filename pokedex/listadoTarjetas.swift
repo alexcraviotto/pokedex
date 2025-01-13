@@ -17,12 +17,16 @@ struct listadoTarjetas: View {
     
     // Incluimos el tipo de letra
     let font = Font.custom("Inter", size: 18)
-
+    
     var body: some View {
         NavigationView {
             VStack {
                 HStack {
-                    Image("Pokedex").scaledToFit().frame(height: 50)
+                    Text("Pokedex")
+                        .font(.custom("Press Start 2P Regular", size: 27))
+                        .foregroundColor(.black)
+                        .padding(.leading)
+                    
                     Spacer()
                     NavigationLink(
                         destination: FavoritesView(favoritePokemons: $favoritePokemons, loadFavoritePokemons: loadFavoritePokemons) // Pasar la función
@@ -81,76 +85,82 @@ struct listadoTarjetas: View {
             }
         }
     }
-
-    func carga() {
-        isLoading = true
-        var start = 0
-        if pokemons.count >= 1025 {
-            start = 10000 + countex * items
-            countex += 1
-        } else {
-            start = count * items
-            count += 1
-        }
-        start += 1
-        let end = start + items
-        for i in start..<end {
-            fetchPokemonData(pokemonId: i) { result in
-                switch result {
-                case .success(let pokemon):
-                    DispatchQueue.main.async {
-                        pokemons.append(pokemon)
-                    }
-                case .failure:
-                    break
-                }
-            }
-        }
-        pokemons = pokemons.sorted(by: { $0.id < $1.id })
-        isLoading = false
-    }
-}
-
-struct FavoritesView: View {
-    @Binding var favoritePokemons: [Pokemon] // Usamos Binding para que se actualice cada vez que se recarguen los favoritos
-    var loadFavoritePokemons: () -> Void // Pasamos la función como parámetro
     
-    let font = Font.custom("Inter", size: 18)
+    func carga() {
+           isLoading = true
+           var start = 0
+           if pokemons.count >= 1025 {
+               start = 10000 + countex * items
+               countex += 1
+           } else {
+               start = count * items
+               count += 1
+           }
+           start += 1
+           let end = start + items
+           for i in start..<end {
+               fetchPokemonData(pokemonId: i) { result in
+                   switch result {
+                   case .success(let pokemon):
+                       DispatchQueue.main.async {
+                           pokemons.append(pokemon)
+                       }
+                   case .failure:
+                       break
+                   }
+               }
+           }
+           pokemons = pokemons.sorted(by: { $0.id < $1.id })
+           isLoading = false
+       }
+   }
 
-    var body: some View {
-        HStack {
-            Text("Favoritos")
-                .font(.custom("Press Start 2P Regular", size: 24))
-                .foregroundColor(.black)
-            Spacer()
-        }.padding()
-        VStack {
-            if favoritePokemons.isEmpty {
-                Text("Aún no tienes Pokémon favoritos.")
-                    .font(.title2)
-                    .padding()
-            } else {
-                ScrollView {
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 20) {
-                        ForEach(favoritePokemons) { pokemon in
-                            PokemonTarjeta2(pokemon: pokemon)
-                                .scaleEffect(0.9)
-                        }
-                    }
-                }
-            }
-        }
-        .padding()
-        .font(font)
-        .onAppear {
-            loadFavoritePokemons()
-        }
-    }
-}
+   struct FavoritesView: View {
+       @Binding var favoritePokemons: [Pokemon] // Usamos Binding para que se actualice cada vez que se recarguen los favoritos
+       var loadFavoritePokemons: () -> Void // Pasamos la función como parámetro
+       
+       let font = Font.custom("Inter", size: 18)
 
-#Preview {
-    listadoTarjetas()
-}
+       var body: some View {
+           HStack {
+               Text("Favoritos")
+                   .font(.custom("Press Start 2P Regular", size: 24))
+                   .foregroundColor(.black)
+               Spacer()
+           }.padding()
+           VStack {
+               if favoritePokemons.isEmpty {
+                   Text("Aún no tienes Pokémon favoritos.")
+                       .font(.title2)
+                       .padding()
+               } else {
+                   ScrollView {
+                       LazyVGrid(columns: [
+                           GridItem(.flexible()),
+                           GridItem(.flexible())
+                       ], spacing: 20) {
+                           ForEach(favoritePokemons) { pokemon in
+                               NavigationLink(
+                                   destination: VistaDetalle(id: pokemon.id)
+                               ) {
+                                   PokemonTarjeta2(pokemon: pokemon)
+                                       .scaleEffect(0.9)
+                               }
+                               .zIndex(0)
+                               .buttonStyle(PlainButtonStyle()) // Previene el estilo predeterminado del NavigationLink
+                           }
+                       }
+                   }
+               }
+           }
+           .padding()
+           .font(font)
+           .onAppear {
+               loadFavoritePokemons()
+           }
+       }
+   }
+
+   #Preview {
+       listadoTarjetas()
+   }
