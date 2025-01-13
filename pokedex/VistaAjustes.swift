@@ -161,6 +161,9 @@ struct VistaAjustes: View {
         if password != passwordInicial {
             viewModel.actualizarUsuario(userId: userId, newUsername: nil, newEmail: nil, newPassword: password, avatar: selectedAvatar)
         }
+        
+        viewModel.actualizarUsuario(userId: userId, newUsername: nil, newEmail: nil, newPassword: nil, avatar: selectedAvatar)
+        
     }
 
     private func eliminarUsuario() {
