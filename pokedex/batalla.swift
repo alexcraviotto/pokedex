@@ -438,9 +438,11 @@ struct Combate: View {
                 // Botón de acción
                 Button(action: {
                     if fin {
+                        let userId = obtenerUserIdDesdeLocalStorage()
                         if let window = UIApplication.shared.windows.first {
-                            window.rootViewController = UIHostingController(
-                                rootView: VistaCombate())
+                            let rootView = VistaHistorialBatalla(
+                                userId: userId)
+                            window.rootViewController = UIHostingController(rootView: rootView)
                             window.makeKeyAndVisible()
                         }
                     } else {

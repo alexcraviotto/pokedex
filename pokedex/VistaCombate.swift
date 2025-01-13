@@ -1,11 +1,24 @@
 import SwiftUI
 
 struct VistaCombate: View {
-    @State private var contrincante: Bool = false  // Si es false, combate contra la IA. Si es true, combate multijugador.
+    @State private var contrincante: Bool = false
 
     var body: some View {
         NavigationView {
             VStack {
+                // Título alineado a la izquierda
+                HStack {
+                    Text("Combate")
+                        .font(.custom("Press Start 2P Regular", size: 24))
+                        .foregroundColor(.black)
+                        .padding(.leading)
+                        .padding(.bottom, 30)
+
+                    Spacer()
+                }
+                .padding(.top)
+
+                // Contenedor principal con centering y spacing reducido
                 VStack(spacing: 20) {
                     NavigationLink(
                         destination: eleccionPokemon(
@@ -28,18 +41,23 @@ struct VistaCombate: View {
                         VStack(spacing: 20) {
                             Image("Mewtwo")
                                 .renderingMode(.original)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 120)
                             Text("Contra la IA")
                                 .font(.custom("Press Start 2P Regular", size: 16))
                                 .foregroundColor(.black)
                         }
-                        .frame(width: 330, height: 190)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.gray, lineWidth: 2)
+                        )
+                        .shadow(radius: 5)
                     }
-                    .padding()
-                    .cornerRadius(10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray, lineWidth: 2)
-                    ).shadow(radius: 10)
 
                     NavigationLink(
                         destination: eleccionPokemon(
@@ -63,48 +81,59 @@ struct VistaCombate: View {
                             HStack(spacing: 10) {
                                 Image("Zekrom")
                                     .renderingMode(.original)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 120)
                                 Image("Reshiram")
                                     .renderingMode(.original)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 120)
                             }
                             Text("Multijugador")
                                 .font(.custom("Press Start 2P Regular", size: 16))
                                 .foregroundColor(.black)
                         }
-                        .frame(width: 330, height: 190)
+                        .frame(maxWidth: .infinity)
                         .padding()
+                        .background(Color(.systemBackground))
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.gray, lineWidth: 2)
                         )
+                        .shadow(radius: 5)
                     }
-                    .shadow(radius: 10)
                 }
+                .padding(.horizontal)
+
+                Spacer()
             }
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    HStack {
-                        Button(action: {
-                            // Acción para volver atrás
-                            // Deja que el NavigationView maneje automáticamente el retroceso.
-                            if let window = UIApplication.shared.windows.first {
-                                let rootView = vistaMenu()
-                                window.rootViewController = UIHostingController(rootView: rootView)
-                                window.makeKeyAndVisible()
-                            }
-                        }) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.blue)
-                            Text("Atrás")
-                                .foregroundColor(.blue)
-                        }
+                // ToolbarItem(placement: .navigationBarLeading) {
+                //     Button(action: {
+                //         if let window = UIApplication.shared.windows.first {
+                //             let rootView = vistaMenu()
+                //             window.rootViewController = UIHostingController(rootView: rootView)
+                //             window.makeKeyAndVisible()
+                //         }
+                //     }) {
+                //         HStack {
+                //             Image(systemName: "chevron.left")
+                //             Text("Atrás")
+                //         }
+                //         .foregroundColor(.blue)
+                //     }
+                // }
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(
+                        destination: VistaHistorialBatalla(userId: obtenerUserIdDesdeLocalStorage())
+                    ) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 15))
+                            .foregroundColor(.blue)
                     }
-                }
-                ToolbarItem(placement: .principal) {
-                    Text("Combate")
-                        .font(.custom("Press Start 2P Regular", size: 24))
-                        .foregroundColor(.black)
-                        .padding()
                 }
             }
         }
