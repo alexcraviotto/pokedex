@@ -25,7 +25,7 @@ struct vistaMenu: View {
                     Text("Busqueda")
                 }
                 .tag(1)
-            
+            #if V2
             VistaCombate(
             )
             .tabItem {
@@ -34,7 +34,7 @@ struct vistaMenu: View {
             }
             .tag(2)
     
-
+            #endif
             
             VistaAjustes(
                 userId: userId,
