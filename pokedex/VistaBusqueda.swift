@@ -84,9 +84,6 @@ struct VistaBusqueda: View {
                         }
                     }
                     .onChange(of: tipoSeleccionado) { newValue in
-                        if filtrado.isEmpty {
-                            return
-                        }
                         buscar()
 
                     }
