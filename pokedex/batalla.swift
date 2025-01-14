@@ -475,34 +475,6 @@ struct Combate: View {
                     }
                 }
                 Spacer()
-                // Botón de acción
-                Button(action: {
-                    if fin {
-                        let userId = obtenerUserIdDesdeLocalStorage()
-                        if let window = UIApplication.shared.windows.first {
-                            let rootView = VistaHistorialBatalla(
-                                userId: userId)
-                            window.rootViewController = UIHostingController(rootView: rootView)
-                            window.makeKeyAndVisible()
-                        }
-                    } else {
-                        realizarTurno()
-                    }
-                }) {
-                    Text(
-                        currentTurn == 1
-                        ? "¡A luchar!"
-                        : (!fin ? "Turno actual: \(currentTurn-1)" : "Fin del combate")
-                    )
-                    .font(.headline)
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 40)
-                }
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(10)
-                .shadow(radius: 5)
-                .padding(.top, 10)
                 // Cuadro de acción
                 ZStack {
                     Image("cuadroTextoCombate")
@@ -539,6 +511,19 @@ struct Combate: View {
                     reproducirMusica(url: battleMusicURL)
             }
         }
+        .onTapGesture {
+            if fin {
+                let userId = obtenerUserIdDesdeLocalStorage()
+                if let window = UIApplication.shared.windows.first {
+                    let rootView = VistaHistorialBatalla(
+                        userId: userId)
+                    window.rootViewController = UIHostingController(rootView: rootView)
+                    window.makeKeyAndVisible()
+                }
+            } else {
+                realizarTurno()
+            }
+        }
     }
     
     func reproducirMusica(url: URL) {
@@ -548,6 +533,7 @@ struct Combate: View {
     }
     
 }
+
 #Preview {
     Combate(
         pokemonsUsuario: [
