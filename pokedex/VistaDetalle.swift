@@ -28,39 +28,37 @@ struct VistaDetalle: View {
     
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                ZStack(alignment: .top) {
-                    RoundedRectangle(cornerRadius: 25)
-                        .fill(colorPicker(tipo: pokemon?.types.first ?? ""))
-                        .frame(height: 350)
-                        .offset(y: -100)
-                        .ignoresSafeArea()
-                    
-                    VStack(spacing: 10) {
-                        if let pokemon = pokemon {
-                            ZStack {
-                                // Imagen del Pokémon (normal o shiny)
-                                (isShiny ? pokemon.image_shiny : pokemon.image)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 350, height: 350)
-                                    .offset(y: -20)
-                                
-                                // Botón para alternar entre las imágenes
-                                Button(action: {
-                                    isShiny.toggle()
-                                }) {
-                                    Text("Shiny version")
-                                        .font(.custom("Press Start 2P Regular", size: 10))
-                                        .padding(10)
-                                        .background(Color.blue)
-                                        .foregroundColor(.white)
-                                        .clipShape(Capsule())
+            ScrollView {
+                VStack(spacing: 20) {
+                    ZStack(alignment: .top) {
+                        RoundedRectangle(cornerRadius: 25)
+                            .fill(colorPicker(tipo: pokemon?.types.first ?? ""))
+                            .frame(height: 350)
+                            .offset(y: -100)
+                            .ignoresSafeArea()
+                        
+                        VStack(spacing: 10) {
+                            if let pokemon = pokemon {
+                                ZStack(alignment: .topTrailing){
+                                    // Imagen del Pokémon (normal o shiny)
+                                    (isShiny ? pokemon.image_shiny : pokemon.image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 350, height: 350)
+                                        .offset(y: -20)
+                                    
+                                    // Botón para alternar entre las imágenes
+                                    Button(action: {
+                                        isShiny.toggle()
+                                    }) {
+                                        Image(isShiny ? "shiny_filled" : "shiny")
+                                            .resizable()
+                                            .scaledToFit()
+                                            
+                                    }
+                                    .frame(width: 35, height: 35)
+                                    
                                 }
-                                .frame(width: 150) // El botón es más grande para garantizar el área tocable
-                                .offset(x: 110, y: -165) // Desplaza el botón hacia la izquierda (x: -50)
-                            }
 
                             
                             
