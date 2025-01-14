@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct Inicio: View {
+    @StateObject private var musicPlayer = MusicPlayer()
+    let musicURL = URL(string: "https://kappa.vgmsite.com/soundtracks/pokemon-firered-leafgreen-music-super-complete/nixinsogwg/1-03.%20Title%20Screen.mp3")!
     var body: some View {
         NavigationView {
             NavigationLink(destination: navegarIniciarSession()) {
@@ -21,7 +23,15 @@ struct Inicio: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }.navigationBarHidden(true)
+            .onDisappear{
+                musicPlayer.detenerMusica()
+            }
+        }
+        .navigationBarHidden(true)
+        .onAppear{
+            musicPlayer.reproducirMusica(url: musicURL)
+        }
+       
     }
 }
 
