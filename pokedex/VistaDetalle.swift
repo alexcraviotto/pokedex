@@ -11,6 +11,8 @@ struct VistaDetalle: View {
     @State private var selectedTab: Tab = .about
     @State private var apiCalls = ApiCalls()
     @State private var isFavorite: Bool = false
+    @State private var isShiny: Bool = false // Nueva variable de estado para alternar imagen
+    
     
     enum Tab: String, CaseIterable {
         case about = "About"
@@ -29,28 +31,44 @@ struct VistaDetalle: View {
                         .offset(y: -100)
                         .ignoresSafeArea()
                     
-                    
                     VStack(spacing: 10) {
                         if let pokemon = pokemon {
-                            pokemon.image
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 350, height: 350)
-                                .offset(y: -30)
+                            ZStack {
+                                // Imagen del Pokémon (normal o shiny)
+                                (isShiny ? pokemon.image_shiny : pokemon.image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 350, height: 350)
+                                    .offset(y: -20)
+                                
+                                // Botón para alternar entre las imágenes
+                                Button(action: {
+                                    isShiny.toggle()
+                                }) {
+                                    Text("Shiny version")
+                                        .font(.custom("Press Start 2P Regular", size: 10))
+                                        .padding(10)
+                                        .background(Color.blue)
+                                        .foregroundColor(.white)
+                                        .clipShape(Capsule())
+                                }
+                                .frame(width: 150) // El botón es más grande para garantizar el área tocable
+                                .offset(x: 110, y: -185) // Desplaza el botón hacia la izquierda (x: -50)
+                            }
+
+                            
                             
                             HStack(spacing: 2) {
-                                
                                 Text("\(pokemon.name.capitalized) #\(String(format: "%04d", pokemon.id))")
                                     .font(.custom("Press Start 2P Regular", size: 18))
                                     .fontWeight(.bold)
                                 
-                                
-                                // Mover el botón de favoritos aquí
                                 Image(isFavorite ? "pokeheart_filled" : "pokeheart")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 40, height: 40)
-                                    .offset(y: 2)                                    .zIndex(1)
+                                    .offset(y: 2)
+                                    .zIndex(1)
                                     .onTapGesture {
                                         let userId: UUID = obtenerUserIdDesdeLocalStorage()
                                         var vm = ViewModel()
@@ -70,9 +88,12 @@ struct VistaDetalle: View {
                             HStack(spacing: 10) {
                                 ForEach(pokemon.types, id: \.self) { type in
                                     Text(type.capitalized)
-                                        .font(.caption).padding(.horizontal, 20).padding(.vertical, 6)
+                                        .font(.caption)
+                                        .padding(.horizontal, 20)
+                                        .padding(.vertical, 6)
                                         .background(colorPicker(tipo: type))
-                                        .foregroundColor(.white).clipShape(Capsule())
+                                        .foregroundColor(.white)
+                                        .clipShape(Capsule())
                                 }
                             }
                         } else {
@@ -80,6 +101,7 @@ struct VistaDetalle: View {
                         }
                     }
                 }
+                
                 // Descripción y pestañas
                 Text(pokemon?.description ?? "Sin descripción disponible.")
                     .font(.body)
