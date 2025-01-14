@@ -4,7 +4,7 @@ import SwiftUI
 struct PokedexApp: App {
     var body: some Scene {
         WindowGroup {
-            Inicio()
+            vistaMenu()
             /* WindowGroup {
               Inicio()
           }*/

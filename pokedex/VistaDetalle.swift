@@ -1,7 +1,13 @@
 import SwiftUI
+import AVFoundation
+import AVKit
+import OggDecoder
+
+
 
 struct VistaDetalle: View {
     var id: Int
+    @State var audioPlayer: AVAudioPlayer?
     @State private var pokemon: Pokemon2?
     @State private var evolutions: [(Pokemon2, String, Pokemon2)] = []
     @State private var movimientos: [(String, String, Int, Int)] = []
@@ -129,6 +135,8 @@ struct VistaDetalle: View {
             Task {
                 await cargarPokemon()
                 checkIfFavorite()
+                await reproducirSonidoPokemon(id: id)
+                
             }
         }
     }
@@ -138,6 +146,50 @@ struct VistaDetalle: View {
         let vm = ViewModel()
         isFavorite = vm.esPokemonFavorito(userId: userId, pokemonId: Int64(id))
     }
+    
+    func reproducirSonidoPokemon(id: Int) async {
+        do {
+            // Construimos la URL del sonido usando el ID del Pokémon
+            guard let soundURL = URL(string: "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/\(id).ogg") else {
+                print("Error: No se pudo construir la URL para el Pokémon con ID \(id).")
+                return
+            }
+            
+            // Descargamos el archivo desde la URL
+            let (data, _) = try await URLSession.shared.data(from: soundURL)
+            
+            // Guardamos el archivo en el directorio temporal como `.ogg`
+            let oggTempURL = FileManager.default.temporaryDirectory.appendingPathComponent("pokemon_\(id)_sound.ogg")
+            try data.write(to: oggTempURL)
+            
+            // Convertimos el archivo `.ogg` a `.wav` usando OggDecoder
+            let decoder = OGGDecoder()
+            decoder.decode(oggTempURL) { savedWavUrl in
+                guard let wavURL = savedWavUrl else {
+                    print("Error: Falló la conversión de OGG a WAV.")
+                    return
+                }
+                
+                // Reproducimos el archivo `.wav`
+                do {
+                    try self.reproducirSonidoDesdeArchivo(url: wavURL)
+                } catch {
+                    print("Error al reproducir el archivo convertido: \(error.localizedDescription)")
+                }
+            }
+        } catch {
+            print("Error al descargar o manejar el archivo: \(error.localizedDescription)")
+        }
+    }
+
+    func reproducirSonidoDesdeArchivo(url: URL) throws {
+        // Creamos el reproductor con el archivo `.wav`
+        audioPlayer = try AVAudioPlayer(contentsOf: url)
+        audioPlayer?.play()
+        print("Reproduciendo sonido desde el archivo convertido: \(url)")
+    }
+    
+    
     
     private var aboutContent: some View {
         VStack(alignment: .leading, spacing: 15) {

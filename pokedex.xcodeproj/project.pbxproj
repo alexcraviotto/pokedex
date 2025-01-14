@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3547237D2CF63579007D7261 /* PokemonAPI in Frameworks */ = {isa = PBXBuildFile; productRef = 3547237C2CF63579007D7261 /* PokemonAPI */; };
+		35656AC52D36E53C00C12D6F /* OggDecoder in Frameworks */ = {isa = PBXBuildFile; productRef = 35656AC42D36E53C00C12D6F /* OggDecoder */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3547237D2CF63579007D7261 /* PokemonAPI in Frameworks */,
+				35656AC52D36E53C00C12D6F /* OggDecoder in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +118,7 @@
 			name = pokedex;
 			packageProductDependencies = (
 				3547237C2CF63579007D7261 /* PokemonAPI */,
+				35656AC42D36E53C00C12D6F /* OggDecoder */,
 			);
 			productName = pokedex;
 			productReference = A9FBC7532CDA858100C4A0DF /* pokedex.app */;
@@ -202,6 +205,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				3547237B2CF63579007D7261 /* XCRemoteSwiftPackageReference "PokemonAPI" */,
+				35656AC32D36E53C00C12D6F /* XCRemoteSwiftPackageReference "OggDecoder" */,
 			);
 			productRefGroup = A9FBC7542CDA858100C4A0DF /* Products */;
 			projectDirPath = "";
@@ -1091,6 +1095,14 @@
 				minimumVersion = 6.1.1;
 			};
 		};
+		35656AC32D36E53C00C12D6F /* XCRemoteSwiftPackageReference "OggDecoder" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/arkasas/OggDecoder";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1098,6 +1110,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3547237B2CF63579007D7261 /* XCRemoteSwiftPackageReference "PokemonAPI" */;
 			productName = PokemonAPI;
+		};
+		35656AC42D36E53C00C12D6F /* OggDecoder */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 35656AC32D36E53C00C12D6F /* XCRemoteSwiftPackageReference "OggDecoder" */;
+			productName = OggDecoder;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
