@@ -53,7 +53,7 @@ struct VistaDetalle: View {
                                         .clipShape(Capsule())
                                 }
                                 .frame(width: 150) // El botón es más grande para garantizar el área tocable
-                                .offset(x: 110, y: -185) // Desplaza el botón hacia la izquierda (x: -50)
+                                .offset(x: 110, y: -165) // Desplaza el botón hacia la izquierda (x: -50)
                             }
 
                             

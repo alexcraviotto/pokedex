@@ -8,5 +8,17 @@
 		</array>
 		<key>UIUserInterfaceStyle</key>
 		<string>Light</string>
+
+		<key>CFBundleIcons</key>
+		<dict>
+			<key>CFBundlePrimaryIcon</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>AppIcon</string>
+				</array>
+			</dict>
+		</dict>
+
 	</dict>
 </plist>
