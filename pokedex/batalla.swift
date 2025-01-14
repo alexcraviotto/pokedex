@@ -1,15 +1,15 @@
 import SwiftUI
-
+import AVFoundation
 struct CamposBatalla {
     static let hierbaAlta: String = "fondoCombateHierba"
     static let desierto: String = "fondoCombateDesierto"
     static let altoMando: String = "fondoCombateAltoMando"
 }
-
 struct Combate: View {
     var pokemonsUsuario: [Pokemon2?]  // Lista de Pokémon personalizados por el usuario
     var campoBatalla: String  // Fondo del combate personalizado
     var posicion: String
+    @State var audioPlay: AVPlayer?
     @State private var apiCalls = ApiCalls()
     
     @StateObject private var gifLoader = GIFLoader()
@@ -534,14 +534,20 @@ struct Combate: View {
                 }
                 
                 cargarMovimientos()
+                
+                let battleMusicURL = URL(string: "https://eta.vgmtreasurechest.com/soundtracks/pokemon-game-boy-pok-mon-sound-complete-set-play-cd/wpfiaxpxan/1-07.%20Battle%20%28Vs.%20Wild%20Pok%C3%A9mon%29.mp3")!
+                    reproducirMusica(url: battleMusicURL)
             }
         }
     }
     
-    
+    func reproducirMusica(url: URL) {
+        audioPlay = AVPlayer(url: url)
+        audioPlay?.play()
+        print("Reproduciendo música desde: \(url)")
+    }
     
 }
-
 #Preview {
     Combate(
         pokemonsUsuario: [
@@ -582,10 +588,3 @@ struct Combate: View {
                 image_shiny: Image("Mewtwo"), evolution_chain_id: 3),
         ], campoBatalla: "fondoCombateHierba")
 }
-
-//
-//  PokedexApp.swift
-//  Pokedex
-//
-//  Created by Aula03 on 12/11/24.
-//

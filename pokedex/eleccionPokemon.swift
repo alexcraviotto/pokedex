@@ -1,27 +1,22 @@
 import SwiftUI
-
 struct PokebolaGiratoriaView: View {
     @State private var isRotating = false
     @State private var isScaling = false
-
     var body: some View {
         ZStack {
             // Fondo blanco circular
             Circle()
                 .fill(Color.white)
                 .frame(width: 50, height: 50)
-
             // Parte superior roja
             Circle()
                 .trim(from: 0, to: 0.5)
                 .fill(Color.red)
                 .frame(width: 50, height: 50)
-
             // Línea central
             Rectangle()
                 .fill(Color.black)
                 .frame(width: 50, height: 4)
-
             // Círculo central
             Circle()
                 .fill(Color.white)
@@ -50,7 +45,6 @@ struct PokebolaGiratoriaView: View {
         }
     }
 }
-
 struct eleccionPokemon: View {
     @Environment(\.presentationMode) var presentationMode
     @State var contrincante: Bool
@@ -231,30 +225,25 @@ struct eleccionPokemon: View {
                 }
             }
         }
-
         private func handleOnAppear() {
             if pokemonActual.id != -1 && pokemonActual.id != 0 {
                 if let index = pokemonsUsuario.firstIndex(where: { $0 == nil }) {
                     pokemonsUsuario[index] = pokemonActual
                 }
             }
-
             if !contrincante && pokemonsUsuario[3..<6].allSatisfy({ $0 == nil }) {
                 elegirAleatorios()
             }
         }
-
         private func resetPokemons() {
             for index in 0..<(contrincante ? 6 : 3) {
                 pokemonsUsuario[index] = nil
             }
         }
-
         private func elegirAleatorios() {
-            let pokemonIds = (1...1025).shuffled().prefix(3)
+            let pokemonIds = (1...800).shuffled().prefix(3)
             let group = DispatchGroup()
             var randomPokemons: [Pokemon2?] = []
-
             loadingEnemyPokemons = true
             
             /*Gifs enemigo*/
@@ -263,11 +252,9 @@ struct eleccionPokemon: View {
                 for id in pokemonIds {
                     if let gifURL = await apiCalls.gifPokemonFront(id: id), !gifURL.isEmpty {
                         validPokemonIds.append(id)
-                    }else {
                     }
                 }
             }
-
             for id in pokemonIds {
                 group.enter()
                 Task {
@@ -280,7 +267,6 @@ struct eleccionPokemon: View {
                     group.leave()
                 }
             }
-
             group.notify(queue: .main) {
                 for (index, pokemon) in randomPokemons.enumerated() {
                     if 3 + index < pokemonsUsuario.count {
