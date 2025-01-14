@@ -181,6 +181,8 @@ struct BusquedaView: View {
                     ? Color(UIColor.gray).opacity(0.6)
                     : Color(UIColor.gray).opacity(0.9))
             TextField("Buscar…", text: $text)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
             Button {
                 text = ""
             } label: {
