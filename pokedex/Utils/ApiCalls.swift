@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import WebKit
 
 class ApiCalls{
     
@@ -352,4 +353,85 @@ class ApiCalls{
             power: power
         )
     }
+    
+    
+    func gifPokemonFront(id: Int) async -> String? {
+        let endpoint = "pokemon/\(id)"
+        let pokemonData = await pokeApi(endpoint: endpoint)
+
+        if let sprites = pokemonData["sprites"] as? [String: Any],
+           let other = sprites["other"] as? [String: Any],
+           let showdown = other["showdown"] as? [String: Any], // Cambiado "official-artwork" a "showdown"
+           let gifURL = showdown["front_default"] as? String { // El campo correcto para el GIF
+            return gifURL
+        }
+        return nil
+    }
+    
+    func gifPokemonBack(id: Int) async -> String? {
+        let endpoint = "pokemon/\(id)"
+        let pokemonData = await pokeApi(endpoint: endpoint)
+
+        if let sprites = pokemonData["sprites"] as? [String: Any],
+           let other = sprites["other"] as? [String: Any],
+           let showdown = other["showdown"] as? [String: Any], // Cambiado "official-artwork" a "showdown"
+           let gifURL = showdown["back_default"] as? String { // El campo correcto para el GIF
+            return gifURL
+        }
+        return nil
+    }
+    
+    func PokemonBackImage(id: Int) async -> Image? {
+    let poke = await pokeApi(endpoint: "pokemon/\(id)")
+    var officialArtworkImage: String = ""
+    if let sprites = poke["sprites"] as? [String: Any]
+      {
+        officialArtworkImage = sprites["back_default"] as? String ?? ""
+    }
+    // Convertimos las URLs en imágenes
+    let image = Image(uiImage: UIImage(data: try! Data(contentsOf: URL(string: officialArtworkImage)!)) ?? UIImage())
+    return image
+    }
+
+    
 }
+
+class GIFLoader: ObservableObject {
+    @Published var gifURLs: [Int: String] = [:]
+    
+    func loadGIF(for pokemonID: Int, type: Int) async {
+        if type == 1 {
+            // Cargar GIF delantero
+            if let gifURL = await ApiCalls().gifPokemonFront(id: pokemonID) {
+                DispatchQueue.main.async {
+                    self.gifURLs[pokemonID] = gifURL
+                }
+            }
+        } else if type == 0 {
+            // Cargar GIF trasero
+            if let gifURL = await ApiCalls().gifPokemonBack(id: pokemonID) {
+                DispatchQueue.main.async {
+                    self.gifURLs[pokemonID] = gifURL
+                }
+            }
+        }
+    }
+}
+    
+    struct GIFView: UIViewRepresentable {
+        let gifURL: URL
+        
+        func makeUIView(context: Context) -> WKWebView {
+            let webView = WKWebView()
+            webView.scrollView.isScrollEnabled = false
+            webView.scrollView.bounces = false
+            webView.isOpaque = false
+            webView.backgroundColor = .clear
+            return webView
+        }
+        
+        func updateUIView(_ uiView: WKWebView, context: Context) {
+            let request = URLRequest(url: gifURL)
+            uiView.load(request)
+        }
+    }

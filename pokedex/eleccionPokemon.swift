@@ -256,6 +256,17 @@ struct eleccionPokemon: View {
             var randomPokemons: [Pokemon2?] = []
 
             loadingEnemyPokemons = true
+            
+            /*Gifs enemigo*/
+            Task {
+            var validPokemonIds: [Int] = []
+                for id in pokemonIds {
+                    if let gifURL = await apiCalls.gifPokemonFront(id: id), !gifURL.isEmpty {
+                        validPokemonIds.append(id)
+                    }else {
+                    }
+                }
+            }
 
             for id in pokemonIds {
                 group.enter()
