@@ -1,6 +1,15 @@
 {
-  "originHash" : "e523c10b530dad252968088fa950a1e7bf40ea747ec025e6b66365a1f0215fa4",
+  "originHash" : "05f86b724492092270c08ac90ce13948bd00d0e9e8101d68cef86252f7f952f5",
   "pins" : [
+    {
+      "identity" : "oggdecoder",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/arkasas/OggDecoder",
+      "state" : {
+        "branch" : "main",
+        "revision" : "65e1465e593d2b0be6ac12256f2866a18d26e211"
+      }
+    },
     {
       "identity" : "pokemonapi",
       "kind" : "remoteSourceControl",

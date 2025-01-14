@@ -394,6 +394,25 @@ class ApiCalls{
     }
 
     
+    func sonidoPokemonLatest(id: Int) async -> URL? {
+        let poke = await pokeApi(endpoint: "pokemon/\(id)")
+        var latestSoundURL: String = ""
+        
+        // Extraemos el campo "cries" y su subcampo "latest"
+        if let cries = poke["cries"] as? [String: Any] {
+            latestSoundURL = cries["latest"] as? String ?? ""
+        }
+        
+        // Convertimos la URL del sonido a una instancia de URL
+        if let url = URL(string: latestSoundURL) {
+            return url
+        }
+        
+        print("Error: No se encontró el sonido más reciente para el Pokémon con ID \(id).")
+        return nil
+    }
+
+    
 }
 
 class GIFLoader: ObservableObject {
