@@ -136,23 +136,45 @@ struct eleccionPokemon: View {
                     Spacer()
                     
                     Button(action: {
-                        var empty = 0
-                        for i in 0..<3 {
-                            if pokemonsUsuario[i]?.name == nil {
-                                empty += 1
+                        if !contrincante {
+                            var empty = 0
+                            for i in 0..<3 {
+                                if pokemonsUsuario[i]?.name == nil {
+                                    empty += 1
+                                }
                             }
-                        }
-                        if empty >= 3 {
-                            showAlert = true
+                            if empty >= 3 {
+                                showAlert = true
+                            } else {
+                                if let window = UIApplication.shared.windows.first {
+                                    let rootView = eleccionCampo(pokemonsUsuario: $pokemonsUsuario)
+                                    window.rootViewController = UIHostingController(
+                                        rootView: rootView)
+                                    window.makeKeyAndVisible()
+                                }
+                            }
                         } else {
-                            if let window = UIApplication.shared.windows.first {
-                                let rootView = eleccionCampo(pokemonsUsuario: $pokemonsUsuario)
-                                window.rootViewController = UIHostingController(
-                                    rootView: rootView)
-                                window.makeKeyAndVisible()
+                            // Lógica para asegurarse de que se hayan escogido 6 Pokémon
+                            var empty = 0
+                            for i in 0..<6 {
+                                if pokemonsUsuario[i]?.name == nil {
+                                    empty += 1
+                                }
+                            }
+                            if empty > 0 { // Si falta al menos un Pokémon
+                                showAlert = true
+                            } else {
+                                if let window = UIApplication.shared.windows.first {
+                                    let rootView = eleccionCampo(pokemonsUsuario: $pokemonsUsuario)
+                                    window.rootViewController = UIHostingController(
+                                        rootView: rootView)
+                                    window.makeKeyAndVisible()
+                                }
                             }
                         }
-                    }) {
+                    }
+                    )
+{
                         Text("Siguiente")
                             .font(.custom("Press Start 2P Regular", size: 16))
                             .foregroundColor(Color(red: 67 / 255, green: 67 / 255, blue: 67 / 255))
@@ -169,7 +191,7 @@ struct eleccionPokemon: View {
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text("Error"),
-                message: Text("Debes elegir al menos 3 Pokémon"),
+                message: Text("Debes elegir todos los pokemons"),
                 dismissButton: .default(Text("OK")))
         }
         .onAppear {
@@ -277,3 +299,4 @@ struct eleccionPokemon: View {
             }
         }
     }
+
