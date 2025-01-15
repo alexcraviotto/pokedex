@@ -335,7 +335,7 @@ struct Combate: View {
                     VStack {
                         // Nombre del entrenador o Pokémon
                         HStack {
-                            Text("Ramón")
+                            Text("P1")
                                 .font(.custom("Press Start 2P Regular", size: 20))
                                 .foregroundColor(.black)
                                 .offset(x: -50, y: -20)
@@ -444,7 +444,7 @@ struct Combate: View {
                     VStack {
                         // Nombre del entrenador o Pokémon
                         HStack {
-                            Text("Paco")
+                            Text("P2")
                                 .font(.custom("Press Start 2P Regular", size: 20)).foregroundColor(
                                     .black
                                 )
