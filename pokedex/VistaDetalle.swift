@@ -265,6 +265,7 @@ struct VistaDetalle: View {
             Text("Movimientos")
                 .font(.title2)
                 .fontWeight(.bold)
+                .padding(.horizontal)
             
             ScrollView {
                 LazyVStack(spacing: 15) {
@@ -306,7 +307,7 @@ struct VistaDetalle: View {
                             .padding(.top, 5)
                         }
                         .padding()
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color(UIColor.systemGray6))
                         .cornerRadius(10)
                         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
@@ -323,9 +324,11 @@ struct VistaDetalle: View {
                     }
                 }
                 .padding(.horizontal)
+                .frame(maxWidth: .infinity) // Asegura que el contenido no se desborde
             }
         }
-        .padding()
+        .padding(.horizontal)
+        .padding(.top)
         .onAppear {
             Task {
                 if moveNames.isEmpty {
@@ -338,6 +341,7 @@ struct VistaDetalle: View {
             }
         }
     }
+
     
     private func fetchMoreMoves() async {
         guard !isLoading else { return }
