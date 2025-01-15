@@ -61,7 +61,7 @@ struct eleccionPokemon: View {
         ZStack {
             VStack {
                 HStack {
-                    Button(action: {
+                    /*Button(action: {
                         // Acción para volver atrás
                         if let window = UIApplication.shared.windows.first {
                             let rootView = vistaMenu()
@@ -76,7 +76,7 @@ struct eleccionPokemon: View {
                                 .foregroundColor(.blue)
                         }
                     }
-                    .padding(.leading, 20)
+                    .padding(.leading, 20)*/
                     Spacer()
                 }
                 .padding(.top, 20)
@@ -165,7 +165,7 @@ struct eleccionPokemon: View {
                 .padding(.bottom, 40)
             }
         }
-        .navigationBarBackButtonHidden(true)
+        //.navigationBarBackButtonHidden(true)
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text("Error"),
