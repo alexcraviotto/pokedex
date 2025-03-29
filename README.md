@@ -14,31 +14,37 @@ Welcome to Pokedex! An immersive application crafted with Swift that allows you 
 <div align="center">
     <img src="media/main.gif" alt="Pokedex" width="300">
 </div>
+<br>
 
 2. **Pokémon data**: Get all the information about a Pokémon, from details about their attacks to their evolutionary line.
 <div align="center">
     <img src="media/data.gif" alt="Pokémon Data" width="300">
 </div>
+<br>
 
 3. **Pokémon Search**: Quickly search and filter Pokémon by name, type, or abilities.
 <div align="center">
     <img src="media/search.gif" alt="Pokémon Search" width="300">
 </div>
+<br>
 
 4. **Look for shinies and mark favourites**: Identify shiny Pokémon and mark your favorite ones to easily access them later.
 <div align="center">
-    <img src="media/search.gif" alt="Shiny and Favourites" width="300">
+    <img src="media/shinyAndFavorite.gif" alt="Shiny and Favourites" width="300">
 </div>
+<br>
 
 5. **Battle Simulator**: Simulate battles between Pokémon with dynamic animations and monitor your battle history to improve your strategies.
 <div align="center">
     <img src="media/fighting.gif" alt="Battle Simulator" width="300">
 </div>
+<br>
 
 6. **Battle Simulator**: Simulate battles between Pokémon with dynamic animations and monitor your battle history to improve your strategies.
 <div align="center">
     <img src="media/fighting.gif" alt="Battle Simulator" width="300">
 </div>
+<br>
 
 ## 📱 Installation
 
