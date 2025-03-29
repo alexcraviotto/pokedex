@@ -40,9 +40,9 @@ Welcome to Pokedex! An immersive application crafted with Swift that allows you 
 </div>
 <br>
 
-6. **Battle Simulator**: Simulate battles between Pokémon with dynamic animations and monitor your battle history to improve your strategies.
+6. **Settings**: Make your profile more unique choosing the profile picture that suits you the most. You can also change your username, email and password.
 <div align="center">
-    <img src="media/fighting.gif" alt="Battle Simulator" width="300">
+    <img src="media/settings.gif" alt="Battle Simulator" width="300">
 </div>
 <br>
 
