@@ -11,28 +11,34 @@ Welcome to Pokedex! An immersive application crafted with Swift that allows you 
 ## 🎮 Main Functions
 
 1. **Pokédex**: Keep track of the Pokémon all the creatures that have been released.
-
-<img src="media/main.gif" alt="Pokedex" width="400">
+<div align="center">
+    <img src="media/main.gif" alt="Pokedex" width="300">
+</div>
 
 2. **Pokémon data**: Get all the information about a Pokémon, from details about their attacks to their evolutionary line.
-
-<img src="media/data.gif" alt="Pokémon Data" width="400">
+<div align="center">
+    <img src="media/data.gif" alt="Pokémon Data" width="300">
+</div>
 
 3. **Pokémon Search**: Quickly search and filter Pokémon by name, type, or abilities.
-
-<img src="media/search.gif" alt="Pokémon Search" width="400">
+<div align="center">
+    <img src="media/search.gif" alt="Pokémon Search" width="300">
+</div>
 
 4. **Look for shinies and mark favourites**: Identify shiny Pokémon and mark your favorite ones to easily access them later.
-
-<img src="media/search.gif" alt="Shiny and Favourites" width="400">
+<div align="center">
+    <img src="media/search.gif" alt="Shiny and Favourites" width="300">
+</div>
 
 5. **Battle Simulator**: Simulate battles between Pokémon with dynamic animations and monitor your battle history to improve your strategies.
-
-<img src="media/fighting.gif" alt="Battle Simulator" width="400">
+<div align="center">
+    <img src="media/fighting.gif" alt="Battle Simulator" width="300">
+</div>
 
 6. **Battle Simulator**: Simulate battles between Pokémon with dynamic animations and monitor your battle history to improve your strategies.
-
-<img src="media/fighting.gif" alt="Battle Simulator" width="400">
+<div align="center">
+    <img src="media/fighting.gif" alt="Battle Simulator" width="300">
+</div>
 
 ## 📱 Installation
 
